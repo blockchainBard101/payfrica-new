@@ -1,7 +1,18 @@
+"use client";
 import Image from "next/image";
 import { LoginFeaturedImage, GoogleIcon, FacebookIcon, TwitchIcon, MicrosoftIcon } from "@/imports"; // Replace with actual image path
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { useRouter } from "next/navigation"; 
 
 export default function LoginPage() {
+    const router = useRouter();
+  const { isConnected, logout, redirectToAuthUrl, emailAddress, address } =
+    useCustomWallet();
+    // const isConnected = true;
+    if (isConnected) {
+      router.push("/dashboard");
+      return null;
+    }
     return (
         <div className="login-page-container">
             <div className="image-container">
@@ -10,7 +21,7 @@ export default function LoginPage() {
             <div className="login-container">
                 <div className="login-box">
                     <h2 className="login-title">Login</h2>
-                    <button className="login-button">
+                    <button className="login-button" onClick={redirectToAuthUrl}>
                         <img src={GoogleIcon.src} alt="Google" className="icon" />
                         Sign in with Google
                     </button>

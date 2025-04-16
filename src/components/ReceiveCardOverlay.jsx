@@ -6,14 +6,16 @@ import { BsQuestionCircleFill } from 'react-icons/bs';
 import { toPng } from 'html-to-image';
 import { useGlobalState } from '@/GlobalStateProvider';
 import { PayfricaCardBg, PayfricaNavLogo } from '@/imports';
-import PayfricaCardHeadImg from '@/assets/images/PayfricaCardHeadImg.jpg';
+import PayfricaCardHeadImg from '@/assets/Images/PayfricaCardHeadImg.jpg';
+import { useCustomWallet } from '@/contexts/CustomWallet';
 
 const ReceiveCardOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
     const cardRef = useRef(null);
+    const { address } = useCustomWallet();
 
-    const qrValue = '@teamsushi.payfrica';
-    const payfricaID = '56y5437894hghf5';
+    const qrValue = address;
+    const payfricaID = 'Payfrica Wallet';
 
     const downloadCard = () => {
         if (cardRef.current) {
@@ -67,7 +69,7 @@ const ReceiveCardOverlay = () => {
                                 </div>
                             </div>
                             <p className="tagline">No Network, No Wahala</p>
-                            <p className="pay-id">Payfrica ID: {payfricaID}</p>
+                            <p className="pay-id">{payfricaID}</p>
                         </div>
                     </div>
 

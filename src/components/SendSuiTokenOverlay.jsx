@@ -17,7 +17,7 @@ const SendSuiTokenOverlay = () => {
                     <IoIosCloseCircleOutline className="close-icon" onClick={() => toggleOverlay('sendSuiToken')} />
                 </div>
                 <div className="overlay-options">
-                    <div className="option" onClick={() => { toggleOverlay('payfricaPadiSui'); toggleOverlay('sendSuiToken') }}>
+                    <div className="option" onClick={() => { toggleOverlay('payfricaPadiSui'); toggleOverlay('enterSuiAmount') }}>
                         <FaPaperPlane />
                         <div>
                             <h3>To Payfrica Padi</h3>
