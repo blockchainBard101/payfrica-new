@@ -1,7 +1,7 @@
 import { client } from "@/config/suiClient";
 
 const countries_token = {
-    "Nigeria": "0x6ef57f046c9ee96108c6309843f5d2611befb0aec7f12371cef1c6aca66a83db::ngnc::NGNC",
+    "Nigeria": "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::ngnc::NGNC",
     "Ghana" : "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ngnc::NGNC"
 }
 
@@ -9,7 +9,7 @@ const countries_token = {
 const user_details = {
     "Country": "Nigeria",
     "BaseToken": {
-        token: "0x6ef57f046c9ee96108c6309843f5d2611befb0aec7f12371cef1c6aca66a83db::ngnc::NGNC",
+        token: "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::ngnc::NGNC",
         decimals: 6,
     },
     "Symbol": "₦"
