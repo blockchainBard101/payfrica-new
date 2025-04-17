@@ -43,3 +43,7 @@ export async function nameExists(name: string) {
     // const namens = name+"@payyf";
     return !!(await suinsClient.getNameRecord(name));
 }
+
+export async function getNsAddress(name: string): Promise<string | null> {
+    return (await suinsClient.getNameRecord(name))?.targetAddress || null;
+}

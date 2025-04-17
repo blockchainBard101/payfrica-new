@@ -205,7 +205,6 @@ export default function CustomWalletProvider({children}: {children: React.ReactN
           client: suiClient,
           onlyTransactionKind: true,
         });
-        console.log('address', address)
         const sponsorTxBody: SponsorTxRequestBody = {
           network,
           txBytes: toB64(txBytes),

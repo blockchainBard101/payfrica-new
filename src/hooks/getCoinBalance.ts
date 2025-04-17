@@ -2,7 +2,7 @@ import { client } from "@/config/suiClient";
 
 const token_details = {
     "NGNC": {
-        CoinId: "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ngnc::NGNC",
+        CoinId: "0x6ef57f046c9ee96108c6309843f5d2611befb0aec7f12371cef1c6aca66a83db::ngnc::NGNC",
         PoolId: "",
         decimals: 6
     },
