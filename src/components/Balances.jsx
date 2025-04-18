@@ -1,75 +1,55 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FaEye, FaEyeSlash, FaEllipsisV, FaPlus } from 'react-icons/fa';
 import { useCustomWallet } from "@/contexts/CustomWallet";
 import { useRealTimeBalances } from '@/hooks/useRealTimeBalances';
 
 const BalanceCards = () => {
   const { address } = useCustomWallet();
-  const {
-    fundingBalance,
-    // unifiedBalance,
-    // savingsBalance,
-    // cardBalance,
-    // tokenBalances,
-  } = useRealTimeBalances(address);
+  const { fundingBalance, portfolioBalance } = useRealTimeBalances(address);
 
-  // Example initial values for your card data
+  // 1. Compute real total balance:
+  const totalBalance = useMemo(() => {
+    // strip out any non‐numeric, then parse
+    const fundNum = parseFloat((fundingBalance || '0').replace(/[^0-9.-]+/g, ''));
+    const portNum = parseFloat((portfolioBalance || '0').replace(/[^0-9.-]+/g, ''));
+    return (fundNum + portNum).toLocaleString('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    });
+  }, [fundingBalance, portfolioBalance]);
+
+  // 2. Set up your cards with proper defaults (use ₦-- for both):
   const initialBalanceData = [
-    {
-      title: 'Base Currency',
-      amount: fundingBalance || '₦--',
-      actionText: 'Fund Wallet',
-      actionIcon: <FaPlus />,
-      tokens: null,
-    },
-    {
-      title: 'All Balances',
-      amount: '₦45,567.87', // This might be updated similarly
-      actionText: 'Tokens: Sui, USDC',
-      actionIcon: null,
-      tokens: 'Sui, USDC',
-    },
-    {
-      title: 'Savings Balance',
-      amount: '₦45,567.87',
-      actionText: 'View more',
-      actionIcon: null,
-      tokens: null,
-    },
-    {
-      title: 'Card Balance',
-      amount: '₦45,567.87',
-      actionText: 'Details',
-      actionIcon: null,
-      tokens: null,
-    },
+    { title: 'Base Currency',   amount: fundingBalance   || '₦--', actionText: 'Fund Wallet',    actionIcon: <FaPlus />, tokens: null },
+    { title: 'All Balances',    amount: portfolioBalance || '₦--', actionText: 'Tokens: Sui, USDC', actionIcon: null, tokens: 'Sui, USDC' },
+    { title: 'Savings Balance', amount: '₦0',              actionText: 'View more',        actionIcon: null, tokens: null },
+    { title: 'Card Balance',    amount: '₦0',              actionText: 'Details',          actionIcon: null, tokens: null },
   ];
 
   const [balanceData, setBalanceData] = useState(initialBalanceData);
   const [showTotalBalance, setShowTotalBalance] = useState(true);
-  const [visibleCards, setVisibleCards] = useState(
-    initialBalanceData.map(() => true)
-  );
+  const [visibleCards, setVisibleCards] = useState(initialBalanceData.map(() => true));
 
-  // Update balanceData for the Funding Balance whenever fundingBalance changes
-  React.useEffect(() => {
-    setBalanceData((prevData) => {
-      const updated = [...prevData];
-      updated[0] = { ...updated[0], amount: fundingBalance || '₦--' };
+  // 3. Update both fundingBalance (index 0) AND portfolioBalance (index 1)
+  useEffect(() => {
+    setBalanceData(prev => {
+      const updated = prev.map((card, idx) => {
+        if (idx === 0) {
+          return { ...card, amount: fundingBalance || '₦--' };
+        }
+        if (idx === 1) {
+          return { ...card, amount: portfolioBalance || '₦--' };
+        }
+        return card;
+      });
       return updated;
     });
-  }, [fundingBalance]);
+  }, [fundingBalance, portfolioBalance]);
 
-  const toggleTotalBalance = () => setShowTotalBalance((prev) => !prev);
-
-  const toggleCardBalance = (index) => {
-    setVisibleCards((prev) => {
-      const updated = [...prev];
-      updated[index] = !updated[index];
-      return updated;
-    });
-  };
+  const toggleTotalBalance = () => setShowTotalBalance(v => !v);
+  const toggleCardBalance = idx =>
+    setVisibleCards(vis => vis.map((v, i) => (i === idx ? !v : v)));
 
   return (
     <div className="balances-container">

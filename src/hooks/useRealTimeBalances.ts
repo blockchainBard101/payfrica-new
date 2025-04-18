@@ -1,27 +1,25 @@
 // useRealTimeBalances.js
 import { useState, useEffect, useCallback } from 'react';
-import { getBasetokenBalance } from '@/hooks/getBalances';
+import { getBasetokenBalance, getPortfolioValue } from '@/hooks/getBalances';
 // Suppose you have another hook that retrieves token details
 // import { getTokenBalances } from '@/hooks/getTokenBalances';
 
 export const useRealTimeBalances = (address) => {
   const [balances, setBalances] = useState({
     fundingBalance: null,
-    unifiedBalance: null,
+    portfolioBalance: null,
     savingsBalance: null,
     cardBalance: null,
-    // You might also want an array/object for token balances
     tokenBalances: [],
   });
-
   // The function to update all balances; wrap with useCallback to avoid re-creation
   const updateBalances = useCallback(async () => {
     if (!address) return;
     try {
       // Fetch your balances asynchronously
       const fundingBalance = await getBasetokenBalance(address);
-      // For example, if you have other functions:
-      // const unifiedBalance = await getUnifiedBalance(address);
+      const portfolioBalance = await getPortfolioValue(address);
+      const pb = portfolioBalance.totalInUserCurrency;
       // const savingsBalance = await getSavingsBalance(address);
       // const cardBalance = await getCardBalance(address);
       // const tokenBalances = await getTokenBalances(address);
@@ -29,7 +27,7 @@ export const useRealTimeBalances = (address) => {
       setBalances((prev) => ({
         ...prev,
         fundingBalance,
-        // unifiedBalance,
+        portfolioBalance: pb,
         // savingsBalance,
         // cardBalance,
         // tokenBalances,
