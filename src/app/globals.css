@@ -1714,65 +1714,143 @@ Overlay Background .overlay-background {
 }
 
 /* Convert Overlay Stylings */
-.convert-overlay {
-  background: #fbe19a;
-  padding: 2rem;
-  border-radius: 12px;
+/* .overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+} */
+
+.convert-modal {
+  background-color: #fbe19a;
+  border-radius: 16px;
+  width: 100%;
   max-width: 600px;
-  width: 90%;
-  text-align: center;
-  position: relative;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.convert-header {
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #c43e26;
+  color: #3c53a4;
   font-family: LexendExtraBold;
-  font-size: 30px;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
-.close-btn {
-  font-size: 1.2rem;
+.modal-header h2 {
+  font-size: 35px;
+  color: #000;
+  /* margin-bottom: 20px; */
+}
+
+.modal-header .close-btn {
+  cursor: pointer;
+  font-size: 30px;
+  color: #c43e26;
+}
+
+.convert-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  /* margin-bottom: 1rem; */
+  border: 2px solid #c43e26;
+}
+
+.convert-label {
+  font-weight: bold;
+  color: #c43e26;
+  font-size: 20px;
+  margin-bottom: 0.5rem;
+  font-family: InterBold;
+}
+
+.convert-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* max-width: fit-content; */
+  /* width: 80%; */
+  /* max-width: 50%; */
+  gap: 00px;
+  /* padding-right: 10px; */
+}
+
+.convert-row input {
+  flex: 1;
+  padding: 0.8rem 0;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  /* color: #474747; */
+  font-family: InterLight;
+}
+
+.convert-row input:focus {
+  outline: none;
+}
+
+.convert-row select {
+  border: none;
+  font-weight: bold;
+  background: transparent;
+  font-size: 1.1rem;
+  color: #3c53a4;
+  cursor: pointer;
+  /* padding: 0.8rem; */
+  outline: none;
+}
+
+.switch-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  /* flex-direction: column; */
+}
+
+.switch-btn-bg-thin-line {
+  background-color: #c43e26;
+  height: 1px;
+  width: 100%;
+  /* margin: 20px 10px 25px 0px; */
+  /* position: absolute; */
+}
+
+.switch-btn {
+  background: none;
+  border: none;
+  display: block;
+  font-size: 4rem;
   cursor: pointer;
   color: #c43e26;
-}
-
-.convert-select {
-  width: 100%;
-  padding: 1rem;
-  font-size: 16px;
-  margin: 1rem 0;
-  border-radius: 8px;
-  border: none;
-  background: #fef6d5;
-  color: #474747;
-}
-
-.convert-icon {
-  font-size: 24px;
-  margin: 1rem 0;
-  color: #c43e26;
-  rotate: 90deg;
 }
 
 .convert-btn {
-  background: #3c53a4;
+  background-color: #3c53a4;
   color: white;
-  padding: 0.8rem 1.5rem;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 20px;
-  font-family: InterBold;
-  cursor: pointer;
+  padding: 0.9rem;
   width: 100%;
-  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  cursor: pointer;
 }
 
 .convert-btn:disabled {
-  background: #ccc;
+  background-color: #999;
   cursor: not-allowed;
 }
 
@@ -1940,4 +2018,26 @@ Overlay Background .overlay-background {
     font-size: 15px;
     font-family: LexendExtraBold;
   }
+}
+
+@media (max-width: 380px) {
+  .convert-modal {
+    padding: 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 30px;
+  }
+}
+
+/* CSS additions for logos */
+.dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.token-icon {
+  width: 20px;
+  height: 20px;
 }
