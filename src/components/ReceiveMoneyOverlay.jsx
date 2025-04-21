@@ -1,49 +1,57 @@
 'use client';
-import React, { useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import QRCode from 'react-qr-code';
 import { FaArrowLeft, FaCopy } from 'react-icons/fa';
 import { BsQuestionCircleFill } from 'react-icons/bs';
 import { useGlobalState } from '@/GlobalStateProvider';
 import { toast } from 'react-toastify';
 import { useCustomWallet } from '@/contexts/CustomWallet';
+import { getFormattedSuiHandle } from '@/hooks/registerNsName';
 
 // Utility to shorten addresses
 const shortenAddress = (address, start = 10, end = 10) => {
   if (!address) return '';
-  return `${address.slice(0, start)}...${address.slice(-end)}`;
+  return `${address.slice(0, start)}…${address.slice(-end)}`;
 };
 
 const ReceiveMoneyOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
   const { address } = useCustomWallet();
-  const payTag = '@teamsushi.payfrica';
-  const walletAddress = address;
+  const [payTag, setPayTag] = useState('');
+  const [loadingTag, setLoadingTag] = useState(false);
 
-  // Compute a shortened address only when walletAddress changes.
+  useEffect(() => {
+    if (!address) {
+      setPayTag('');
+      return;
+    }
+    setLoadingTag(true);
+    const fetchTag = async () => {
+      try {
+        const tag = await getFormattedSuiHandle(address);
+        setPayTag(tag);
+      } catch (err) {
+        console.error('getFormattedSuiHandle failed', err);
+        setPayTag('');
+      } finally {
+        setLoadingTag(false);
+      }
+    };
+    fetchTag();
+  }, [address]);
+
+  const walletAddress = address ?? '';
+
   const shortenedAddress = useMemo(
     () => shortenAddress(walletAddress),
     [walletAddress]
   );
 
-  // Optimize the copy-to-clipboard function with useCallback.
   const copyToClipboard = useCallback((text) => {
     navigator.clipboard
       .writeText(text)
-      .then(() => {
-        toast.success('Copied to clipboard!', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
-      })
-      .catch(() => {
-        toast.error('Failed to copy');
-      });
+      .then(() => toast.success('Copied to clipboard!'))
+      .catch(() => toast.error('Failed to copy'));
   }, []);
 
   if (!overlayStates.receiveMoney) return null;
@@ -61,14 +69,26 @@ const ReceiveMoneyOverlay = () => {
         </div>
 
         <div className="qr-wrapper">
-          <QRCode value={walletAddress} size={160} bgColor="#FCF5D7" fgColor="#000" />
+          <QRCode
+            value={walletAddress}
+            size={160}
+            bgColor="#FCF5D7"
+            fgColor="#000"
+          />
         </div>
 
         <div className="info-block">
           <h2>Payfrica Tag</h2>
           <div className="copy-box">
-            <p>{payTag}</p>
-            <button onClick={() => copyToClipboard(payTag)}>
+            {loadingTag ? (
+              <p>Loading…</p>
+            ) : (
+              <p>{payTag || '—'}</p>
+            )}
+            <button
+              onClick={() => payTag && copyToClipboard(payTag)}
+              disabled={!payTag}
+            >
               <FaCopy /> Copy
             </button>
           </div>
@@ -77,10 +97,6 @@ const ReceiveMoneyOverlay = () => {
         <div className="info-block">
           <h2>Wallet Address</h2>
           <div className="copy-box">
-            {/* 
-              The shortened address is displayed,
-              and the full address is set as the title attribute for hover visibility.
-            */}
             <p title={walletAddress}>{shortenedAddress}</p>
             <button onClick={() => copyToClipboard(walletAddress)}>
               <FaCopy /> Copy

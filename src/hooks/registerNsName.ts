@@ -1,26 +1,19 @@
 import { client, suinsClient } from '@/config/suiClient';
 import { SuinsTransaction } from "@mysten/suins";
 import { Transaction } from "@mysten/sui/transactions";
+import axios from 'axios';
 
 export const createLeafSubname = async (name: string, parentNftId: string, targetAddress: string) => {
-    // Create a transaction block as usual in your PTBs.
     const transaction = new Transaction();
-    // Pass in the transaction block & the app's global SuinsClient.
     const suinsTransaction = new SuinsTransaction(suinsClient, transaction);
     const subname = name+"@payfrica"
  
-    // We build the transaction to create a leaf subname.
-    // A leaf subname is a subname that has a target address and no NFT of its own.
     suinsTransaction.createLeafSubName({
-        // The NFT of the parent
         parentNft: parentNftId,
-        // The leaf subname to be created.
         name: subname,
-        // the target address of the leaf subname (any valid Sui address)
         targetAddress
     });
  
-    // ... sign and execute the transaction
     try{
         const { events } = await client.signAndExecuteTransaction({
             signer: keypair,
@@ -47,3 +40,61 @@ export async function nameExists(name: string) {
 export async function getNsAddress(name: string): Promise<string | null> {
     return (await suinsClient.getNameRecord(name))?.targetAddress || null;
 }
+
+
+async function resolveNameServiceNames(address) {
+  const rpcUrl = 'https://fullnode.testnet.sui.io:443';
+  const requestBody = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'suix_resolveNameServiceNames',
+    params: [
+      address
+    ]
+  };
+
+  const { data: response } = await axios.post(rpcUrl, requestBody, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (response.error) {
+    throw new Error(`RPC error ${response.error.code}: ${response.error.message}`);
+  }
+
+  return response.result;
+}
+
+function formatSuiName(rawName) {
+  if (!rawName.endsWith('.sui')) {
+    return rawName;
+  }
+
+  const withoutTld = rawName.slice(0, -4);
+
+  const parts = withoutTld.split('.');
+
+  if (parts.length === 1) {
+    return `@${parts[0]}`;
+  }
+
+  if (parts.length === 2) {
+    return `${parts[0]}@${parts[1]}`;
+  }
+
+  const last = parts.pop();
+  return `${parts.join('.') }@${last}`;
+}
+
+
+export async function getFormattedSuiHandle(address) {
+    console.log(address);
+  const { data } = await resolveNameServiceNames(address);
+  return data[0];
+//   if (!Array.isArray(data) || data.length === 0) {
+//     return null;  // No names resolved
+//   }
+//   const rawName = data[0];
+//   console.log(rawName);
+//   return formatSuiName(rawName);
+}
+
