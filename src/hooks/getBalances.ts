@@ -68,18 +68,18 @@ export async function getPortfolioValue(owner: string) {
   const balances = await Promise.all(
     symbols.map(async (symbol) => {
       const balance = await fetchTokenBalance(owner, symbol);
-      const usdValue = balance * (rates_dollar[symbol] ?? 0);
+      const usdValue = balance / (rates_dollar[symbol] ?? 0);
       return { symbol, balance, usdValue };
     })
   );  
-  // console.log(balances);
+  console.log(balances);
 
   // 3. Sum USD values
   const totalUSD = balances.reduce((sum, t) => sum + t.usdValue, 0);
-  // console.log(totalUSD);
+  console.log(totalUSD);
   // 4. Convert USD total to user currency
   const userRate = rates_dollar[user_details.Currency];
-  const totalInUserCurrency = totalUSD / userRate;
+  const totalInUserCurrency = totalUSD * userRate;
 //   console.log(`${user_details.Symbol}${totalInUserCurrency.toFixed(2)}`)
   return {
     breakdown: balances,
