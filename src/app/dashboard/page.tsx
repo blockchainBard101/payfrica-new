@@ -34,11 +34,11 @@ const Dashboard = () => {
   const router = useRouter();
   const { isConnected } = useCustomWallet();
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/login");
-    }
-  }, [isConnected, router]);
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     router.push("/login");
+  //   }
+  // }, [isConnected, router]);
 
   if (!isConnected) return null;
 
