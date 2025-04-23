@@ -8,6 +8,7 @@ import { useGlobalState } from '@/GlobalStateProvider';
 import { PayfricaCardBg, PayfricaNavLogo } from '@/imports';
 import PayfricaCardHeadImg from '@/assets/Images/PayfricaCardHeadImg.jpg';
 import { useCustomWallet } from '@/contexts/CustomWallet';
+import Image from 'next/image';
 
 const ReceiveCardOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
@@ -50,12 +51,12 @@ const ReceiveCardOverlay = () => {
                 <div className="card-preview">
                     {/* Front of the card */}
                     <div className="pay-card front" ref={cardRef}>
-                        {/* <div className="payfrica-card-header">
-                            <img src={PayfricaNavLogo.src} alt="Payfrica Logo" />
-                            <span>Accepted</span>
-                        </div> */}
                         <div>
-                            <img src={PayfricaCardHeadImg.src} alt="" style={{ width: '100%', marginBottom: '0px' }} />
+                            <Image
+                                src={PayfricaCardHeadImg}
+                                alt="Payfrica Card Header"
+                                style={{ width: '100%', marginBottom: '0px' }}
+                            />
                             <div style={{ width: '100%', backgroundColor: '#3C53A4', height: '10px', marginTop: '-5px' }}></div>
                         </div>
                         <div className="card-body">
@@ -75,7 +76,11 @@ const ReceiveCardOverlay = () => {
 
                     {/* Back of the card (desktop only) */}
                     <div className="pay-card back">
-                        <img src={PayfricaCardBg.src} alt="Back of card" />
+                        <Image
+                            src={PayfricaCardBg}
+                            alt="Back of card"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
                     </div>
                 </div>
 

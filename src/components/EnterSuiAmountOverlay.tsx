@@ -5,25 +5,24 @@ import { useGlobalState } from '../GlobalStateProvider';
 import { BsQrCodeScan } from 'react-icons/bs';
 import { ProfileDP, PayfricaNavLogo } from '@/imports';
 import { nameExists } from '@/hooks/registerNsName';
-import { getTokenBalance } from '@/hooks/getCoinBalance'; // Import your balance script
+import { getTokenBalance } from '@/hooks/getCoinBalance';
 import { useCustomWallet } from "@/contexts/CustomWallet";
+import Image from 'next/image';
+
 
 const EnterSuiAmountOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
-    if (!overlayStates.enterSuiAmount) return null;
+    const isVisible = overlayStates.enterSuiAmount; // ✅ control visibility, don't skip hooks
+
     const { address } = useCustomWallet();
     const [amount, setAmount] = useState('');
     const [tagInput, setTagInput] = useState('');
     const [tagExists, setTagExists] = useState(null);
-
-    // New state variables for currency and balance
     const [currency, setCurrency] = useState('NGNC');
     const [balance, setBalance] = useState(null);
     const [loadingBalance, setLoadingBalance] = useState(false);
-
     const suffix = '@payfrica';
 
-    // Validate tag via nameExists when the editable tag part is longer than 4 characters.
     useEffect(() => {
         if (tagInput.trim().length > 4) {
             const fullTag = tagInput + suffix;
@@ -35,13 +34,12 @@ const EnterSuiAmountOverlay = () => {
         }
     }, [tagInput, suffix]);
 
-    // When the selected currency changes, fetch the corresponding balance.
     useEffect(() => {
         async function fetchBalance() {
+            if (!address) return;
             setLoadingBalance(true);
             try {
                 const bal = await getTokenBalance(address, currency);
-                // console.log(bal);
                 setBalance(bal);
             } catch (err) {
                 console.error(err);
@@ -51,16 +49,14 @@ const EnterSuiAmountOverlay = () => {
             }
         }
         fetchBalance();
-    }, [currency]);
+    }, [currency, address]);
 
-    // Editable tag is valid if more than 3 characters and no spaces.
     const isTagValid = tagInput.trim().length > 3 && !tagInput.includes(' ');
     const isAmountValid = amount && parseFloat(amount) > 0;
     const isSendActive = isTagValid && isAmountValid;
 
-    // Determine tag validation message and its color.
     let tagMessage = "*Tag must be at least 4 characters long*";
-    let tagMessageColor = "#555"; // default gray
+    let tagMessageColor = "#555";
 
     if (tagInput.trim().length > 4) {
         if (tagExists) {
@@ -73,32 +69,41 @@ const EnterSuiAmountOverlay = () => {
     }
 
     return (
-        <div className="overlay-background">
+        <div
+            className="overlay-background"
+            style={{
+                display: isVisible ? 'flex' : 'none',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+            }}
+        >
             <div className="enter-amount-overlay">
                 <div className="overlay-header">
-                    <LuMoveLeft 
-                        className="back-icon" 
-                        onClick={() => { 
-                            toggleOverlay('payfricaPadiSui'); 
-                            toggleOverlay('enterSuiAmount'); 
-                        }} 
+                    <LuMoveLeft
+                        className="back-icon"
+                        onClick={() => {
+                            toggleOverlay('payfricaPadiSui');
+                            toggleOverlay('enterSuiAmount');
+                        }}
                     />
                     <BsQrCodeScan className="qrcodeicon" />
                 </div>
 
                 <div className="recipient-info">
-                    <img src={PayfricaNavLogo.src}  alt="" />
-                    {/* <div>
-                        <h3>Payfica</h3>
-                        <p>@payfrica</p>
-                    </div> */}
+                    <Image src={PayfricaNavLogo} alt="Payfrica Logo" width={40} height={40} />
                 </div>
-                
-                {/* Payfrica Tag Input Section */}
+
                 <div className="payfrica-tag-section" style={{ margin: '20px 0' }}>
                     <h3 style={{ color: "#333" }}>Enter Recipient Tag</h3>
-                    <div 
-                        className="payfrica-tag-wrapper" 
+                    <div
+                        className="payfrica-tag-wrapper"
                         style={{ position: 'relative', width: '100%' }}
                     >
                         <input
@@ -106,19 +111,19 @@ const EnterSuiAmountOverlay = () => {
                             placeholder="Recipient Tag"
                             value={tagInput}
                             onChange={(e) => setTagInput(e.target.value)}
-                            style={{ 
-                                width: '100%', 
-                                padding: '10px', 
-                                borderRadius: '5px', 
-                                fontFamily: 'InterLight', 
-                                fontSize: '16px', 
-                                outline: 'none', 
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '5px',
+                                fontFamily: 'InterLight',
+                                fontSize: '16px',
+                                outline: 'none',
                                 border: '1px solid #ccc',
-                                paddingRight: '100px' // leave space for suffix display
+                                paddingRight: '100px'
                             }}
                         />
-                        <span 
-                            className="payfrica-tag-suffix" 
+                        <span
+                            className="payfrica-tag-suffix"
                             style={{
                                 position: 'absolute',
                                 right: '10px',
@@ -131,19 +136,18 @@ const EnterSuiAmountOverlay = () => {
                             {suffix}
                         </span>
                     </div>
-                    <small 
-                        style={{ 
-                            display: 'block', 
-                            marginTop: '5px', 
-                            fontFamily: 'InterLight', 
-                            color: tagMessageColor 
+                    <small
+                        style={{
+                            display: 'block',
+                            marginTop: '5px',
+                            fontFamily: 'InterLight',
+                            color: tagMessageColor
                         }}
                     >
                         {tagMessage}
                     </small>
                 </div>
 
-                {/* Amount Entry Section */}
                 <div className="amount-entry">
                     <h3 style={{ color: "#333" }}>Enter Amount</h3>
                     <input
@@ -151,44 +155,48 @@ const EnterSuiAmountOverlay = () => {
                         placeholder="0.00"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        style={{ 
-                            width: '100%', 
-                            padding: '10px', 
-                            borderRadius: '5px', 
-                            fontFamily: 'InterLight', 
-                            fontSize: '16px', 
-                            outline: 'none', 
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            fontFamily: 'InterLight',
+                            fontSize: '16px',
+                            outline: 'none',
                             border: '1px solid #ccc'
                         }}
                     />
-                    <select 
-                        name="currency" 
-                        id="currency" 
+                    <select
+                        name="currency"
+                        id="currency"
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
-                        style={{ 
-                            padding: '10px', 
-                            borderRadius: '5px', 
-                            fontFamily: 'InterLight', 
-                            fontSize: '16px', 
-                            outline: 'none', 
+                        style={{
+                            padding: '10px',
+                            borderRadius: '5px',
+                            fontFamily: 'InterLight',
+                            fontSize: '16px',
+                            outline: 'none',
                             border: '1px solid #ccc',
                             marginTop: '10px'
                         }}
                     >
-                        {/* <option value="USD">USDC</option> */}
                         <option value="USDC">USDC</option>
                         <option value="SUI">SUI</option>
-                        {/* <option value="KES">KESC</option>
-                        <option value="ZAR">ZARC</option> */}
                     </select>
-                    <div style={{ marginTop: '5px', fontFamily: 'InterLight', fontSize: '14px', color: '#333' }}>
-                        {loadingBalance ? "Loading balance..." : `Balance: ${balance !== null ? balance : '0'}`}
+                    <div
+                        style={{
+                            marginTop: '5px',
+                            fontFamily: 'InterLight',
+                            fontSize: '14px',
+                            color: '#333'
+                        }}
+                    >
+                        {loadingBalance ? "Loading balance..." : `Balance: ${balance ?? '0'}`}
                     </div>
                     <div className="amount-options" style={{ marginTop: '10px' }}>
                         {['100', '200', '500', '1000'].map((amt) => (
-                            <button 
-                                key={amt} 
+                            <button
+                                key={amt}
                                 onClick={() => setAmount(amt)}
                                 style={{ marginRight: '5px' }}
                             >
@@ -198,18 +206,16 @@ const EnterSuiAmountOverlay = () => {
                     </div>
                 </div>
 
-                <button 
-                    className="send-money-button" 
+                <button
+                    className="send-money-button"
                     disabled={!isSendActive}
-                    style={{ 
-                        opacity: isSendActive ? 1 : 0.5, 
+                    style={{
+                        opacity: isSendActive ? 1 : 0.5,
                         cursor: isSendActive ? 'pointer' : 'not-allowed',
                         marginTop: '15px'
                     }}
-                    onClick={() => { 
-                        // Optionally, combine the tag with suffix:
-                        // const fullTag = tagInput + suffix;
-                        toggleOverlay('sending'); 
+                    onClick={() => {
+                        toggleOverlay('sending');
                         toggleOverlay('enterSuiAmount');
                     }}
                 >

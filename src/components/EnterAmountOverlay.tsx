@@ -8,26 +8,24 @@ import { nameExists } from '@/hooks/registerNsName';
 import { getTokenBalance } from '@/hooks/getCoinBalance';
 import { useCustomWallet } from "@/contexts/CustomWallet";
 import { useSendCoinNs } from '@/hooks/send';
+import Image from 'next/image';
 
 const EnterAmountOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
-    if (!overlayStates.enterAmount) return null;
-    
     const { address } = useCustomWallet();
-    const [amount, setAmount] = useState('');
     const sendCoinNs = useSendCoinNs();
+
+    const [amount, setAmount] = useState('');
     const [tagInput, setTagInput] = useState('');
     const [tagExists, setTagExists] = useState(null);
     const [isSending, setIsSending] = useState(false);
-
-    // New state variables for currency and balance
-    const [currency, setCurrency] = useState('NGNC');
+    const [currency, setCurrency] = useState<'NGNC' | 'GHSC'>('NGNC');
     const [balance, setBalance] = useState(null);
     const [loadingBalance, setLoadingBalance] = useState(false);
 
     const suffix = '@payfrica';
+    const isVisible = overlayStates.enterAmount;
 
-    // Validate the tag using nameExists if the editable part is longer than 4 characters.
     useEffect(() => {
         if (tagInput.trim().length > 4) {
             const fullTag = tagInput + suffix;
@@ -39,7 +37,6 @@ const EnterAmountOverlay = () => {
         }
     }, [tagInput, suffix]);
 
-    // When the selected currency changes, fetch the corresponding token balance.
     useEffect(() => {
         async function fetchBalance() {
             setLoadingBalance(true);
@@ -56,14 +53,12 @@ const EnterAmountOverlay = () => {
         fetchBalance();
     }, [currency, address]);
 
-    // Editable tag is valid if it is more than 3 characters (trimmed) and does not contain spaces.
     const isTagValid = tagInput.trim().length > 3 && !tagInput.includes(' ');
     const isAmountValid = amount && parseFloat(amount) > 0;
     const isSendActive = isTagValid && isAmountValid && !isSending;
 
-    // Determine the tag validation message and its color.
     let tagMessage = "*Tag must be at least 4 characters long*";
-    let tagMessageColor = "#555"; // default gray
+    let tagMessageColor = "#555";
     if (tagInput.trim().length > 4) {
         if (tagExists) {
             tagMessage = "Valid Payfrica Tag";
@@ -74,20 +69,16 @@ const EnterAmountOverlay = () => {
         }
     }
 
-    // Handler for the send button.
     const handleSendMoney = async () => {
         if (!isSendActive) return;
         setIsSending(true);
         const fullTag = tagInput + suffix;
         try {
-            // sendTransaction should accept (currency, amount, nsname) and return a boolean
-            const success = await sendCoinNs(currency, amount, fullTag);
+            const success = await sendCoinNs(currency, parseFloat(amount), fullTag);
             if (success) {
-                // Show the sending overlay so that after its 3-second animation, the success overlay is triggered.
                 toggleOverlay('sending');
-                toggleOverlay('enterAmount'); // Hide the current overlay.
+                toggleOverlay('enterAmount');
             } else {
-                // Transaction failed – show the failed overlay.
                 toggleOverlay('failed');
             }
         } catch (error) {
@@ -99,28 +90,43 @@ const EnterAmountOverlay = () => {
     };
 
     return (
-        <div className="overlay-background">
+        <div
+            className="overlay-background"
+            style={{
+                display: isVisible ? 'flex' : 'none',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+            }}
+        >
+
             <div className="enter-amount-overlay">
                 <div className="overlay-header">
-                    <LuMoveLeft 
-                        className="back-icon" 
-                        onClick={() => { 
-                            toggleOverlay('payfricaPadi'); 
-                            toggleOverlay('enterAmount'); 
-                        }} 
+                    <LuMoveLeft
+                        className="back-icon"
+                        onClick={() => {
+                            toggleOverlay('payfricaPadi');
+                            toggleOverlay('enterAmount');
+                        }}
                     />
                     <BsQrCodeScan className="qrcodeicon" />
                 </div>
 
                 <div className="recipient-info">
-                    <img src={PayfricaNavLogo.src} alt="" />
+                <Image src={PayfricaNavLogo} alt="Payfrica Logo" width={40} height={40} />
+
                 </div>
-                
-                {/* Payfrica Tag Input Section */}
+
                 <div className="payfrica-tag-section" style={{ margin: '20px 0' }}>
                     <h3 style={{ color: "#333" }}>Enter Recipient Tag</h3>
-                    <div 
-                        className="payfrica-tag-wrapper" 
+                    <div
+                        className="payfrica-tag-wrapper"
                         style={{ position: 'relative', width: '100%' }}
                     >
                         <input
@@ -128,19 +134,19 @@ const EnterAmountOverlay = () => {
                             placeholder="Recipient Tag"
                             value={tagInput}
                             onChange={(e) => setTagInput(e.target.value)}
-                            style={{ 
-                                width: '100%', 
-                                padding: '10px', 
-                                borderRadius: '5px', 
-                                fontFamily: 'InterLight', 
-                                fontSize: '16px', 
-                                outline: 'none', 
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '5px',
+                                fontFamily: 'InterLight',
+                                fontSize: '16px',
+                                outline: 'none',
                                 border: '1px solid #ccc',
                                 paddingRight: '100px'
                             }}
                         />
-                        <span 
-                            className="payfrica-tag-suffix" 
+                        <span
+                            className="payfrica-tag-suffix"
                             style={{
                                 position: 'absolute',
                                 right: '10px',
@@ -153,19 +159,18 @@ const EnterAmountOverlay = () => {
                             {suffix}
                         </span>
                     </div>
-                    <small 
-                        style={{ 
-                            display: 'block', 
-                            marginTop: '5px', 
-                            fontFamily: 'InterLight', 
-                            color: tagMessageColor 
+                    <small
+                        style={{
+                            display: 'block',
+                            marginTop: '5px',
+                            fontFamily: 'InterLight',
+                            color: tagMessageColor
                         }}
                     >
                         {tagMessage}
                     </small>
                 </div>
 
-                {/* Amount Entry Section */}
                 <div className="amount-entry">
                     <h3 style={{ color: "#333" }}>Enter Amount</h3>
                     <input
@@ -173,27 +178,27 @@ const EnterAmountOverlay = () => {
                         placeholder="0.00"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        style={{ 
-                            width: '100%', 
-                            padding: '10px', 
-                            borderRadius: '5px', 
-                            fontFamily: 'InterLight', 
-                            fontSize: '16px', 
-                            outline: 'none', 
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            fontFamily: 'InterLight',
+                            fontSize: '16px',
+                            outline: 'none',
                             border: '1px solid #ccc'
                         }}
                     />
-                    <select 
-                        name="currency" 
-                        id="currency" 
+                    <select
+                        name="currency"
+                        id="currency"
                         value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        style={{ 
-                            padding: '10px', 
-                            borderRadius: '5px', 
-                            fontFamily: 'InterLight', 
-                            fontSize: '16px', 
-                            outline: 'none', 
+                        onChange={(e) => setCurrency(e.target.value as 'NGNC' | 'GHSC')}
+                        style={{
+                            padding: '10px',
+                            borderRadius: '5px',
+                            fontFamily: 'InterLight',
+                            fontSize: '16px',
+                            outline: 'none',
                             border: '1px solid #ccc',
                             marginTop: '10px'
                         }}
@@ -205,8 +210,8 @@ const EnterAmountOverlay = () => {
                     </div>
                     <div className="amount-options" style={{ marginTop: '10px' }}>
                         {['100', '200', '500', '1000'].map((amtValue) => (
-                            <button 
-                                key={amtValue} 
+                            <button
+                                key={amtValue}
                                 onClick={() => setAmount(amtValue)}
                                 style={{ marginRight: '5px' }}
                             >
@@ -216,11 +221,11 @@ const EnterAmountOverlay = () => {
                     </div>
                 </div>
 
-                <button 
-                    className="send-money-button" 
+                <button
+                    className="send-money-button"
                     disabled={!isSendActive}
-                    style={{ 
-                        opacity: isSendActive ? 1 : 0.5, 
+                    style={{
+                        opacity: isSendActive ? 1 : 0.5,
                         cursor: isSendActive ? 'pointer' : 'not-allowed',
                         marginTop: '15px'
                     }}

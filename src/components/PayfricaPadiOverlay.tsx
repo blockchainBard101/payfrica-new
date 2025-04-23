@@ -6,10 +6,9 @@ import { LuMoveLeft } from "react-icons/lu";
 
 const PayfricaPadiOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
+    const [inputValue, setInputValue] = useState('');
 
     if (!overlayStates.payfricaPadi) return null;
-
-    const [inputValue, setInputValue] = useState('');
 
     const isButtonActive = inputValue.startsWith('@') && inputValue.length > 3 && !inputValue.includes(' ');
 

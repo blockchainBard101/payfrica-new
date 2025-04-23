@@ -2,8 +2,11 @@ import { client, suinsClient } from '@/config/suiClient';
 import { SuinsTransaction } from "@mysten/suins";
 import { Transaction } from "@mysten/sui/transactions";
 import axios from 'axios';
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import clientConfig from '@/config/clientConfig';
 
 export const createLeafSubname = async (name: string, parentNftId: string, targetAddress: string) => {
+    const keypair = Ed25519Keypair.fromSecretKey(clientConfig.PAYFRICA_PRIVATE_KEY);
     const transaction = new Transaction();
     const suinsTransaction = new SuinsTransaction(suinsClient, transaction);
     const subname = name+"@payfrica"

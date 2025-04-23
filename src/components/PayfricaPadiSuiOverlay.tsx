@@ -7,15 +7,12 @@ import { nameExists } from '@/hooks/registerNsName';
 
 const PayfricaPadiSuiOverlay = () => {
     const { overlayStates, toggleOverlay } = useGlobalState();
-
-    if (!overlayStates.payfricaPadiSui) return null;
+    const isVisible = overlayStates.payfricaPadiSui; // ✅ control visibility here
 
     const suffix = '@payfrica';
-    // Store only the editable part of the tag.
     const [inputValue, setInputValue] = useState('');
     const [isValid, setIsValid] = useState(false);
 
-    // Check the full tag (editable part + suffix) whenever the inputValue changes.
     useEffect(() => {
         const checkName = async () => {
             const fullTag = inputValue + suffix;
@@ -25,11 +22,13 @@ const PayfricaPadiSuiOverlay = () => {
         checkName();
     }, [inputValue, suffix]);
 
-    // Button is enabled only if the editable portion has more than 3 characters and contains no spaces.
     const isButtonActive = inputValue.length > 3 && !inputValue.includes(' ');
 
     return (
-        <div className="overlay-background">
+        <div
+            className="overlay-background"
+            style={{ display: isVisible ? 'block' : 'none' }}
+        >
             <div 
                 className="send-money-overlay" 
                 style={{ 
@@ -72,7 +71,6 @@ const PayfricaPadiSuiOverlay = () => {
                 <p style={{ fontFamily: 'InterLight', fontSize: '20px' }}>
                     Make sure the Payfrica tag is valid
                 </p>
-                {/* Container for the editable input and the non-editable suffix */}
                 <div 
                     className="payfrica-tag-wrapper" 
                     style={{ 
@@ -89,7 +87,7 @@ const PayfricaPadiSuiOverlay = () => {
                         onChange={(e) => setInputValue(e.target.value)}
                         style={{ 
                             width: '100%', 
-                            paddingRight: '100px' // add space for the suffix
+                            paddingRight: '100px' 
                         }}
                     />
                     <span 
@@ -99,7 +97,7 @@ const PayfricaPadiSuiOverlay = () => {
                             right: '10px', 
                             top: '50%', 
                             transform: 'translateY(-50%)', 
-                            pointerEvents: 'none', // prevent interaction with the suffix
+                            pointerEvents: 'none',
                             color: '#555'
                         }}
                     >

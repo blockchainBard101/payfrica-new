@@ -1,4 +1,3 @@
-// src/components/ConvertOverlay.jsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -8,6 +7,7 @@ import { BsArrowDownSquareFill } from 'react-icons/bs'
 import { SuiLogo } from '@/imports'
 import { useCustomWallet } from '@/contexts/CustomWallet'
 import { getTokenBalance } from '@/hooks/getCoinBalance'
+import Image from 'next/image' // ✅ Import Image from next/image
 
 const tokens = {
   NGNC: {
@@ -136,10 +136,13 @@ export default function ConvertOverlay() {
               onChange={(e) => setSellAmount(e.target.value)}
             />
             <div className="dropdown">
-              <img
+              <Image
                 src={tokens[sellSymbol].logo.src}
                 alt={sellSymbol}
+                width={24}
+                height={24}
                 className="token-icon"
+                loading="lazy"
               />
               <select value={sellSymbol} onChange={handleSellChange}>
                 {tokenKeys.map((sym) => (
@@ -176,10 +179,13 @@ export default function ConvertOverlay() {
               readOnly
             />
             <div className="dropdown">
-              <img
+              <Image
                 src={tokens[buySymbol].logo.src}
                 alt={buySymbol}
+                width={24}
+                height={24}
                 className="token-icon"
+                loading="lazy"
               />
               <select value={buySymbol} onChange={handleBuyChange}>
                 {tokenKeys.map((sym) => (

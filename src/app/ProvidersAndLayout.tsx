@@ -1,23 +1,19 @@
 "use client";
-
-import { AuthenticationProvider } from "@/contexts/Authentication";
 import { ChildrenProps } from "@/types/ChildrenProps";
 import React from "react";
-import { EnokiFlowProvider } from "@mysten/enoki/react";
 import {
   createNetworkConfig,
   SuiClientProvider,
+  useSuiClientContext,
   WalletProvider,
 } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
-import { registerStashedWallet } from "@mysten/zksend";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isEnokiNetwork, registerEnokiWallets } from '@mysten/enoki';
 import clientConfig from "@/config/clientConfig";
 import "@mysten/dapp-kit/dist/index.css";
+import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CustomWalletProvider from "@/contexts/CustomWallet";
-// import { Toaster } from "@/components/ui/sonner";
-// import { Analytics } from '@vercel/analytics/react';
-
 
 export interface StorageAdapter {
   setItem(key: string, value: string): Promise<void>;
@@ -37,8 +33,6 @@ const sessionStorageAdapter: StorageAdapter = {
   },
 };
 
-registerStashedWallet("Breaking the Ice - Community Vote", {});
-
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   const { networkConfig } = createNetworkConfig({
     testnet: { url: getFullnodeUrl("testnet") },
@@ -49,30 +43,50 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SuiClientProvider
-        networks={networkConfig}
-        defaultNetwork={clientConfig.SUI_NETWORK_NAME}
-      >
+      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+        <RegisterEnokiWallets />
         <WalletProvider
           autoConnect
-          stashedWallet={{
-            name: "Breaking the Ice - Community Vote",
-          }}
           storage={sessionStorageAdapter}
         >
-          <EnokiFlowProvider apiKey={clientConfig.ENOKI_API_KEY}>
-            <AuthenticationProvider>
-              <CustomWalletProvider>
-                <main>
-                  {children}
-                  {/* <Toaster duration={2000} /> */}
-                  {/* <Analytics /> */}
-                </main>
-              </CustomWalletProvider>
-            </AuthenticationProvider>
-          </EnokiFlowProvider>
+          <CustomWalletProvider>
+            <main>
+              {children}
+            </main>
+          </CustomWalletProvider>
         </WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
+
   );
 };
+
+function RegisterEnokiWallets() {
+  const { client, network } = useSuiClientContext();
+
+  useEffect(() => {
+    if (!isEnokiNetwork(network)) return;
+
+    const { unregister } = registerEnokiWallets({
+      apiKey: clientConfig.ENOKI_API_KEY,
+      providers: {
+        google: {
+          clientId: clientConfig.GOOGLE_CLIENT_ID,
+        },
+        facebook: {
+          clientId: 'YOUR_FACEBOOK_CLIENT_ID',
+        },
+        twitch: {
+          clientId: 'YOUR_TWITCH_CLIENT_ID',
+        },
+      },
+      client,
+      network,
+    });
+
+    return unregister;
+  }, [client, network]);
+
+  return null;
+}
+

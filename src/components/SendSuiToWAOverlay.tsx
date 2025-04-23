@@ -5,37 +5,40 @@ import { BsQrCodeScan } from 'react-icons/bs';
 import { useGlobalState } from '../GlobalStateProvider';
 import { ProfileDP } from '@/imports';
 import { nameExists, getNsAddress } from '@/hooks/registerNsName';
-import { useSendCoinNs, useSendCoinAdd } from '@/hooks/send'; 
+import { useSendCoinNs, useSendCoinAdd } from '@/hooks/send';
 import { useCustomWallet } from '@/contexts/CustomWallet';
 import { getTokenBalance } from '@/hooks/getCoinBalance';
+import Image from 'next/image';
 
 const SendSuiToWAOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
-  if (!overlayStates.sendSuiToWA) return null;
+  const isVisible = overlayStates.sendSuiToWA;
 
   const { address: myAddress } = useCustomWallet();
-  const sendCoinNs  = useSendCoinNs();
+  const sendCoinNs = useSendCoinNs();
   const sendCoinAdd = useSendCoinAdd();
 
-  const [amount,     setAmount]     = useState('');
-  const [recipient,  setRecipient]  = useState('');
-  const [token,      setToken]      = useState('SUI');
-  const [balance,    setBalance]    = useState(null);
+  const [amount, setAmount] = useState('');
+  const [recipient, setRecipient] = useState('');
+  const [token, setToken] = useState<"NGNC" | "GHSC">("NGNC");
+  const [balance, setBalance] = useState<number | null>(null);
   const [loadingBal, setLoadingBal] = useState(false);
-  const [isSending,  setIsSending]  = useState(false);
-  const [nsValid,    setNsValid]    = useState(null);
+  const [isSending, setIsSending] = useState(false);
+  const [nsValid, setNsValid] = useState<boolean | null>(null);
 
-  // Fetch balance on token or address change
   useEffect(() => {
-    if (!myAddress) { setBalance(null); return; }
+    if (!myAddress) {
+      setBalance(null);
+      return;
+    }
+
     setLoadingBal(true);
     getTokenBalance(myAddress, token)
-      .then(bal => setBalance(bal))
+      .then(bal => setBalance(Number(bal)))
       .catch(() => setBalance(null))
       .finally(() => setLoadingBal(false));
   }, [myAddress, token]);
 
-  // Validate NS names
   useEffect(() => {
     if (recipient.includes('@')) {
       nameExists(recipient).then(exists => setNsValid(exists));
@@ -50,18 +53,18 @@ const SendSuiToWAOverlay = () => {
 
     setIsSending(true);
     let rawAddr = recipient;
+
     if (recipient.includes('@')) {
       rawAddr = await getNsAddress(recipient);
     }
 
     try {
       const success = recipient.includes('@')
-        ? await sendCoinNs(token , Number(amount), recipient)
+        ? await sendCoinNs(token, Number(amount), recipient)
         : await sendCoinAdd(token, Number(amount), rawAddr);
 
-      toggleOverlay('sendSuiToWA'); 
-      if (success) toggleOverlay('sending');
-      else         toggleOverlay('failed');
+      toggleOverlay('sendSuiToWA');
+      toggleOverlay(success ? 'sending' : 'failed');
     } catch {
       toggleOverlay('sendSuiToWA');
       toggleOverlay('failed');
@@ -70,14 +73,24 @@ const SendSuiToWAOverlay = () => {
     }
   };
 
-  const canSend =
-    !!amount &&
-    !!recipient &&
-    !isSending &&
-    (recipient.includes('@') ? nsValid === true : true);
+  const canSend = !!amount && !!recipient && !isSending && (recipient.includes('@') ? nsValid === true : true);
 
   return (
-    <div className="overlay-background">
+    <div
+    className="overlay-background"
+    style={{
+      display: isVisible ? 'flex' : 'none',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      height: '100vh',
+      width: '100vw',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      zIndex: 999,
+    }}
+  >
       <div className="enter-amount-overlay">
         <div className="overlay-header">
           <LuMoveLeft
@@ -91,7 +104,7 @@ const SendSuiToWAOverlay = () => {
         </div>
 
         <div className="recipient-info">
-          <img src={ProfileDP.src} className="profile-picture" alt="Profile Picture" />
+          <Image src={ProfileDP} alt="Profile Picture" className="profile-picture" width={40} height={40} />
           <div>
             <h3>Team Sushi</h3>
             <p>@teamsushi</p>
@@ -118,7 +131,7 @@ const SendSuiToWAOverlay = () => {
             />
             <select
               value={token}
-              onChange={e => setToken(e.target.value)}
+              onChange={e => setToken(e.target.value as "NGNC" | "GHSC")}
               style={{
                 marginLeft: '8px',
                 padding: '10px',
@@ -129,7 +142,8 @@ const SendSuiToWAOverlay = () => {
                 outline: 'none',
               }}
             >
-              <option value="SUI">SUI</option>
+              <option value="NGNC">NGNC</option>
+              <option value="GHSC">GHSC</option>
             </select>
             <button
               onClick={() => balance !== null && setAmount(balance.toString())}

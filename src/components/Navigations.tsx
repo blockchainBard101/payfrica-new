@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { ProfileDP, PayfricaNavLogo } from '@/imports';
 import { FaBell, FaBars, FaChevronDown, FaTimes } from 'react-icons/fa';
 
@@ -13,7 +14,14 @@ const Navigation = () => {
     return (
         <nav className="navbar">
             <div className="desktop-nav">
-                <img src={PayfricaNavLogo.src} className='company-nav-logo' alt="Payfrica Logo" />
+                <Image
+                    src={PayfricaNavLogo}
+                    alt="Payfrica Logo"
+                    className="company-nav-logo"
+                    width={100}
+                    height={40}
+                    priority
+                />
                 <ul className="nav-links">
                     <li>Dashboard</li>
                     <li>Pay</li>
@@ -24,8 +32,13 @@ const Navigation = () => {
                 <div className="profile">
                     <FaBell className="icon notis-icon" />
                     <div className="profile-img">
-                        <img src={ProfileDP.src} alt="Profile" />
-                        <p className='profile-name'>John Doe</p>
+                        <Image
+                            src={ProfileDP}
+                            alt="Profile"
+                            width={32}
+                            height={32}
+                        />
+                        <p className="profile-name">John Doe</p>
                         <FaChevronDown className="icon" />
                     </div>
                 </div>
@@ -36,7 +49,12 @@ const Navigation = () => {
                 <div className="profile-icon">
                     <FaBell className="icon" />
                     <div className="profile-img">
-                        <img src={ProfileDP.src} alt="Profile" />
+                        <Image
+                            src={ProfileDP}
+                            alt="Profile"
+                            width={32}
+                            height={32}
+                        />
                         <FaChevronDown className="icon" />
                     </div>
                 </div>

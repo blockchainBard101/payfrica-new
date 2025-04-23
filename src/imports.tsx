@@ -1,9 +1,10 @@
 // Imports for the login page
-import LoginFeaturedImage from '@/Assets/Images/Login Featured Image.png';
-import GoogleIcon from '@/Assets/Images/GoogleLogo.png';
-import FacebookIcon from '@/Assets/Images/FacebookLogo.png';
-import TwitchIcon from '@/Assets/Images/TwitchLogo.png';
-import MicrosoftIcon from '@/Assets/Images/MicrosoftLogo.png';
+// ✅ This works during both dev and build
+export { default as GoogleIcon } from '@/Assets/Images/GoogleLogo.png';
+export { default as FacebookIcon } from '@/Assets/Images/FacebookLogo.png';
+export { default as TwitchIcon } from '@/Assets/Images/TwitchLogo.png';
+export { default as MicrosoftIcon } from '@/Assets/Images/MicrosoftLogo.png';
+export { default as LoginFeaturedImage } from '@/Assets/Images/LoginFeaturedImage.png';
 
 // Imports for the Dashboard page
 import Navigation from '@/components/Navigations';
@@ -41,4 +42,33 @@ import SuiLogo from '@/Assets/Images/SuiLogo.png';
 // Imports for Layout
 import { GlobalStateProvider } from '@/GlobalStateProvider';
 
-export { Loading, LoginFeaturedImage, GoogleIcon, FacebookIcon, TwitchIcon, MicrosoftIcon, Navigation, PayfricaNavLogo, BalancesBg, Balances, QuickActions, SavingsCircle, TransactionHistory, GlobalStateProvider, SendMoneyOverlay, PayfricaPadiOverlay, EnterAmountOverlay, ProfileDP, SendingOverlay, FeedbackOverlay, SuccessOverlay, FailedOverlay, SendSuiTokenOverlay, PayfricaPadiSuiOverlay, EnterSuiAmountOverlay, SendSuiToWAOverlay, ReceiveMoneyOverlay, ReceiveCardOverlay, PayfricaCardBg, ConvertOverlay, ConfirmConvertOverlay, SuiLogo };
+export {
+    Loading,
+    Navigation,
+    PayfricaNavLogo,
+    BalancesBg,
+    Balances,
+    QuickActions,
+    SavingsCircle,
+    TransactionHistory,
+    GlobalStateProvider,
+    SendMoneyOverlay,
+    PayfricaPadiOverlay,
+    EnterAmountOverlay,
+    ProfileDP,
+    SendingOverlay,
+    FeedbackOverlay,
+    SuccessOverlay,
+    FailedOverlay,
+    SendSuiTokenOverlay,
+    PayfricaPadiSuiOverlay,
+    EnterSuiAmountOverlay,
+    SendSuiToWAOverlay,
+    ReceiveMoneyOverlay,
+    ReceiveCardOverlay,
+    PayfricaCardBg,
+    ConvertOverlay,
+    ConfirmConvertOverlay,
+    SuiLogo
+  };
+  
