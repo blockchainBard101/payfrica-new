@@ -41,7 +41,7 @@ export default function Page() {
       {/* Left-side image */}
       <div className="image-container relative flex-1">
         <Image
-          src={"/src/Assets/Images/LoginFeaturedImage.png"}
+          src={"/LoginFeaturedImage.png"}
           alt="Payfrica Featured"
           fill
           className="object-cover"

@@ -96,7 +96,7 @@ export const EnterSuiAmountOverlay = () => {
 
         <div className="recipient-info">
           <Image
-            src={"/src/Assets/Images/PayfricaNavLogo.png"}
+            src={"/PayfricaNavLogo.png"}
             alt="Payfrica Logo"
             width={40}
             height={40}

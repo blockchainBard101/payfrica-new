@@ -108,7 +108,7 @@ export const SendSuiToWAOverlay = () => {
 
         <div className="recipient-info">
           <Image
-            src={"/src/Assets/Images/ProfileDP.jpg"}
+            src={"/ProfileDP.jpg"}
             alt="Profile Picture"
             className="profile-picture"
             width={40}

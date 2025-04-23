@@ -89,7 +89,7 @@ export const ReceiveCardOverlay = () => {
           {/* Back of the card (desktop only) */}
           <div className="pay-card back">
             <Image
-              src={"/src/Assets/Images/PayfricaCardBg.png"}
+              src={"/PayfricaCardBg.png"}
               alt="Back of card"
               style={{ width: "100%", height: "auto" }}
             />

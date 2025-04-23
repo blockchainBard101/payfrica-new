@@ -15,7 +15,7 @@ const tokens = {
     PoolId:
       "0x5d3cb4beb22f251e54de9580b6530ebbad115f92fd0bccec5190c38f14591684",
     decimals: 6,
-    logo: "/src/Assets/Images/SuiLogo.png",
+    logo: "/SuiLogo.png",
     name: "Nigeria Stable",
   },
   GHSC: {
@@ -23,7 +23,7 @@ const tokens = {
       "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ghsc::GHSC",
     PoolId: "0xBBB…222",
     decimals: 6,
-    logo: "/src/Assets/Images/SuiLogo.png",
+    logo: "/SuiLogo.png",
     name: "Ghana Stable",
   },
   USDC: {
@@ -32,7 +32,7 @@ const tokens = {
     PoolId:
       "0xaae9216964bf12c862ab72c3331490bde1f6afbc5d1f48056496d381803b48ad",
     decimals: 6,
-    logo: "/src/Assets/Images/SuiLogo.png",
+    logo: "/SuiLogo.png",
     name: "USD Coin",
   },
   KHSC: {
@@ -40,7 +40,7 @@ const tokens = {
       "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::khsc::KHSC",
     PoolId: "0xDDD…444",
     decimals: 6,
-    logo: "/src/Assets/Images/SuiLogo.png",
+    logo: "/SuiLogo.png",
     name: "Kenya Stable",
   },
 };

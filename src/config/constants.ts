@@ -1,22 +1,22 @@
 const socialLogins = [
   {
     label: "Google",
-    icon: "/src/Assets/Images/GoogleLogo.png",
+    icon: "/GoogleLogo.png",
     provider: "google",
   },
   {
     label: "Facebook",
-    icon: "/src/Assets/Images/FacebookLogo.png",
+    icon: "/FacebookLogo.png",
     provider: "facebook",
   },
   {
     label: "Twitch",
-    icon: "/src/Assets/Images/TwitchLogo.png",
+    icon: "/TwitchLogo.png",
     provider: "twitch",
   },
   {
     label: "Microsoft",
-    icon: "/src/Assets/Images/MicrosoftLogo.png",
+    icon: "/MicrosoftLogo.png",
     provider: "microsoft",
   },
 ];

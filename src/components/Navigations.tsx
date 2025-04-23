@@ -14,7 +14,7 @@ export const Navigation = () => {
     <nav className="navbar">
       <div className="desktop-nav">
         <Image
-          src={"/src/Assets/Images/PayfricaNavLogo.png"}
+          src={"/PayfricaNavLogo.png"}
           alt="Payfrica Logo"
           className="company-nav-logo"
           width={100}
@@ -32,7 +32,7 @@ export const Navigation = () => {
           <FaBell className="icon notis-icon" />
           <div className="profile-img">
             <Image
-              src={"/src/Assets/Images/ProfileDP.jpg"}
+              src={"/ProfileDP.jpg"}
               alt="Profile"
               width={32}
               height={32}
@@ -49,7 +49,7 @@ export const Navigation = () => {
           <FaBell className="icon" />
           <div className="profile-img">
             <Image
-              src={"/src/Assets/Images/ProfileDP.jpg"}
+              src={"/ProfileDP.jpg"}
               alt="Profile"
               width={32}
               height={32}
