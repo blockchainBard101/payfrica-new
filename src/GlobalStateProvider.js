@@ -26,17 +26,21 @@ export const GlobalStateProvider = ({ children }) => {
     // Convert Tokens Overlays
     confirmConvert: false,
     convert: false,
+    //This is only for testing.
+    default: false,
   });
 
-  const toggleOverlay = (overlayName) => {
+  const toggleOverlay = (overlayName = "sendMoney") => {
+    console.log({ overlayName });
     setOverlayStates((prevState) => ({
       ...prevState,
-      [overlayName]: !prevState[overlayName],
+      [overlayName]: !prevState?.[overlayName],
     }));
   };
 
   const closeAllOverlays = () => {
     const allOverlays = Object.keys(overlayStates).reduce((acc, key) => {
+      console.log({ key });
       acc[key] = false;
       return acc;
     }, {});

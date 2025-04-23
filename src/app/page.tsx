@@ -7,31 +7,13 @@ import React, { useEffect, useState } from "react";
 import {
   useConnectWallet,
   useWallets,
-  useCurrentAccount
+  useCurrentAccount,
 } from "@mysten/dapp-kit";
-import {
-  isEnokiWallet,
-  EnokiWallet,
-  AuthProvider,
-} from "@mysten/enoki";
+import { isEnokiWallet, EnokiWallet, AuthProvider } from "@mysten/enoki";
+import { socialLogins } from "@/config/constants";
 // import { useCustomWallet } from "@/contexts/CustomWallet";
 
-import {
-  LoginFeaturedImage,
-  GoogleIcon,
-  FacebookIcon,
-  TwitchIcon,
-  MicrosoftIcon,
-} from "@/imports";
-
-const socialLogins = [
-  { label: "Google", icon: GoogleIcon, provider: "google" },
-  { label: "Facebook", icon: FacebookIcon, provider: "facebook" },
-  { label: "Twitch", icon: TwitchIcon, provider: "twitch" },
-  { label: "Microsoft", icon: MicrosoftIcon, provider: "microsoft" },
-];
-
-export default function HomPage() {
+export default function Page() {
   const router = useRouter();
   // const { isConnected } = useCustomWallet();
   const currentAccount = useCurrentAccount();
@@ -59,7 +41,7 @@ export default function HomPage() {
       {/* Left-side image */}
       <div className="image-container relative flex-1">
         <Image
-          src={LoginFeaturedImage}
+          src={"/src/Assets/Images/LoginFeaturedImage.png"}
           alt="Payfrica Featured"
           fill
           className="object-cover"

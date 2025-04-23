@@ -1,45 +1,75 @@
-'use client';
-import React, { useState, useEffect, useMemo } from 'react';
-import { FaEye, FaEyeSlash, FaEllipsisV, FaPlus } from 'react-icons/fa';
+"use client";
+import React, { useState, useEffect, useMemo } from "react";
+import { FaEye, FaEyeSlash, FaEllipsisV, FaPlus } from "react-icons/fa";
 import { useCustomWallet } from "@/contexts/CustomWallet";
-import { useRealTimeBalances } from '@/hooks/useRealTimeBalances';
+import { useRealTimeBalances } from "@/hooks/useRealTimeBalances";
 
-const BalanceCards = () => {
+export const BalanceCards = () => {
   const { address } = useCustomWallet();
   const { fundingBalance, portfolioBalance } = useRealTimeBalances(address);
 
   // 1. Compute real total balance:
   const totalBalance = useMemo(() => {
     // strip out any non‐numeric, then parse
-    const fundNum = parseFloat((fundingBalance || '0').replace(/[^0-9.-]+/g, ''));
-    const portNum = parseFloat((portfolioBalance || '0').replace(/[^0-9.-]+/g, ''));
-    return (fundNum + portNum).toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN'
+    const fundNum = parseFloat(
+      (fundingBalance || "0").replace(/[^0-9.-]+/g, "")
+    );
+    const portNum = parseFloat(
+      (portfolioBalance || "0").replace(/[^0-9.-]+/g, "")
+    );
+    return (fundNum + portNum).toLocaleString("en-NG", {
+      style: "currency",
+      currency: "NGN",
     });
   }, [fundingBalance, portfolioBalance]);
 
   // 2. Set up your cards with proper defaults (use ₦-- for both):
   const initialBalanceData = [
-    { title: 'Base Currency',   amount: fundingBalance   || '₦--', actionText: 'Fund Wallet',    actionIcon: <FaPlus />, tokens: null },
-    { title: 'All Balances',    amount: portfolioBalance || '₦--', actionText: 'Tokens: Sui, USDC', actionIcon: null, tokens: 'Sui, USDC' },
-    { title: 'Savings Balance', amount: '₦0',              actionText: 'View more',        actionIcon: null, tokens: null },
-    { title: 'Card Balance',    amount: '₦0',              actionText: 'Details',          actionIcon: null, tokens: null },
+    {
+      title: "Base Currency",
+      amount: fundingBalance || "₦--",
+      actionText: "Fund Wallet",
+      actionIcon: <FaPlus />,
+      tokens: null,
+    },
+    {
+      title: "All Balances",
+      amount: portfolioBalance || "₦--",
+      actionText: "Tokens: Sui, USDC",
+      actionIcon: null,
+      tokens: "Sui, USDC",
+    },
+    {
+      title: "Savings Balance",
+      amount: "₦0",
+      actionText: "View more",
+      actionIcon: null,
+      tokens: null,
+    },
+    {
+      title: "Card Balance",
+      amount: "₦0",
+      actionText: "Details",
+      actionIcon: null,
+      tokens: null,
+    },
   ];
 
   const [balanceData, setBalanceData] = useState(initialBalanceData);
   const [showTotalBalance, setShowTotalBalance] = useState(true);
-  const [visibleCards, setVisibleCards] = useState(initialBalanceData.map(() => true));
+  const [visibleCards, setVisibleCards] = useState(
+    initialBalanceData.map(() => true)
+  );
 
   // 3. Update both fundingBalance (index 0) AND portfolioBalance (index 1)
   useEffect(() => {
-    setBalanceData(prev => {
+    setBalanceData((prev) => {
       const updated = prev.map((card, idx) => {
         if (idx === 0) {
-          return { ...card, amount: fundingBalance || '₦--' };
+          return { ...card, amount: fundingBalance || "₦--" };
         }
         if (idx === 1) {
-          return { ...card, amount: portfolioBalance || '₦--' };
+          return { ...card, amount: portfolioBalance || "₦--" };
         }
         return card;
       });
@@ -47,9 +77,9 @@ const BalanceCards = () => {
     });
   }, [fundingBalance, portfolioBalance]);
 
-  const toggleTotalBalance = () => setShowTotalBalance(v => !v);
-  const toggleCardBalance = idx =>
-    setVisibleCards(vis => vis.map((v, i) => (i === idx ? !v : v)));
+  const toggleTotalBalance = () => setShowTotalBalance((v) => !v);
+  const toggleCardBalance = (idx) =>
+    setVisibleCards((vis) => vis.map((v, i) => (i === idx ? !v : v)));
 
   return (
     <div className="balances-container">
@@ -58,7 +88,7 @@ const BalanceCards = () => {
           <h1>Welcome to Payfrica</h1>
           <div className="total-balance">
             <span>Total Balance:</span>
-            {showTotalBalance ? '1,000,000,000' : '******'}
+            {showTotalBalance ? "1,000,000,000" : "******"}
             <span onClick={toggleTotalBalance} className="eye-icon">
               {showTotalBalance ? <FaEye /> : <FaEyeSlash />}
             </span>
@@ -70,14 +100,14 @@ const BalanceCards = () => {
             <div key={index} className="balance-card">
               <div className="balance-card-header">
                 <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
                 >
                   <span>{card.title}</span>
                   <span onClick={() => toggleCardBalance(index)}>
                     {visibleCards[index] ? (
-                      <FaEye style={{ cursor: 'pointer' }} />
+                      <FaEye style={{ cursor: "pointer" }} />
                     ) : (
-                      <FaEyeSlash style={{ cursor: 'pointer' }} />
+                      <FaEyeSlash style={{ cursor: "pointer" }} />
                     )}
                   </span>
                 </div>
@@ -85,7 +115,7 @@ const BalanceCards = () => {
               </div>
 
               <div className="card-amount">
-                <h2>{visibleCards[index] ? card.amount : '******'}</h2>
+                <h2>{visibleCards[index] ? card.amount : "******"}</h2>
               </div>
 
               <div className="card-footer">
@@ -101,5 +131,3 @@ const BalanceCards = () => {
     </div>
   );
 };
-
-export default BalanceCards;

@@ -1,28 +1,28 @@
-'use client';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import QRCode from 'react-qr-code';
-import { FaArrowLeft, FaCopy } from 'react-icons/fa';
-import { BsQuestionCircleFill } from 'react-icons/bs';
-import { useGlobalState } from '@/GlobalStateProvider';
-import { toast } from 'react-toastify';
-import { useCustomWallet } from '@/contexts/CustomWallet';
-import { getFormattedSuiHandle } from '@/hooks/registerNsName';
+"use client";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import QRCode from "react-qr-code";
+import { FaArrowLeft, FaCopy } from "react-icons/fa";
+import { BsQuestionCircleFill } from "react-icons/bs";
+import { useGlobalState } from "@/GlobalStateProvider";
+import { toast } from "react-toastify";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { getFormattedSuiHandle } from "@/hooks/registerNsName";
 
 // Utility to shorten addresses
 const shortenAddress = (address, start = 10, end = 10) => {
-  if (!address) return '';
+  if (!address) return "";
   return `${address.slice(0, start)}…${address.slice(-end)}`;
 };
 
-const ReceiveMoneyOverlay = () => {
+export const ReceiveMoneyOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
   const { address } = useCustomWallet();
-  const [payTag, setPayTag] = useState('');
+  const [payTag, setPayTag] = useState("");
   const [loadingTag, setLoadingTag] = useState(false);
 
   useEffect(() => {
     if (!address) {
-      setPayTag('');
+      setPayTag("");
       return;
     }
     setLoadingTag(true);
@@ -31,8 +31,8 @@ const ReceiveMoneyOverlay = () => {
         const tag = await getFormattedSuiHandle(address);
         setPayTag(tag);
       } catch (err) {
-        console.error('getFormattedSuiHandle failed', err);
-        setPayTag('');
+        console.error("getFormattedSuiHandle failed", err);
+        setPayTag("");
       } finally {
         setLoadingTag(false);
       }
@@ -40,7 +40,7 @@ const ReceiveMoneyOverlay = () => {
     fetchTag();
   }, [address]);
 
-  const walletAddress = address ?? '';
+  const walletAddress = address ?? "";
 
   const shortenedAddress = useMemo(
     () => shortenAddress(walletAddress),
@@ -50,8 +50,8 @@ const ReceiveMoneyOverlay = () => {
   const copyToClipboard = useCallback((text) => {
     navigator.clipboard
       .writeText(text)
-      .then(() => toast.success('Copied to clipboard!'))
-      .catch(() => toast.error('Failed to copy'));
+      .then(() => toast.success("Copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy"));
   }, []);
 
   if (!overlayStates.receiveMoney) return null;
@@ -62,7 +62,7 @@ const ReceiveMoneyOverlay = () => {
         <div className="receive-header">
           <FaArrowLeft
             className="icon"
-            onClick={() => toggleOverlay('receiveMoney')}
+            onClick={() => toggleOverlay("receiveMoney")}
           />
           <h2>Receive Money</h2>
           <BsQuestionCircleFill className="icon" />
@@ -80,11 +80,7 @@ const ReceiveMoneyOverlay = () => {
         <div className="info-block">
           <h2>Payfrica Tag</h2>
           <div className="copy-box">
-            {loadingTag ? (
-              <p>Loading…</p>
-            ) : (
-              <p>{payTag || '—'}</p>
-            )}
+            {loadingTag ? <p>Loading…</p> : <p>{payTag || "—"}</p>}
             <button
               onClick={() => payTag && copyToClipboard(payTag)}
               disabled={!payTag}
@@ -111,8 +107,8 @@ const ReceiveMoneyOverlay = () => {
         <button
           className="share-btn"
           onClick={() => {
-            toggleOverlay('receiveMoney');
-            toggleOverlay('receiveCard');
+            toggleOverlay("receiveMoney");
+            toggleOverlay("receiveCard");
           }}
         >
           Share address
@@ -121,5 +117,3 @@ const ReceiveMoneyOverlay = () => {
     </div>
   );
 };
-
-export default ReceiveMoneyOverlay;

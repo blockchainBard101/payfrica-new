@@ -1,11 +1,16 @@
 // "use client"; // Not needed here unless you use client hooks
 import "./globals.css";
-import { GlobalStateProvider } from "@/imports";
-import { ToastContainer } from "react-toastify";
-import { ProvidersAndLayout } from "./ProvidersAndLayout";
-import "react-toastify/dist/ReactToastify.css";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { ToastContainer } from "react-toastify";
+import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
+import "react-toastify/dist/ReactToastify.css";
+import { GlobalStateProvider } from "@/GlobalStateProvider";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>

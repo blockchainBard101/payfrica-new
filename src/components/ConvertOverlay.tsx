@@ -1,105 +1,110 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { useGlobalState } from '@/GlobalStateProvider'
-import { IoIosCloseCircleOutline } from 'react-icons/io'
-import { BsArrowDownSquareFill } from 'react-icons/bs'
-import { SuiLogo } from '@/imports'
-import { useCustomWallet } from '@/contexts/CustomWallet'
-import { getTokenBalance } from '@/hooks/getCoinBalance'
-import Image from 'next/image' // ✅ Import Image from next/image
+import React, { useState, useEffect } from "react";
+import { useGlobalState } from "@/GlobalStateProvider";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import { BsArrowDownSquareFill } from "react-icons/bs";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { getTokenBalance } from "@/hooks/getCoinBalance";
+import Image from "next/image"; // ✅ Import Image from next/image
 
 const tokens = {
   NGNC: {
-    CoinId: "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::ngnc::NGNC",
-    PoolId: "0x5d3cb4beb22f251e54de9580b6530ebbad115f92fd0bccec5190c38f14591684",
+    CoinId:
+      "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::ngnc::NGNC",
+    PoolId:
+      "0x5d3cb4beb22f251e54de9580b6530ebbad115f92fd0bccec5190c38f14591684",
     decimals: 6,
-    logo: SuiLogo,
+    logo: "/src/Assets/Images/SuiLogo.png",
     name: "Nigeria Stable",
   },
   GHSC: {
-    CoinId: "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ghsc::GHSC",
+    CoinId:
+      "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ghsc::GHSC",
     PoolId: "0xBBB…222",
     decimals: 6,
-    logo: SuiLogo,
+    logo: "/src/Assets/Images/SuiLogo.png",
     name: "Ghana Stable",
   },
   USDC: {
-    CoinId: "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::usdc::USDC",
-    PoolId: "0xaae9216964bf12c862ab72c3331490bde1f6afbc5d1f48056496d381803b48ad",
+    CoinId:
+      "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::usdc::USDC",
+    PoolId:
+      "0xaae9216964bf12c862ab72c3331490bde1f6afbc5d1f48056496d381803b48ad",
     decimals: 6,
-    logo: SuiLogo,
+    logo: "/src/Assets/Images/SuiLogo.png",
     name: "USD Coin",
   },
   KHSC: {
-    CoinId: "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::khsc::KHSC",
+    CoinId:
+      "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::khsc::KHSC",
     PoolId: "0xDDD…444",
     decimals: 6,
-    logo: SuiLogo,
+    logo: "/src/Assets/Images/SuiLogo.png",
     name: "Kenya Stable",
   },
-}
+};
 
 const rates_dollar = {
   NGNC: 1500,
   GHSC: 15.56,
   USDC: 1,
   KHSC: 15.56,
-}
+};
 
-export default function ConvertOverlay() {
-  const { overlayStates, toggleOverlay, setConvertData } = useGlobalState()
-  const { address } = useCustomWallet()
-  const tokenKeys = Object.keys(tokens)
-  const [sellSymbol, setSellSymbol] = useState('NGNC')
-  const [buySymbol, setBuySymbol] = useState('USDC')
-  const [sellAmount, setSellAmount] = useState('')
-  const [buyAmount, setBuyAmount] = useState('')
-  const [sellBalance, setSellBalance] = useState('0.00')
-  const [buyBalance, setBuyBalance] = useState('0.00')
+export function ConvertOverlay() {
+  const { overlayStates, toggleOverlay, setConvertData } = useGlobalState();
+  const { address } = useCustomWallet();
+  const tokenKeys = Object.keys(tokens);
+  const [sellSymbol, setSellSymbol] = useState("NGNC");
+  const [buySymbol, setBuySymbol] = useState("USDC");
+  const [sellAmount, setSellAmount] = useState("");
+  const [buyAmount, setBuyAmount] = useState("");
+  const [sellBalance, setSellBalance] = useState("0.00");
+  const [buyBalance, setBuyBalance] = useState("0.00");
 
   // compute buyAmount
   useEffect(() => {
-    const sell = parseFloat(sellAmount)
+    const sell = parseFloat(sellAmount);
     if (!sellAmount || isNaN(sell)) {
-      setBuyAmount('')
-      return
+      setBuyAmount("");
+      return;
     }
-    const rate = rates_dollar[buySymbol] / rates_dollar[sellSymbol]
-    setBuyAmount((sell * rate).toFixed(2))
-  }, [sellAmount, sellSymbol, buySymbol])
+    const rate = rates_dollar[buySymbol] / rates_dollar[sellSymbol];
+    setBuyAmount((sell * rate).toFixed(2));
+  }, [sellAmount, sellSymbol, buySymbol]);
 
   // fetch balances
   useEffect(() => {
-    if (!address) return
+    if (!address) return;
     getTokenBalance(address, sellSymbol)
       .then(setSellBalance)
-      .catch(() => setSellBalance('0.00'))
-  }, [address, sellSymbol])
+      .catch(() => setSellBalance("0.00"));
+  }, [address, sellSymbol]);
 
   useEffect(() => {
-    if (!address) return
+    if (!address) return;
     getTokenBalance(address, buySymbol)
       .then(setBuyBalance)
-      .catch(() => setBuyBalance('0.00'))
-  }, [address, buySymbol])
+      .catch(() => setBuyBalance("0.00"));
+  }, [address, buySymbol]);
 
   const handleSwitch = () => {
-    setSellSymbol(buySymbol)
-    setBuySymbol(sellSymbol)
-    setSellAmount(buyAmount)
-    setBuyAmount(sellAmount)
-  }
+    setSellSymbol(buySymbol);
+    setBuySymbol(sellSymbol);
+    setSellAmount(buyAmount);
+    setBuyAmount(sellAmount);
+  };
 
   const handleSellChange = (e) => {
-    const symbol = e.target.value
-    symbol === buySymbol ? handleSwitch() : setSellSymbol(symbol)
-  }
+    const symbol = e.target.value;
+    symbol === buySymbol ? handleSwitch() : setSellSymbol(symbol);
+  };
 
   const handleBuyChange = (e) => {
-    const symbol = e.target.value
-    symbol === sellSymbol ? handleSwitch() : setBuySymbol(symbol)
-  }
+    const symbol = e.target.value;
+    symbol === sellSymbol ? handleSwitch() : setBuySymbol(symbol);
+  };
 
   const handleContinue = () => {
     setConvertData({
@@ -107,12 +112,12 @@ export default function ConvertOverlay() {
       toToken: buySymbol,
       fromAmount: sellAmount,
       toAmount: buyAmount,
-    })
-    toggleOverlay('convert')
-    toggleOverlay('confirmConvert')
-  }
+    });
+    toggleOverlay("convert");
+    toggleOverlay("confirmConvert");
+  };
 
-  if (!overlayStates.convert) return null
+  if (!overlayStates.convert) return null;
 
   return (
     <div className="overlay-background">
@@ -121,7 +126,7 @@ export default function ConvertOverlay() {
           <h2>Convert Tokens</h2>
           <IoIosCloseCircleOutline
             className="close-btn"
-            onClick={() => toggleOverlay('convert')}
+            onClick={() => toggleOverlay("convert")}
           />
         </div>
 
@@ -172,12 +177,7 @@ export default function ConvertOverlay() {
         <div className="convert-card">
           <div className="convert-label">Buy</div>
           <div className="convert-row">
-            <input
-              type="text"
-              placeholder="0"
-              value={buyAmount}
-              readOnly
-            />
+            <input type="text" placeholder="0" value={buyAmount} readOnly />
             <div className="dropdown">
               <Image
                 src={tokens[buySymbol].logo.src}
@@ -214,5 +214,5 @@ export default function ConvertOverlay() {
         </button>
       </div>
     </div>
-  )
+  );
 }
