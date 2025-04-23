@@ -21,17 +21,17 @@ export interface StorageAdapter {
   removeItem(key: string): Promise<void>;
 }
 
-const sessionStorageAdapter: StorageAdapter = {
-  getItem: async (key) => {
-    return sessionStorage.getItem(key);
-  },
-  setItem: async (key, value) => {
-    sessionStorage.setItem(key, value);
-  },
-  removeItem: async (key) => {
-    sessionStorage.removeItem(key);
-  },
-};
+// const sessionStorageAdapter: StorageAdapter = {
+//   getItem: async (key) => {
+//     return sessionStorage.getItem(key);
+//   },
+//   setItem: async (key, value) => {
+//     sessionStorage.setItem(key, value);
+//   },
+//   removeItem: async (key) => {
+//     sessionStorage.removeItem(key);
+//   },
+// };
 
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   const { networkConfig } = createNetworkConfig({
@@ -47,7 +47,6 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
         <RegisterEnokiWallets />
         <WalletProvider
           autoConnect
-          storage={sessionStorageAdapter}
         >
           <CustomWalletProvider>
             <main>
