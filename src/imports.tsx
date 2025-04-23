@@ -1,74 +1,45 @@
-// Imports for the login page
-// ✅ This works during both dev and build
-export { default as GoogleIcon } from '@/Assets/Images/GoogleLogo.png';
-export { default as FacebookIcon } from '@/Assets/Images/FacebookLogo.png';
-export { default as TwitchIcon } from '@/Assets/Images/TwitchLogo.png';
-export { default as MicrosoftIcon } from '@/Assets/Images/MicrosoftLogo.png';
-export { default as LoginFeaturedImage } from '@/Assets/Images/LoginFeaturedImage.png';
+// src/imports/index.ts
 
-// Imports for the Dashboard page
-import Navigation from '@/components/Navigations';
-import PayfricaNavLogo from '@/Assets/Images/PayfricaNavLogo.png';
-import BalancesBg from '@/Assets/Images/BalancesBg.png';
-import Balances from './components/Balances';
-import QuickActions from './components/QuickActions';
-import SavingsCircle from './components/SavingsCircle';
-import TransactionHistory from './components/TransactionHistory';
-// Imports for the Send Money Overlay
-import SendMoneyOverlay from './components/SendMoneyOverlay';
-import PayfricaPadiOverlay from './components/PayfricaPadiOverlay';
-import EnterAmountOverlay from './components/EnterAmountOverlay';
-import ProfileDP from '@/Assets/Images/Profile DP.jpg';
-import SendingOverlay from './components/SendingOverlay';
-import FeedbackOverlay from './components/FeedbackOverlay';
-import SuccessOverlay from './components/SuccessOverlay';
-import FailedOverlay from './components/FailedOverlay';
-import SendSuiTokenOverlay from './components/SendSuiTokenOverlay';
-import PayfricaPadiSuiOverlay from './components/PayfricaPadiSuiOverlay';
-import EnterSuiAmountOverlay from './components/EnterSuiAmountOverlay';
-import SendSuiToWAOverlay from './components/SendSuiToWAOverlay';
-import Loading from './components/Loading';
+// — Login page assets —
+export { default as GoogleIcon }           from '@/Assets/Images/GoogleLogo.png'
+export { default as FacebookIcon }         from '@/Assets/Images/FacebookLogo.png'
+export { default as TwitchIcon }           from '@/Assets/Images/TwitchLogo.png'
+export { default as MicrosoftIcon }        from '@/Assets/Images/MicrosoftLogo.png'
+export { default as LoginFeaturedImage }   from '@/Assets/Images/LoginFeaturedImage.png'
 
-// Imports for the Receive Money Overlay
-import ReceiveMoneyOverlay from './components/ReceiveMoneyOverlay';
-import ReceiveCardOverlay from './components/ReceiveCardOverlay';
-import PayfricaCardBg from '@/Assets/Images/PayfricaCardBg.png';
+// — Dashboard components & assets —
+export { default as Navigation }           from '@/components/Navigations'
+export { default as PayfricaNavLogo }      from '@/Assets/Images/PayfricaNavLogo.png'
+export { default as BalancesBg }           from '@/Assets/Images/BalancesBg.png'
+export { default as Balances }             from '@/components/Balances'
+export { default as QuickActions }         from '@/components/QuickActions'
+export { default as SavingsCircle }        from '@/components/SavingsCircle'
+export { default as TransactionHistory }   from '@/components/TransactionHistory'
 
-// Imports for Converts
-import ConvertOverlay from './components/ConvertOverlay';
-import ConfirmConvertOverlay from './components/ConfirmConvertOverlay';
-import SuiLogo from '@/Assets/Images/SuiLogo.png';
+// — Send overlays & related assets —
+export { default as SendMoneyOverlay }     from '@/components/SendMoneyOverlay'
+export { default as PayfricaPadiOverlay }  from '@/components/PayfricaPadiOverlay'
+export { default as EnterAmountOverlay }   from '@/components/EnterAmountOverlay'
+export { default as ProfileDP }            from '@/Assets/Images/ProfileDP.jpg'
+export { default as SendingOverlay }       from '@/components/SendingOverlay'
+export { default as FeedbackOverlay }      from '@/components/FeedbackOverlay'
+export { default as SuccessOverlay }       from '@/components/SuccessOverlay'
+export { default as FailedOverlay }        from '@/components/FailedOverlay'
+export { default as SendSuiTokenOverlay }  from '@/components/SendSuiTokenOverlay'
+export { default as PayfricaPadiSuiOverlay } from '@/components/PayfricaPadiSuiOverlay'
+export { default as EnterSuiAmountOverlay }  from '@/components/EnterSuiAmountOverlay'
+export { default as SendSuiToWAOverlay }     from '@/components/SendSuiToWAOverlay'
+export { default as Loading }               from '@/components/Loading'
 
-// Imports for Layout
-import { GlobalStateProvider } from '@/GlobalStateProvider';
+// — Receive overlays & assets —
+export { default as ReceiveMoneyOverlay }  from '@/components/ReceiveMoneyOverlay'
+export { default as ReceiveCardOverlay }   from '@/components/ReceiveCardOverlay'
+export { default as PayfricaCardBg }       from '@/Assets/Images/PayfricaCardBg.png'
 
-export {
-    Loading,
-    Navigation,
-    PayfricaNavLogo,
-    BalancesBg,
-    Balances,
-    QuickActions,
-    SavingsCircle,
-    TransactionHistory,
-    GlobalStateProvider,
-    SendMoneyOverlay,
-    PayfricaPadiOverlay,
-    EnterAmountOverlay,
-    ProfileDP,
-    SendingOverlay,
-    FeedbackOverlay,
-    SuccessOverlay,
-    FailedOverlay,
-    SendSuiTokenOverlay,
-    PayfricaPadiSuiOverlay,
-    EnterSuiAmountOverlay,
-    SendSuiToWAOverlay,
-    ReceiveMoneyOverlay,
-    ReceiveCardOverlay,
-    PayfricaCardBg,
-    ConvertOverlay,
-    ConfirmConvertOverlay,
-    SuiLogo
-  };
-  
+// — Convert overlays & assets —
+export { default as ConvertOverlay }       from '@/components/ConvertOverlay'
+export { default as ConfirmConvertOverlay } from '@/components/ConfirmConvertOverlay'
+export { default as SuiLogo }              from '@/Assets/Images/SuiLogo.png'
+
+// — App layout / state —
+export { GlobalStateProvider }   from '@/GlobalStateProvider'

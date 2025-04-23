@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -9,7 +8,10 @@ import {
   SavingsCircle,
   TransactionHistory,
 } from "@/imports";
-import { useCustomWallet } from "@/contexts/CustomWallet";
+// import { useCustomWallet } from "@/contexts/CustomWallet";
+import {
+  useCurrentAccount,
+} from "@mysten/dapp-kit";
 
 // Overlay groups
 import {
@@ -32,15 +34,16 @@ import {
 
 const Dashboard = () => {
   const router = useRouter();
-  const { isConnected } = useCustomWallet();
+  // const { isConnected } = useCustomWallet();
+  const currentAccount = useCurrentAccount();
+  useEffect(() => {
+    if (!currentAccount) {
+      router.push("/login");
+      console.log("Not connected");
+    }
+  }, [currentAccount, router]);
 
-  // useEffect(() => {
-  //   if (!isConnected) {
-  //     router.push("/login");
-  //   }
-  // }, [isConnected, router]);
-
-  if (!isConnected) return null;
+  if (!currentAccount) return null;
 
   return (
     <div className="min-h-screen w-full bg-background">

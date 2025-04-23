@@ -7,13 +7,14 @@ import React, { useEffect, useState } from "react";
 import {
   useConnectWallet,
   useWallets,
+  useCurrentAccount
 } from "@mysten/dapp-kit";
 import {
   isEnokiWallet,
   EnokiWallet,
   AuthProvider,
 } from "@mysten/enoki";
-import { useCustomWallet } from "@/contexts/CustomWallet";
+// import { useCustomWallet } from "@/contexts/CustomWallet";
 
 import {
   LoginFeaturedImage,
@@ -30,9 +31,10 @@ const socialLogins = [
   { label: "Microsoft", icon: MicrosoftIcon, provider: "microsoft" },
 ];
 
-export default function LoginPage() {
+export default function HomPage() {
   const router = useRouter();
-  const { isConnected } = useCustomWallet();
+  // const { isConnected } = useCustomWallet();
+  const currentAccount = useCurrentAccount();
   const { mutateAsync: connect } = useConnectWallet();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,13 +46,13 @@ export default function LoginPage() {
 
   // Redirect as soon as we're connected
   useEffect(() => {
-    if (isConnected) {
+    if (currentAccount) {
       router.push("/dashboard");
     }
-  }, [isConnected, router]);
+  }, [currentAccount, router]);
 
   // Don't flash the login page if already connected
-  if (isConnected) return null;
+  if (currentAccount) return null;
 
   return (
     <div className="login-page-container flex">
