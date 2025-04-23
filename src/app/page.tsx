@@ -21,6 +21,7 @@ import {
   TwitchIcon,
   MicrosoftIcon,
 } from "@/imports";
+import { useCustomWallet } from "@/contexts/CustomWallet";
 
 const socialLogins = [
   { label: "Google", icon: GoogleIcon, provider: "google" },
@@ -29,9 +30,9 @@ const socialLogins = [
   { label: "Microsoft", icon: MicrosoftIcon, provider: "microsoft" },
 ];
 
-export default function Home() {
+export default function LoginPage() {
   const router = useRouter();
-  const currentAccount = useCurrentAccount();
+  const { isConnected } = useCustomWallet();
   const { mutate: connect } = useConnectWallet();
 
   const wallets = useWallets().filter(isEnokiWallet);
@@ -41,12 +42,12 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (currentAccount) {
+    if (isConnected) {
       router.push("/dashboard");
     }
-  }, [currentAccount, router]);
+  }, [isConnected, router]);
 
-  if (currentAccount) return null;
+  if (isConnected) return null;
 
   return (
     <div className="login-page-container">
