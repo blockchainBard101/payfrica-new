@@ -56,7 +56,6 @@ export const BalanceCards = () => {
   ];
 
   const [balanceData, setBalanceData] = useState(initialBalanceData);
-  const [showTotalBalance, setShowTotalBalance] = useState(true);
   const [visibleCards, setVisibleCards] = useState(
     initialBalanceData.map(() => true)
   );
@@ -77,7 +76,6 @@ export const BalanceCards = () => {
     });
   }, [fundingBalance, portfolioBalance]);
 
-  const toggleTotalBalance = () => setShowTotalBalance((v) => !v);
   const toggleCardBalance = (idx) =>
     setVisibleCards((vis) => vis.map((v, i) => (i === idx ? !v : v)));
 
@@ -87,11 +85,6 @@ export const BalanceCards = () => {
         <div className="balance-header">
           <h1>Welcome to Payfrica</h1>
           <div className="total-balance">
-            <span>Total Balance:</span>
-            {showTotalBalance ? "1,000,000,000" : "******"}
-            <span onClick={toggleTotalBalance} className="eye-icon">
-              {showTotalBalance ? <FaEye /> : <FaEyeSlash />}
-            </span>
           </div>
         </div>
 

@@ -2040,3 +2040,474 @@ Overlay Background .overlay-background {
   width: 20px;
   height: 20px;
 }
+
+/* Deposit Type Overlay Stylings */
+
+/* Full‐screen backdrop */
+.overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal container */
+.deposit-type-container {
+  background: #fbe19a;
+  border: 1px solid #c43e26;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  font-family: Inter, sans-serif;
+}
+
+/* Header row */
+.deposit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.deposit-header h3 {
+  margin: 0;
+  font-size: 25px;
+  color: #474747;
+  font-weight: bold;
+  font-family: LexendExtraBold;
+}
+
+/* Each deposit option */
+.deposit-option {
+  display: flex;
+  align-items: flex-start;
+  background: #fcf5d5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.deposit-option:hover {
+  background: #f6e8b0;
+}
+
+/* Disabled state */
+.deposit-option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.option-icon {
+  font-size: 1.5rem;
+  color: #c43e26;
+  margin-right: 1rem;
+  margin-top: 0.2rem;
+}
+
+/* Text content */
+.option-content h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #474747;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: InterBold;
+  margin-bottom: 10px;
+}
+
+.option-content p {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.9rem;
+  color: #474747;
+  font-family: InterLight;
+}
+
+/* “Zero fees” / “Few minutes” badges */
+.badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: #c43e26;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: InterBold;
+}
+
+/* Coming soon label */
+.coming-soon {
+  font-size: 0.75rem;
+  color: #c43e26;
+}
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .deposit-type-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .deposit-option {
+    padding: 0.8rem;
+  }
+}
+
+/* Full‐screen Backdrop */
+/* .overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+} */
+
+/* Main Container */
+.enter-deposit-container {
+  background: #fbe19a; /* Soft yellow */
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Inter, sans-serif;
+}
+
+/* Header Row */
+.overlay-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.overlay-header .icon {
+  font-size: 1.2rem;
+  color: #c43e26; /* Brand red */
+  cursor: pointer;
+}
+
+/* Entry Card */
+.deposit-entry-card {
+  background: #fcf5d7; /* Slightly lighter yellow */
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.deposit-entry-card h3 {
+  margin: 0 0 1rem;
+  color: #c43e26;
+  font-family: LexendExtraBold;
+}
+
+/* Input + Currency Label */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+.input-wrapper input {
+  width: 100%;
+  padding: 0.8rem 3rem 0.8rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  color: #474747;
+}
+.input-wrapper .currency {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  transform: translateY(-50%);
+  font-family: InterBold;
+  color: #474747;
+}
+
+/* Preset Buttons */
+.preset-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.preset-buttons button {
+  border: 1px solid #c43e26;
+  background: transparent;
+  color: #c43e26;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  font-family: InterBold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.preset-buttons button:hover {
+  background: #c43e26;
+  color: white;
+}
+
+/* Next Button */
+.next-btn {
+  background: #3c53a4; /* Brand blue */
+  color: white;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: InterBold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  width: 100%;
+}
+.next-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile Tweaks */
+@media (max-width: 480px) {
+  .enter-deposit-container {
+    padding: 1.5rem 1rem;
+  }
+  .preset-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Confirm Deposit Overlay Stylings */
+/* backdrop */
+.overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* modal box */
+.confirm-deposit-container {
+  background: #fff9e6; /* Light card background */
+  border-radius: 10px;
+  padding: 2rem 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  font-family: Inter, sans-serif;
+  position: relative;
+}
+
+/* headings */
+.confirm-deposit-container h4 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #474747;
+  padding-top: 20px;
+  font-family: LexendExtraBold;
+}
+
+.confirm-deposit-container h2 {
+  margin: 0.25rem 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+}
+
+.confirm-deposit-container p {
+  margin: 0.5rem 0 1.5rem;
+  color: #474747;
+  font-family: InterBold;
+}
+
+/* summary box */
+.confirm-summary {
+  background: #fdf5ce; /* Slightly darker yellow */
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.confirm-summary div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.confirm-summary span {
+  color: #c43e26; /* Brand red */
+  font-weight: 500;
+  font-family: InterBold;
+}
+
+.confirm-summary strong {
+  color: #c43e26;
+  font-family: LexendExtraBold;
+}
+
+/* Next button */
+.next-btn {
+  margin-top: 1.5rem;
+  background: #3c53a4;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+  font-family: InterBold;
+}
+
+.next-btn:hover {
+  background: #2b3d7a;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .confirm-deposit-container {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* Confirm Agent Overlay Stylings */
+/* Backdrop */
+/* .overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+} */
+
+/* Modal */
+.confirm-agent-container {
+  background: #fff9e6; /* Light card bg */
+  border: 2px solid #c43e26; /* Brand red border */
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  font-family: Inter, sans-serif;
+  position: relative;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.confirm-agent-container h3 {
+  margin: 0;
+  color: #474747;
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: LexendExtraBold;
+}
+
+/* Amount */
+.confirm-agent-container h2 {
+  margin: 0.25rem 0;
+  font-size: 2.5rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+}
+
+.confirm-agent-container p {
+  margin: 0.25rem 0 1.5rem;
+  color: #474747;
+  font-family: InterBold;
+}
+
+/* Agent Details Card */
+.agent-details-card {
+  background: white;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.agent-details-card .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.agent-details-card .row:last-child {
+  border-bottom: none;
+}
+
+.agent-details-card span {
+  color: #c43e26;
+  font-weight: 500;
+  font-family: InterBold;
+}
+
+.agent-details-card strong {
+  color: #474747;
+  font-family: LexendExtraBold;
+}
+
+/* Confirm Button */
+.confirm-btn {
+  background: #3c53a4;
+  color: white;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+  font-family: InterBold;
+}
+
+.confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #2b3d7a;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .confirm-agent-container {
+    padding: 1.5rem 1rem;
+  }
+}

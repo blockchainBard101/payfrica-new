@@ -6,6 +6,7 @@ import { BsQuestionCircleFill } from "react-icons/bs";
 import { toPng } from "html-to-image";
 import { useGlobalState } from "@/GlobalStateProvider";
 import { useCustomWallet } from "@/contexts/CustomWallet";
+import PayfricaCardHeadImg from "../../public/PayfricaCardHeadImg.jpg";
 import Image from "next/image";
 
 export const ReceiveCardOverlay = () => {
@@ -57,8 +58,10 @@ export const ReceiveCardOverlay = () => {
           <div className="pay-card front" ref={cardRef}>
             <div>
               <Image
-                src={"/public/PayfricaCardHeadImg.jpg"}
+                src={PayfricaCardHeadImg}
                 alt="Payfrica Card Header"
+                width={"100"}
+                height={"100"}
                 style={{ width: "100%", marginBottom: "0px" }}
               />
               <div
@@ -90,7 +93,8 @@ export const ReceiveCardOverlay = () => {
             <Image
               src={"/PayfricaCardBg.png"}
               alt="Back of card"
-              style={{ width: "100%", height: "auto" }}
+              width={100}
+              height={100}
             />
           </div>
         </div>

@@ -23,6 +23,10 @@ import { ReceiveMoneyOverlay } from "@/components/ReceiveMoneyOverlay";
 import { ReceiveCardOverlay } from "@/components/ReceiveCardOverlay";
 import { ConvertOverlay } from "@/components/ConvertOverlay";
 import { ConfirmConvertOverlay } from "@/components/ConfirmConvertOverlay";
+import { DepositTypeOverlay } from "@/components/DepositTypeOverlay";
+import QuickTransfer from "@/components/QuickTransfer";
+import ConfirmDepositOverlay from "@/components/ConfirmDepositOverlay";
+import MakeDepositOverlay from "@/components/MakeDepositOverlay";
 
 const Page = () => {
   const router = useRouter();
@@ -85,6 +89,12 @@ const Page = () => {
       {/* Convert Overlays */}
       <ConvertOverlay />
       <ConfirmConvertOverlay />
+
+      {/* Deposit Overlays */}
+      <DepositTypeOverlay />
+      <QuickTransfer />
+      <ConfirmDepositOverlay />
+      <MakeDepositOverlay />
     </div>
   );
 };

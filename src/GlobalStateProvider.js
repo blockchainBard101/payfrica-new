@@ -28,7 +28,25 @@ export const GlobalStateProvider = ({ children }) => {
     convert: false,
     //This is only for testing.
     default: false,
+    // Deposit Overlays
+    quickTransfer: false,
+    confirmDeposit: false,
+    makeDeposit: false,
   });
+
+  // const DepositData = {
+  //   amount: "",
+  //   method: "",
+  //   agentId: "",
+  // };
+
+  const [depositData, setDepositData] = useState({
+    amount: "",
+    method: "",
+    agentId: undefined,
+  });
+
+  const [depositAmount, setDepositAmount] = useState("");
 
   const toggleOverlay = (overlayName = "sendMoney") => {
     console.log({ overlayName });
@@ -60,6 +78,10 @@ export const GlobalStateProvider = ({ children }) => {
         closeAllOverlays,
         convertData,
         setConvertData,
+        depositData,
+        setDepositData,
+        depositAmount,
+        setDepositAmount,
       }}
     >
       {children}
