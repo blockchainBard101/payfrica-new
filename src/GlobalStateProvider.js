@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useContext } from "react";
 
 const GlobalStateContext = createContext();
 
@@ -32,43 +32,36 @@ export const GlobalStateProvider = ({ children }) => {
     quickTransfer: false,
     confirmDeposit: false,
     makeDeposit: false,
+    // Withdraw Overlays
+    EnterWithdrawAmount: false,
+    confirmWithdraw: false,
+    withdrawing: false,
   });
 
-  // const DepositData = {
-  //   amount: "",
-  //   method: "",
-  //   agentId: "",
-  // };
-
+  // SINGLE SOURCE OF TRUTH for deposit
   const [depositData, setDepositData] = useState({
+    amount: "", // e.g. "30000"
+    method: "", // e.g. "Quick Transfer"
+    agentId: undefined,
+  });
+
+  const [withdrawData, setWithdrawData] = useState({
     amount: "",
     method: "",
     agentId: undefined,
   });
 
-  const [depositAmount, setDepositAmount] = useState("");
-
-  const toggleOverlay = (overlayName = "sendMoney") => {
-    console.log({ overlayName });
-    setOverlayStates((prevState) => ({
-      ...prevState,
-      [overlayName]: !prevState?.[overlayName],
-    }));
+  const toggleOverlay = (name) => {
+    setOverlayStates((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
   const closeAllOverlays = () => {
-    const allOverlays = Object.keys(overlayStates).reduce((acc, key) => {
-      console.log({ key });
+    const all = Object.keys(overlayStates).reduce((acc, key) => {
       acc[key] = false;
       return acc;
     }, {});
-    setOverlayStates(allOverlays);
+    setOverlayStates(all);
   };
-
-  const [convertData, setConvertData] = useState({
-    fromToken: "",
-    toToken: "",
-  });
 
   return (
     <GlobalStateContext.Provider
@@ -76,12 +69,10 @@ export const GlobalStateProvider = ({ children }) => {
         overlayStates,
         toggleOverlay,
         closeAllOverlays,
-        convertData,
-        setConvertData,
         depositData,
         setDepositData,
-        depositAmount,
-        setDepositAmount,
+        withdrawData,
+        setWithdrawData,
       }}
     >
       {children}

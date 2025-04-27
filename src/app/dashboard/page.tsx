@@ -27,6 +27,9 @@ import { DepositTypeOverlay } from "@/components/DepositTypeOverlay";
 import QuickTransfer from "@/components/QuickTransfer";
 import ConfirmDepositOverlay from "@/components/ConfirmDepositOverlay";
 import MakeDepositOverlay from "@/components/MakeDepositOverlay";
+import EnterWithdrawAmount from "@/components/EnterWithdrawAmount";
+import ConfirmWithdrawOverlay from "@/components/ConfirmWithdrawOverlay";
+import WithdrawingOverlay from "@/components/WithdrawingOverlay";
 
 const Page = () => {
   const router = useRouter();
@@ -95,6 +98,11 @@ const Page = () => {
       <QuickTransfer />
       <ConfirmDepositOverlay />
       <MakeDepositOverlay />
+
+      {/* Withdraw Overlays */}
+      <EnterWithdrawAmount />
+      <ConfirmWithdrawOverlay />
+      <WithdrawingOverlay />
     </div>
   );
 };

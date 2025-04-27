@@ -302,8 +302,8 @@ body {
 
 .close-icon {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  /* top: 20px; */
+  right: 5px;
   font-size: 2rem;
   cursor: pointer;
   color: white;
@@ -2195,6 +2195,7 @@ Overlay Background .overlay-background {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
+  position: relative;
 }
 .overlay-header .icon {
   font-size: 1.2rem;
@@ -2509,5 +2510,343 @@ Overlay Background .overlay-background {
 @media (max-width: 480px) {
   .confirm-agent-container {
     padding: 1.5rem 1rem;
+  }
+}
+
+/* Withdrawing Overlay Stylings */
+/* Backdrop */
+/* .overlay-background {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+} */
+
+/* Modal box */
+.withdrawing-container {
+  background-color: #fff5e1; /* soft yellow */
+  border-radius: 10px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  height: 400px;
+  text-align: center;
+  font-family: Inter, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Hourglass icon */
+.hourglass-icon {
+  font-size: 3rem;
+  color: #c43e26; /* brand red */
+  margin-bottom: 1rem;
+  align-self: center;
+  animation: spin 2s linear infinite; /* Add spinning animation */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* “Please wait” */
+.withdrawing-container h3 {
+  margin: 0.5rem 0;
+  font-size: 2rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+}
+
+/* Subtext */
+.withdrawing-container p {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-family: LexendExtraBold;
+  color: #474747;
+}
+
+/* Notify button */
+.notify-btn {
+  background-color: #3c53a4;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-family: InterLight;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.notify-btn:hover {
+  background-color: #2b3d7a;
+}
+
+/* Profile Page Stylings */
+/* Base page styling */
+.profile-page {
+  background: #fff5e1;
+  min-height: 100vh;
+  font-family: Inter, sans-serif;
+  color: #474747;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  margin-bottom: 10px;
+}
+
+.top-left h2 {
+  margin-bottom: 20px;
+  color: #3c53a4;
+  font-size: 2rem;
+  font-family: LexendExtraBold;
+}
+
+.top-left .date {
+  color: #c43e26;
+  font-size: 1rem;
+  font-family: InterLight;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper input {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  outline: none;
+  height: 50px;
+  width: 300px;
+  font-size: 15px;
+  font-family: InterLight;
+}
+
+.search-wrapper .icon {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+}
+
+.top-right .bell {
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #3c53a4;
+}
+
+.top-right .avatar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+}
+
+/* Main content */
+.main-content {
+  padding: 1.5rem 2rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.profile-header-dp {
+  width: 70px;
+  height: 70px;
+  border-radius: 50px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-details div {
+  font-family: InterBold;
+}
+
+.profile-details .profile-avatar svg {
+  font-size: 3rem;
+  color: #3c53a4;
+}
+
+.profile-header h3 {
+  margin: 0;
+  font-size: 30px;
+  font-family: LexendExtraBold;
+  color: #474747;
+}
+
+.profile-header .email {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.edit-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #3c53a4;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: InterBold;
+}
+
+/* Two-column layout */
+.two-column {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.column {
+  background: white;
+  border: 1px solid #c43e26;
+  border-radius: 8px;
+  padding: 1rem;
+  flex: 1 1 300px;
+  min-width: 280px;
+}
+
+.column h2 {
+  margin: 0 0 1rem;
+  color: #3c53a4;
+  font-size: 1.7rem;
+  font-family: LexendExtraBold;
+}
+
+.details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.details-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.details-form input,
+.details-form select {
+  margin-top: 0.25rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.save-btn {
+  background: #3c53a4;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  background: #fdf5ce;
+  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+  color: #474747;
+  font-style: italic;
+  margin: 50px 10px;
+}
+
+/* Payfrica Tag Block */
+.tag-block {
+  background: white;
+  border: 1px solid #c43e26;
+  border-radius: 8px;
+  padding: 1rem;
+  max-width: 600px;
+}
+
+.tag-block h4 {
+  margin: 0 0 0.5rem;
+  color: #3c53a4;
+}
+
+.tag-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.tag-icon {
+  color: #c43e26;
+  font-size: 1.25rem;
+}
+
+.tag-text {
+  font-family: InterBold;
+  color: #3c53a4;
+}
+
+.tag-edit {
+  cursor: pointer;
+  color: #c43e26;
+}
+
+.tag-note {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-bar,
+  .main-content {
+    padding: 1rem;
+  }
+  .two-column {
+    flex-direction: column;
+  }
+  .column {
+    min-width: auto;
   }
 }

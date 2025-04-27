@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { LuMoveLeft } from "react-icons/lu";
 import { useGlobalState } from "@/GlobalStateProvider";
 
-const ConfirmDepositOverlay = () => {
-  const { overlayStates, toggleOverlay, depositData, setDepositData } =
+const ConfirmWithdrawOverlay = () => {
+  const { overlayStates, toggleOverlay, withdrawData, setWithdrawData } =
     useGlobalState();
 
-  const { amount, method, agentId } = depositData;
+  const { amount, method, agentId } = withdrawData;
   const [loadingAgent, setLoadingAgent] = useState(true);
 
   // fetch agentId once
@@ -14,13 +14,13 @@ const ConfirmDepositOverlay = () => {
     async function fetchAgent() {
       // simulate API
       const id = "AGT-12345XYZ";
-      setDepositData((d) => ({ ...d, agentId: id }));
+      setWithdrawData((d) => ({ ...d, agentId: id }));
       setLoadingAgent(false);
     }
     fetchAgent();
-  }, [setDepositData]);
+  }, [setWithdrawData]);
 
-  if (!overlayStates.confirmDeposit) return null;
+  if (!overlayStates.confirmWithdraw) return null;
 
   // mock gas fee: 0.5%
   const fee = (Number(amount) * 0.005).toFixed(2);
@@ -31,8 +31,8 @@ const ConfirmDepositOverlay = () => {
     const accepted = await new Promise((r) =>
       setTimeout(() => r(Math.random() > 0.3), 1000)
     );
-    toggleOverlay("confirmDeposit");
-    toggleOverlay(accepted ? "success" : "failed");
+    toggleOverlay("confirmWithdraw");
+    toggleOverlay(accepted ? "withdrawing" : "failed");
   };
 
   return (
@@ -49,14 +49,16 @@ const ConfirmDepositOverlay = () => {
             color: "#bf8555",
           }}
           onClick={() => {
-            toggleOverlay("confirmDeposit");
-            toggleOverlay("quickTransfer");
+            toggleOverlay("confirmWithdraw");
+            toggleOverlay("withdraw");
           }}
         />
 
-        <h4>You are Depositing</h4>
+        <h4>You are Withdrawing</h4>
         <h2>NGN {Number(amount).toLocaleString()}</h2>
-        <p>Your wallet will receive NGN {Number(amount).toLocaleString()}</p>
+        <p>
+          Your bank account will receive NGN {Number(amount).toLocaleString()}
+        </p>
 
         <div className="confirm-summary">
           <div>
@@ -82,11 +84,11 @@ const ConfirmDepositOverlay = () => {
           disabled={loadingAgent}
           onClick={handleConfirmDeposit}
         >
-          Next
+          Confirm
         </button>
       </div>
     </div>
   );
 };
 
-export default ConfirmDepositOverlay;
+export default ConfirmWithdrawOverlay;
