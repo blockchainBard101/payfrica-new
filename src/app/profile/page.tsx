@@ -14,7 +14,7 @@ import Image from "next/image";
 
 const ProfilePage = () => {
   // mimic loaded user
-  const [user, setUser] = useState({
+  const [userName, setUserName] = useState({
     username: "4our 0ero 4our",
     email: "alexarawles@gmail.com",
     tag: "alexarawles@payfrica",
@@ -63,7 +63,7 @@ const ProfilePage = () => {
       {/* Top Bar */}
       <header className="top-bar">
         <div className="top-left">
-          <h2>Welcome, {user.username}</h2>
+          <h2>Welcome, {userName.username}</h2>
           <div className="date">{today}</div>
         </div>
       </header>
@@ -107,9 +107,9 @@ const ProfilePage = () => {
                   disabled={!isEditing}
                 >
                   <option value="">Select country</option>
-                  <option value="Nigeria">Nigeria</option>
-                  <option value="Ghana">Ghana</option>
-                  <option value="Kenya">Kenya</option>
+                  <option value="NGNC">Nigeria</option>
+                  <option value="GHSC">Ghana</option>
+                  <option value="KHSC">Kenya</option>
                 </select>
               </label>
               <label>
@@ -122,11 +122,6 @@ const ProfilePage = () => {
                 >
                   <option value="">Select a language</option>
                   <option value="English">English</option>
-                  <option value="French">French</option>
-                  <option value="Arabic">Arabic</option>
-                  <option value="Igbo">Igbo</option>
-                  <option value="Yoruba">Yoruba</option>
-                  <option value="Hausa">Hausa</option>
                 </select>
               </label>
               {isEditing && (
