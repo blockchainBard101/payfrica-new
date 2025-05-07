@@ -36,8 +36,10 @@ export const createLeafSubname = async (name: string, parentNftId: string, targe
 }
 
 export async function nameExists(name: string) {
-    // const namens = name+"@payyf";
+  if (name.endsWith("@payfrica")){
     return !!(await suinsClient.getNameRecord(name));
+  }
+  return !!(await suinsClient.getNameRecord(name+"@payfrica")); 
 }
 
 export async function getNsAddress(name: string): Promise<string | null> {

@@ -37,10 +37,10 @@ export const Navigation = () => {
           </li>
         </ul>
         <div className="profile">
-          <div className="profile-img">
+          <a href="/profile" className="profile-img">
             <RxAvatar style={{ fontSize: "30px" }} />
             <p className="profile-name">John Doe</p>
-          </div>
+          </a>
         </div>
       </div>
 

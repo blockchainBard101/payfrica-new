@@ -248,7 +248,7 @@ body {
 .nav-links li a {
   text-decoration: none;
   color: #fff;
-  font-family: ;
+  /* font-family: ; */
 }
 
 .profile {
@@ -257,6 +257,10 @@ body {
   gap: 20px;
 }
 
+.profile a {
+  text-decoration: none;
+  color: #fff;
+}
 .profile-img {
   display: flex;
   align-items: center;

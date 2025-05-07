@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { FaEye, FaEyeSlash, FaEllipsisV, FaPlus } from "react-icons/fa";
 import { useCustomWallet } from "@/contexts/CustomWallet";
-import { useRealTimeBalances } from "@/hooks/useRealTimeBalances";
+import { useRealTimeBalances } from "@/hooks/useRealTimeBalance";
 
 export const BalanceCards = () => {
   const { address } = useCustomWallet();

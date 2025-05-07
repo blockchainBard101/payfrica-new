@@ -35,32 +35,41 @@ const Page = () => {
   const router = useRouter();
   const currentAccount = useCurrentAccount();
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState<string>("");
 
-  //This is the component that first run
+  // simulate your existing loading + redirect logic
   useEffect(() => {
     if (!isLoading) return;
-
-    const timeOut = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => {
-      clearTimeout(timeOut);
-    };
-  }, []);
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   useEffect(() => {
-    if (isLoading) return; //If the component is still loading, just back tf off, allow it to finish loading
-
-    //Loading is done ✅, lets check if the wallet is connected or not
+    if (isLoading) return;
     if (!currentAccount) {
-      //Oops the wallet is not connected, redirect to /login
       router.push("/login");
-      console.log("Not connected");
+      return;
     }
-  }, [currentAccount, isLoading]);
 
-  if (isLoading) return <div>Loading...</div>;
+    // Once wallet is connected, fetch the user
+    (async () => {
+      try {
+        // adjust this URL to wherever your NestJS service is hosted
+        // e.g. `process.env.NEXT_PUBLIC_API_URL` or a relative proxy under /api
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
+        const res = await fetch(`${baseUrl}/users/${currentAccount.address}/basic`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setUser(data);
+      } catch (e: any) {
+        console.error("Failed to fetch user:", e);
+        setError(e.message);
+      }
+    })();
+  }, [currentAccount, isLoading, router]);
+
+  if (isLoading) return <div>Loading…</div>;
 
   return (
     <div className="min-h-screen w-full bg-background">

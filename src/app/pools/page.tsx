@@ -46,8 +46,7 @@ const PoolsPage = () => {
           <tr>
             <th>Token</th>
             <th>Wallet Balance</th>
-            <th>APR</th>
-            <th>Total MC</th>
+            <th>TVL</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -62,7 +61,6 @@ const PoolsPage = () => {
                 <FaCoins className="token-icon" /> {pool.symbol}
               </td>
               <td>{pool.wallet.toLocaleString()}</td>
-              <td>{pool.APR.toFixed(2)}%</td>
               <td>${pool.mc.toLocaleString()}M</td>
               <td className="actions-cell">
                 <button
@@ -147,15 +145,11 @@ const PoolsPage = () => {
 
           <div className="details-box">
             <div>
-              <span>APR</span>
-              <strong>{activePool.APR.toFixed(2)}%</strong>
-            </div>
-            <div>
               <span>Fee</span>
               <strong>$0.00</strong>
             </div>
             <div>
-              <span>Total MC</span>
+              <span>TVL</span>
               <strong>${activePool.mc.toLocaleString()}M</strong>
             </div>
           </div>

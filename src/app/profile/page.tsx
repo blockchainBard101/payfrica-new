@@ -1,55 +1,144 @@
 "use client";
-import { Navigation } from "@/components/Navigations";
+
 import { useState, useEffect } from "react";
-import ProfileDP from "../../../public/ProfileDP.jpg";
-import {
-  FaSearch,
-  FaBell,
-  FaEdit,
-  FaSave,
-  FaTimesCircle,
-  FaRegUserCircle,
-} from "react-icons/fa";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import { FaEdit, FaSave, FaTimesCircle } from "react-icons/fa";
+import { Navigation } from "@/components/Navigations";
+import { nameExists } from "@/hooks/registerNsName";
 
-const ProfilePage = () => {
-  // mimic loaded user
-  const [userName, setUserName] = useState({
-    username: "4our 0ero 4our",
-    email: "alexarawles@gmail.com",
-    tag: "alexarawles@payfrica",
-    tagCreated: "22nd May, 2024",
-  });
+interface UserPayload {
+  address: string;
+  username?: string;
+  language: string;
+  country?: { name: string };
+  accountDetails?: {
+    accountNumber: string;
+    name: string;
+    bank: string;
+  };
+}
 
-  // form state
-  const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState({
-    username: "",
-    country: "",
-    timezone: "",
-    bankName: "",
-    accountNumber: "",
-    accountName: "",
-  });
+export default function ProfilePage() {
+  const router = useRouter();
+  const { address } = useCurrentAccount() ?? {};
 
-  // load saved profile/details
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<UserPayload | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Profile editing
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ username: "", countryName: "", language: "en" });
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+
+  // Bank editing
+  const [editingBank, setEditingBank] = useState(false);
+  const [bankForm, setBankForm] = useState({ bank: "", accountNumber: "", name: "" });
+
+  const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  console.log(address);
+
+  // Redirect guard and data fetch
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("pfProfile") || "{}");
-    setForm((f) => ({ ...f, ...saved }));
-  }, []);
+    if (address === undefined) return;
+    if (!address) {
+      router.push("/login");
+      return;
+    }
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API}/users/${address}`);
+        if (!res.ok) throw new Error(res.statusText);
+        const u: UserPayload = await res.json();
+        setUser(u);
+        setProfileForm({
+          username: u.username ?? "",
+          countryName: u.country?.name ?? "",
+          language: u.language,
+        });
+        if (u.accountDetails) setBankForm({ ...u.accountDetails });
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [address, router, API]);
 
-  const handleChange = (e) =>
-    setForm((f) => ({
-      ...f,
-      [e.target.name]: e.target.value,
-    }));
+  // Username check only when creating username
+  useEffect(() => {
+    if (!editingProfile || !user || user.username) return;
+    const name = profileForm.username.trim();
+    if (name.length < 4) {
+      setUsernameAvailable(null);
+      return;
+    }
+    setCheckingUsername(true);
+    nameExists(name)
+      .then((exists) => setUsernameAvailable(!exists))
+      .catch(() => setUsernameAvailable(null))
+      .finally(() => setCheckingUsername(false));
+  }, [profileForm.username, editingProfile, user]);
 
-  const handleSave = () => {
-    localStorage.setItem("pfProfile", JSON.stringify(form));
-    setIsEditing(false);
+  const onProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setProfileForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  // today's date
+  const onBankChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBankForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  };
+
+  const saveProfile = async () => {
+    if (!user) return;
+    // Validate new username if none exists
+    if (!user.username) {
+      const name = profileForm.username.trim();
+      if (name.length < 4 || checkingUsername || usernameAvailable === false) return;
+    }
+    try {
+      const res = await fetch(`${API}/users/${address}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: user.username ?? profileForm.username.trim(),
+          countryName: profileForm.countryName,
+          language: profileForm.language,
+        }),
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const updated: UserPayload = await res.json();
+      setUser(updated);
+      setEditingProfile(false);
+      setUsernameAvailable(null);
+    } catch (e: any) {
+      console.error("Failed to save profile:", e.message);
+    }
+  };
+
+  const saveBank = async () => {
+    try {
+      const res = await fetch(`${API}/users/${address}/account-details`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bankForm),
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const updated: UserPayload = await res.json();
+      setUser(updated);
+      setEditingBank(false);
+    } catch (e: any) {
+      console.error("Failed to save account details:", e.message);
+    }
+  };
+
+  if (loading) return <div>Loading profile…</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (!user) return <div>User not found</div>;
+
+  const hasUsername = Boolean(user.username && user.username.trim());
   const today = new Date().toLocaleDateString("en-GB", {
     weekday: "short",
     day: "2-digit",
@@ -60,195 +149,153 @@ const ProfilePage = () => {
   return (
     <div className="profile-page">
       <Navigation />
-      {/* Top Bar */}
+
       <header className="top-bar">
         <div className="top-left">
-          <h2>Welcome, {userName.username}</h2>
+          <h2>Welcome, {user.username ?? user.address}</h2>
           <div className="date">{today}</div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="main-content">
-        {/* Profile Header */}
         <div className="profile-header">
-          {/* <div className="profile-details">
-            <h3>{user.username}</h3>
-          </div> */}
-          <button className="edit-btn" onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? <FaTimesCircle /> : <FaEdit />}{" "}
-            {isEditing ? "Cancel" : "Edit"}
+          <button
+            className="edit-btn"
+            onClick={() => setEditingProfile((f) => !f)}
+          >
+            {editingProfile ? <FaTimesCircle /> : <FaEdit />} {editingProfile ? "Cancel" : "Edit"}
           </button>
         </div>
+
         <div className="two-column">
-          {/* Left Column: User Details */}
           <section className="column">
             <h2>Profile Details</h2>
-            <form className="details-form" onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={(e) => e.preventDefault()}>
               <label>
                 Username
                 <input
+                  type="text"
                   name="username"
-                  placeholder="Your username"
-                  value={form.username}
-                  onChange={handleChange}
-                  disabled={!isEditing}
+                  value={profileForm.username}
+                  onChange={onProfileChange}
+                  disabled={!editingProfile || hasUsername}
                 />
-                <small style={{ color: "red", fontFamily: "InterLight" }}>
-                  *Payfrica tag exixts*
-                </small>
+                {editingProfile && !hasUsername && (
+                  <div>
+                    {profileForm.username.trim().length < 4 ? (
+                      <small>Please enter at least 4 characters</small>
+                    ) : checkingUsername ? (
+                      <small>Checking...</small>
+                    ) : usernameAvailable === false ? (
+                      <small style={{ color: 'red' }}>Taken</small>
+                    ) : usernameAvailable === true ? (
+                      <small style={{ color: 'green' }}>Available</small>
+                    ) : null}
+                  </div>
+                )}
               </label>
+
               <label>
                 Country
                 <select
-                  name="country"
-                  value={form.country}
-                  onChange={handleChange}
-                  disabled={!isEditing}
+                  name="countryName"
+                  value={profileForm.countryName}
+                  onChange={onProfileChange}
+                  disabled={!editingProfile}
                 >
                   <option value="">Select country</option>
-                  <option value="NGNC">Nigeria</option>
-                  <option value="GHSC">Ghana</option>
-                  <option value="KHSC">Kenya</option>
+                  <option value="Nigeria">Nigeria</option>
+                  <option value="Ghana">Ghana</option>
+                  <option value="Kenya">Kenya</option>
                 </select>
               </label>
+
               <label>
                 Language
                 <select
-                  name="timezone"
-                  value={form.timezone}
-                  onChange={handleChange}
-                  disabled={!isEditing}
+                  name="language"
+                  value={profileForm.language}
+                  onChange={onProfileChange}
+                  disabled={!editingProfile}
                 >
-                  <option value="">Select a language</option>
-                  <option value="English">English</option>
+                  <option value="en">English</option>
                 </select>
               </label>
-              {isEditing && (
-                <button type="button" className="save-btn" onClick={handleSave}>
+
+              {editingProfile && (
+                <button
+                  type="button"
+                  className="save-btn"
+                  onClick={saveProfile}
+                  disabled={
+                    (!hasUsername && (profileForm.username.trim().length < 4 || checkingUsername || usernameAvailable === false))
+                  }
+                >
                   <FaSave /> Save Details
                 </button>
               )}
             </form>
           </section>
 
-          {/* Right Column: Withdrawal Account */}
-          {/* --- RIGHT: Withdrawal Account Details --- */}
           <section className="column">
-            <div className="section-header">
-              <h2>Withdrawal Account</h2>
-            </div>
+            <h2>Withdrawal Account</h2>
+            <button
+              className="edit-btn"
+              onClick={() => setEditingBank((f) => !f)}
+            >
+              {editingBank ? <FaTimesCircle /> : <FaEdit />} {editingBank ? "Cancel" : "Edit"}
+            </button>
 
-            {isEditing ? (
-              /* 1) Edit mode: always show inputs */
-              <form
-                className="details-form"
-                onSubmit={(e) => e.preventDefault()}
-              >
+            {(!user.accountDetails && !editingBank) ? (
+              <div className="empty-state">
+                <p>You haven’t added withdrawal details yet.</p>
+                <p><em>Click “Edit” above to enter bank details.</em></p>
+              </div>
+            ) : (
+              <form onSubmit={(e) => e.preventDefault()}>
                 <label>
                   Bank Name
                   <input
-                    name="bankName"
-                    placeholder="Bank Name"
-                    value={form.bankName}
-                    onChange={handleChange}
-                    disabled={false}
+                    type="text"
+                    name="bank"
+                    value={bankForm.bank}
+                    onChange={onBankChange}
+                    disabled={!editingBank}
                   />
                 </label>
 
                 <label>
                   Account Number
                   <input
+                    type="text"
                     name="accountNumber"
-                    placeholder="Account Number"
-                    value={form.accountNumber}
-                    onChange={handleChange}
-                    disabled={false}
+                    value={bankForm.accountNumber}
+                    onChange={onBankChange}
+                    disabled={!editingBank}
                   />
                 </label>
 
                 <label>
                   Account Name
                   <input
-                    name="accountName"
-                    placeholder="Account Name"
-                    value={form.accountName}
-                    onChange={handleChange}
-                    disabled={false}
+                    type="text"
+                    name="name"
+                    value={bankForm.name}
+                    onChange={onBankChange}
+                    disabled={!editingBank}
                   />
                 </label>
 
-                <button type="button" className="save-btn" onClick={handleSave}>
-                  <FaSave /> Save Account
-                </button>
+                {editingBank && (
+                  <button type="button" className="save-btn" onClick={saveBank}>
+                    <FaSave /> Save Account
+                  </button>
+                )}
               </form>
-            ) : (
-              (() => {
-                const hasAccount =
-                  form.bankName && form.accountNumber && form.accountName;
-
-                return hasAccount ? (
-                  /* 2) Read-only view if they’ve already saved details */
-                  <form
-                    className="details-form"
-                    onSubmit={(e) => e.preventDefault()}
-                  >
-                    <label>
-                      Bank Name
-                      <input name="bankName" value={form.bankName} disabled />
-                    </label>
-
-                    <label>
-                      Account Number
-                      <input
-                        name="accountNumber"
-                        value={form.accountNumber}
-                        disabled
-                      />
-                    </label>
-
-                    <label>
-                      Account Name
-                      <input
-                        name="accountName"
-                        value={form.accountName}
-                        disabled
-                      />
-                    </label>
-                  </form>
-                ) : (
-                  /* 3) Empty state if no details yet */
-                  <div className="empty-state">
-                    <p>You haven’t added withdrawal details yet.</p>
-                    <p>
-                      <em>
-                        Click “Edit” above to enter bank name, account number &
-                        account name.
-                      </em>
-                    </p>
-                  </div>
-                );
-              })()
             )}
           </section>
         </div>
-        {/* Payfrica Tag Block
-        <div className="tag-block">
-          <h4>My Payfrica Tag</h4>
-          <div className="tag-row">
-            <FaRegUserCircle className="tag-icon" />
-            <span className="tag-text">{user.tag}</span>
-            <FaEdit className="tag-edit" />
-          </div>
-          <div className="tag-note">
-            This can only be edited once
-            <br />
-            Created {user.tagCreated}
-          </div>
-        </div> */}
       </main>
     </div>
   );
-};
-
-export default ProfilePage;
+}
