@@ -14,6 +14,7 @@ import { enokiClient } from "../EnokiClient";
 export const POST = async (request: NextRequest) => {
   const { network, txBytes, sender, allowedAddresses }: SponsorTxRequestBody =
     await request.json();
+    console.log("Sponsoring transaction...");
   return enokiClient
     .createSponsoredTransaction({
       network,

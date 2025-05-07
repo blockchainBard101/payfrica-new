@@ -96,7 +96,7 @@ export default function CustomWalletProvider({ children }: { children: React.Rea
         const { data: { bytes, digest: sponsorDigest } } = await axios.post<CreateSponsoredTransactionApiResponse>("/api/sponsor", sponsorTxBody, { timeout: 7000 });
 
         const signature = await signTransaction(fromBase64(bytes));
-
+        console.log("Executing sponsored transaction block...");
         await axios.post<unknown>("/api/execute", {
           signature,
           digest: sponsorDigest,

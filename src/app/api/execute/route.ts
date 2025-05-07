@@ -6,6 +6,7 @@ export const POST = async (request: NextRequest) => {
   const { digest, signature }: ExecuteSponsoredTransactionApiInput =
     await request.json();
 
+  console.log("Executing sponsored transaction block...");
   return enokiClient
     .executeSponsoredTransaction({
       digest,

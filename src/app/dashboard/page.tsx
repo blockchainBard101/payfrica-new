@@ -52,11 +52,8 @@ const Page = () => {
       return;
     }
 
-    // Once wallet is connected, fetch the user
     (async () => {
       try {
-        // adjust this URL to wherever your NestJS service is hosted
-        // e.g. `process.env.NEXT_PUBLIC_API_URL` or a relative proxy under /api
         const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
         const res = await fetch(`${baseUrl}/users/${currentAccount.address}/basic`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

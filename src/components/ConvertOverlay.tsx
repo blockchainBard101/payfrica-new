@@ -1,121 +1,89 @@
+// src/components/ConvertOverlay.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useGlobalState } from "@/GlobalStateProvider";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { BsArrowDownSquareFill } from "react-icons/bs";
-import { useCustomWallet } from "@/contexts/CustomWallet";
-import { getTokenBalance } from "@/hooks/getCoinBalance";
-import Image from "next/image"; // ✅ Import Image from next/image
-
-const tokens = {
-  NGNC: {
-    CoinId:
-      "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::ngnc::NGNC",
-    PoolId:
-      "0x5d3cb4beb22f251e54de9580b6530ebbad115f92fd0bccec5190c38f14591684",
-    decimals: 6,
-    logo: "/SuiLogo.png",
-    name: "Nigeria Stable",
-  },
-  GHSC: {
-    CoinId:
-      "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::ghsc::GHSC",
-    PoolId: "0xBBB…222",
-    decimals: 6,
-    logo: "/SuiLogo.png",
-    name: "Ghana Stable",
-  },
-  USDC: {
-    CoinId:
-      "0x920dda82ee13d3a75f7842c7797b034f4824d7fae1649e14044a172fc784ca0d::usdc::USDC",
-    PoolId:
-      "0xaae9216964bf12c862ab72c3331490bde1f6afbc5d1f48056496d381803b48ad",
-    decimals: 6,
-    logo: "/SuiLogo.png",
-    name: "USD Coin",
-  },
-  KHSC: {
-    CoinId:
-      "0x1e0d95b18fb8dd08f6cf64498df8310f8da4641512e0d9bf57ac67e386affdc4::khsc::KHSC",
-    PoolId: "0xDDD…444",
-    decimals: 6,
-    logo: "/SuiLogo.png",
-    name: "Kenya Stable",
-  },
-};
-
-const rates_dollar = {
-  NGNC: 1500,
-  GHSC: 15.56,
-  USDC: 1,
-  KHSC: 15.56,
-};
+import { useTokenExchange, usePools } from "@/hooks/useTokenExchange";
+import Image from "next/image";
 
 export function ConvertOverlay() {
-  const { overlayStates, toggleOverlay, setConvertData } = useGlobalState();
-  const { address } = useCustomWallet();
-  const tokenKeys = Object.keys(tokens);
-  const [sellSymbol, setSellSymbol] = useState("NGNC");
-  const [buySymbol, setBuySymbol] = useState("USDC");
-  const [sellAmount, setSellAmount] = useState("");
-  const [buyAmount, setBuyAmount] = useState("");
-  const [sellBalance, setSellBalance] = useState("0.00");
-  const [buyBalance, setBuyBalance] = useState("0.00");
+  const { overlayStates, toggleOverlay } = useGlobalState();
+  const { handleConvert, getBalance } = useTokenExchange();
+  const { pools, poolMap } = usePools();
 
-  // compute buyAmount
+  // Local UI state hooks (always run in same order)
+  const [sellSymbol, setSellSymbol] = useState<string>(pools[0]?.coinType || "");
+  const [buySymbol, setBuySymbol] = useState<string>(pools[1]?.coinType || "");
+  const [sellAmount, setSellAmount] = useState<string>("");
+  const [buyAmount, setBuyAmount] = useState<string>("");
+  const [sellBalance, setSellBalance] = useState<string>("0.00");
+  const [buyBalance, setBuyBalance] = useState<string>("0.00");
+
+  // Generate list of coin-type keys
+  const symbols = useMemo(() => pools.map(p => p.coinType), [pools]);
+
+  // Compute buy amount
   useEffect(() => {
-    const sell = parseFloat(sellAmount);
-    if (!sellAmount || isNaN(sell)) {
+    const amt = parseFloat(sellAmount);
+    if (!sellAmount || isNaN(amt) || amt <= 0) {
       setBuyAmount("");
       return;
     }
-    const rate = rates_dollar[buySymbol] / rates_dollar[sellSymbol];
-    setBuyAmount((sell * rate).toFixed(2));
-  }, [sellAmount, sellSymbol, buySymbol]);
+    const a = poolMap.get(sellSymbol);
+    const b = poolMap.get(buySymbol);
+    if (a && b) {
+      const rate = b.ratesDollar / a.ratesDollar;
+      setBuyAmount((amt * rate).toFixed(2));
+    }
+  }, [sellAmount, sellSymbol, buySymbol, poolMap]);
 
-  // fetch balances
+  // Fetch balances
   useEffect(() => {
-    if (!address) return;
-    getTokenBalance(address, sellSymbol)
+    if (!sellSymbol) return;
+    getBalance(sellSymbol)
       .then(setSellBalance)
       .catch(() => setSellBalance("0.00"));
-  }, [address, sellSymbol]);
+  }, [sellSymbol, getBalance]);
 
   useEffect(() => {
-    if (!address) return;
-    getTokenBalance(address, buySymbol)
+    if (!buySymbol) return;
+    getBalance(buySymbol)
       .then(setBuyBalance)
       .catch(() => setBuyBalance("0.00"));
-  }, [address, buySymbol]);
+  }, [buySymbol, getBalance]);
 
-  const handleSwitch = () => {
-    setSellSymbol(buySymbol);
-    setBuySymbol(sellSymbol);
+  const handleSwitch = useCallback(() => {
+    setSellSymbol(prev => buySymbol);
+    setBuySymbol(prev => sellSymbol);
     setSellAmount(buyAmount);
     setBuyAmount(sellAmount);
-  };
+  }, [sellAmount, buyAmount, sellSymbol, buySymbol]);
 
-  const handleSellChange = (e) => {
-    const symbol = e.target.value;
-    symbol === buySymbol ? handleSwitch() : setSellSymbol(symbol);
-  };
+  const handleSellChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const sym = e.target.value;
+    if (sym === buySymbol) handleSwitch();
+    else setSellSymbol(sym);
+  }, [buySymbol, handleSwitch]);
 
-  const handleBuyChange = (e) => {
-    const symbol = e.target.value;
-    symbol === sellSymbol ? handleSwitch() : setBuySymbol(symbol);
-  };
+  const handleBuyChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const sym = e.target.value;
+    if (sym === sellSymbol) handleSwitch();
+    else setBuySymbol(sym);
+  }, [sellSymbol, handleSwitch]);
 
-  const handleContinue = () => {
-    setConvertData({
-      fromToken: sellSymbol,
-      toToken: buySymbol,
-      fromAmount: sellAmount,
-      toAmount: buyAmount,
-    });
-    toggleOverlay("convert");
-    toggleOverlay("confirmConvert");
-  };
+  const onConvert = useCallback(async () => {
+    const amt = parseFloat(sellAmount);
+    if (!sellAmount || isNaN(amt) || amt <= 0) return;
+    try {
+      await handleConvert(sellSymbol, buySymbol, amt);
+    } catch (e) {
+      console.error("Convert failed", e);
+    } finally {
+      toggleOverlay("convert");
+    }
+  }, [sellAmount, sellSymbol, buySymbol, handleConvert, toggleOverlay]);
 
   if (!overlayStates.convert) return null;
 
@@ -138,38 +106,34 @@ export function ConvertOverlay() {
               type="number"
               placeholder="0"
               value={sellAmount}
-              onChange={(e) => setSellAmount(e.target.value)}
+              onChange={e => setSellAmount(e.target.value)}
             />
             <div className="dropdown">
               <Image
-                src={tokens[sellSymbol].logo.src}
-                alt={sellSymbol}
+                src={`/icons/${poolMap.get(sellSymbol)?.coinName || sellSymbol}.png`}
+                alt={poolMap.get(sellSymbol)?.coinName || sellSymbol}
                 width={24}
                 height={24}
                 className="token-icon"
-                loading="lazy"
               />
               <select value={sellSymbol} onChange={handleSellChange}>
-                {tokenKeys.map((sym) => (
+                {symbols.map(sym => (
                   <option key={sym} value={sym}>
-                    {sym}
+                    {poolMap.get(sym)?.coinName}
                   </option>
                 ))}
               </select>
             </div>
           </div>
           <div className="token-balance">
-            Balance: {sellBalance} {sellSymbol}
+            Balance: {sellBalance} {poolMap.get(sellSymbol)?.coinName}
           </div>
         </div>
 
         {/* Switch Button */}
         <div className="switch-container">
           <div className="switch-btn-bg-thin-line" />
-          <BsArrowDownSquareFill
-            className="switch-btn"
-            onClick={handleSwitch}
-          />
+          <BsArrowDownSquareFill className="switch-btn" onClick={handleSwitch} />
           <div className="switch-btn-bg-thin-line" />
         </div>
 
@@ -180,35 +144,30 @@ export function ConvertOverlay() {
             <input type="text" placeholder="0" value={buyAmount} readOnly />
             <div className="dropdown">
               <Image
-                src={tokens[buySymbol].logo.src}
-                alt={buySymbol}
+                src={`/icons/${poolMap.get(buySymbol)?.coinName || buySymbol}.png`}
+                alt={poolMap.get(buySymbol)?.coinName || buySymbol}
                 width={24}
                 height={24}
                 className="token-icon"
-                loading="lazy"
               />
               <select value={buySymbol} onChange={handleBuyChange}>
-                {tokenKeys.map((sym) => (
+                {symbols.map(sym => (
                   <option key={sym} value={sym}>
-                    {sym}
+                    {poolMap.get(sym)?.coinName}
                   </option>
                 ))}
               </select>
             </div>
           </div>
           <div className="token-balance">
-            Balance: {buyBalance} {buySymbol}
+            Balance: {buyBalance} {poolMap.get(buySymbol)?.coinName}
           </div>
         </div>
 
         <button
           className="convert-btn"
-          disabled={
-            !sellAmount ||
-            isNaN(parseFloat(sellAmount)) ||
-            parseFloat(sellAmount) <= 0
-          }
-          onClick={handleContinue}
+          disabled={!sellAmount || isNaN(parseFloat(sellAmount)) || parseFloat(sellAmount) <= 0}
+          onClick={onConvert}
         >
           Continue
         </button>

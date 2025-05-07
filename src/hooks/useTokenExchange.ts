@@ -104,7 +104,7 @@ export function useTokenExchange() {
     const coins = await client.getCoins({ owner: address, coinType: a.coinType });
     const c = handleMergeSplit(tx, coins.data, amt);
     tx.moveCall({
-      target: `${clientConfig.PACKAGE_ID}::pool_new::convert_a_to_b`,
+      target: `${clientConfig.PACKAGE_ID}::pool::convert_a_to_b`,
       typeArguments: [a.coinType, b.coinType],
       arguments: [tx.object(a.id), tx.object(b.id), c, tx.pure.u64(scaled), tx.pure.u8(a.coinDecimal)],
     });
@@ -148,7 +148,9 @@ export function useTokenExchange() {
   const getBalance = useCallback(async (coinType:string) => {
     if (!address) throw new Error('No wallet');
     const t = poolMap.get(coinType)!;
+    // console.log(t);
     const r = await client.getBalance({ owner:address, coinType:t.coinType });
+    // console.log(r);
     const v=Number(r.totalBalance)/10**t.coinDecimal;
     return formatter.format(v);
   }, [address,poolMap]);
@@ -162,25 +164,53 @@ export function useTokenExchange() {
     // console.log(token);
     if (!token) throw new Error(`Unknown base token: ${userDetails.country.baseTokencoinType}`);
     const r = await client.getBalance({ owner:address, coinType:token.coinType });
+    // console.log(r);
     const val=Number(r.totalBalance)/10**token.coinDecimal;
+    // console.log(val);
     return `${userDetails.country.currencySymbol}${formatter.format(val)}`;
   }, [address, poolMap, userDetails]);
 
   const getPortfolio = useCallback(async () => {
-    if (!address) throw new Error('No wallet');
-    let totalUSD=0;
-    let totalLocal=0;
-    const breakdown = await Promise.all(Array.from(poolMap.values()).map(async t => {
-      const balStr=await getBalance(t.coinType);
-      console.log(t)
-      const balNum=parseFloat(balStr);
-      const usd=balNum*t.ratesDollar;
-      totalUSD+=usd;
-      if(userDetails) totalLocal+=(usd*(t.ratesDollar?1:1));
-      return { symbol:t.coinName, balance:balNum, usdValue:usd };
-    }));
-    return { breakdown, totalUSD, totalLocal: userDetails?`${userDetails.country.currencySymbol}${formatter.format(totalLocal)}`:`${formatter.format(totalLocal)}` };
-  }, [address,poolMap,userDetails,getBalance]);
+    if (!address) {
+      throw new Error('No wallet connected');
+    }
+  
+    // 1. Pull out your pools into an array
+    const pools = Array.from(poolMap.values());
+  
+    // 2. Figure out your local conversion rate once
+    const localPool = pools.find(
+      (t) => t.coinType === userDetails.country.baseTokencoinType
+    );
+    const localConversionRate = localPool?.ratesDollar ?? 0;
+  
+    // 3. Fetch balances in parallel
+    const breakdown = await Promise.all(
+      pools.map(async (t) => {
+        const balStr = await getBalance(t.coinType);
+        const balance = parseFloat(balStr.replace(/,/g, ''));
+        const usdValue = balance / t.ratesDollar;
+        // console.log(usdValue);
+        return {
+          symbol: t.coinName,
+          balance,
+          usdValue,
+        };
+      })
+    );
+    
+    // 4. Aggregate totals with pure reduces
+    const totalUSD = breakdown.reduce((sum, { usdValue }) => sum + usdValue, 0);
+    // console.log(totalUSD);
+    const totalLocal = totalUSD * localConversionRate;
+  
+    // 5. Format local total
+    const formattedLocal = `${userDetails.country.currencySymbol}${formatter.format(
+      totalLocal
+    )}`;
+  
+    return { breakdown, totalUSD, totalLocal: formattedLocal };
+  }, [address, poolMap, userDetails, getBalance]);  
 
   return { handleConvert, sendToAddress, sendToNameService, getBalance, getBaseBalance, getPortfolio };
 }
