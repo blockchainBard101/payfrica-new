@@ -7,7 +7,7 @@ import { nameExists } from "@/hooks/registerNsName";
 
 export const PayfricaPadiSuiOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
-  const isVisible = overlayStates.payfricaPadiSui; // ✅ control visibility here
+  const isVisible = overlayStates.payfricaPadiSui; 
 
   const suffix = "@payfrica";
   const [inputValue, setInputValue] = useState("");

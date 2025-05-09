@@ -114,6 +114,20 @@ export function useTokenExchange() {
     });
   }, [address, poolMap, sponsorAndExecuteTransactionBlock, getConversionRate, toMinimalUnits, handleMergeSplit]);
 
+  const handleDepositRequest = useCallback(async (agent: string, amount: number, comment: string, coinType: string) => {
+    if (!address) throw new Error('No wallet');
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${clientConfig.PACKAGE_ID}::agents::deposit_requests`,
+      typeArguments: [coinType],
+      arguments: [tx.object(clientConfig.PAYFRICA_AGENT_ID), tx.object(agent), tx.pure.u64(amount), tx.pure.string(comment), tx.object("0x6")],
+    });
+    return sponsorAndExecuteTransactionBlock({
+      tx, network: clientConfig.SUI_NETWORK_NAME, includesTransferTx: true,
+      allowedAddresses: [address], options: { showEffects:true, showObjectChanges:true, showEvents:true }
+    });
+  }, [address, sponsorAndExecuteTransactionBlock]);
+
   const sendToAddress = useCallback(async (coinType: string, amount: number, recipient: string) => {
     if (!address) throw new Error('No wallet');
     const t = poolMap.get(coinType)!;
@@ -122,11 +136,11 @@ export function useTokenExchange() {
     const coins = await client.getCoins({ owner: address, coinType: t.coinType });
     const c = handleMergeSplit(tx, coins.data, amt);
     tx.moveCall({ target:`${clientConfig.PACKAGE_ID}::send::send_coin_address`, typeArguments:[t.coinType], arguments:[c, tx.pure.address(recipient), tx.object("0x6")] });
-    const r = await sponsorAndExecuteTransactionBlock({
+    return sponsorAndExecuteTransactionBlock({
       tx, network: clientConfig.SUI_NETWORK_NAME, includesTransferTx:true,
       allowedAddresses:[recipient], options:{ showEffects:true, showObjectChanges:true, showEvents:true }
     });
-    return Boolean(r);
+    // return Boolean(r);
   }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits, handleMergeSplit]);
 
   const sendToNameService = useCallback(async (coinType:string, amount:number, ns:string) => {
@@ -138,11 +152,11 @@ export function useTokenExchange() {
     const c = handleMergeSplit(tx, coins.data, amt);
     const obj = await getNsAddress(ns), formatted=convertNsNameToSui(ns);
     tx.moveCall({ target:`${clientConfig.PACKAGE_ID}::send::send_ns`, typeArguments:[t.coinType], arguments:[c, tx.object("0x300369e8909b9a6464da265b9a5a9ab6fe2158a040e84e808628cde7a07ee5a3"), tx.pure.string(formatted), tx.object("0x6")] });
-    const r = await sponsorAndExecuteTransactionBlock({
+    return sponsorAndExecuteTransactionBlock({
       tx, network: clientConfig.SUI_NETWORK_NAME, includesTransferTx:true,
       allowedAddresses:[obj], options:{ showEffects:true, showObjectChanges:true, showEvents:true }
     });
-    return Boolean(r);
+    // return Boolean(r);
   }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits, handleMergeSplit]);
 
   const getBalance = useCallback(async (coinType:string) => {
@@ -158,8 +172,6 @@ export function useTokenExchange() {
   const getBaseBalance = useCallback(async () => {
     if (!address) throw new Error('No wallet');
     if (!userDetails) throw new Error('No user details');
-    // console.log(userDetails);
-    // console.log(userDetails);
     const token = poolMap.get(userDetails.country.baseTokencoinType);
     // console.log(token);
     if (!token) throw new Error(`Unknown base token: ${userDetails.country.baseTokencoinType}`);
@@ -212,5 +224,5 @@ export function useTokenExchange() {
     return { breakdown, totalUSD, totalLocal: formattedLocal };
   }, [address, poolMap, userDetails, getBalance]);  
 
-  return { handleConvert, sendToAddress, sendToNameService, getBalance, getBaseBalance, getPortfolio };
+  return { handleConvert, sendToAddress, sendToNameService, getBalance, getBaseBalance, getPortfolio, handleDepositRequest };
 }

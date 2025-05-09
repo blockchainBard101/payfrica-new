@@ -23,7 +23,7 @@ export const SendMoneyOverlay = () => {
           <div
             className="option"
             onClick={() => {
-              toggleOverlay("payfricaPadi");
+              // toggleOverlay("payfricaPadi");
               toggleOverlay("enterAmount");
             }}
           >

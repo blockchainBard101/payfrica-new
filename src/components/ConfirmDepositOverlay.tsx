@@ -1,38 +1,103 @@
+// src/components/ConfirmDepositOverlay.tsx
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { LuMoveLeft } from "react-icons/lu";
 import { useGlobalState } from "@/GlobalStateProvider";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { useUserDetails, useTokenExchange } from "@/hooks/useTokenExchange";
 
-const ConfirmDepositOverlay = () => {
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
+export default function ConfirmDepositOverlay() {
   const { overlayStates, toggleOverlay, depositData, setDepositData } =
     useGlobalState();
+  const { amount, method } = depositData;
+  const { address } = useCustomWallet();
 
-  const { amount, method, agentId } = depositData;
-  const [loadingAgent, setLoadingAgent] = useState(true);
+  // pull in the user so we can get their baseToken / currency
+  const userDetails = useUserDetails(address);
+  // bring in the on-chain deposit request handler
+  const { handleDepositRequest } = useTokenExchange();
 
-  // fetch agentId once
+  // derive coinType (on-chain) and stripped version for your agent API
+  const coinType = userDetails?.country?.baseToken?.coinType ?? "";
+  const stripped = coinType.replace(/^0x/, "");
+
+  // local state for the selected agent
+  const [agent, setAgent] = useState<{
+    id: string;
+    accountNumber: string;
+    bank: string;
+    name: string;
+    comment: string;
+  } | null>(null);
+  const [loadingAgent, setLoadingAgent] = useState(false);
+
+  // fetch best‐deposit‐agent whenever coinType or amount changes
   useEffect(() => {
-    async function fetchAgent() {
-      // simulate API
-      const id = "AGT-12345XYZ";
-      setDepositData((d) => ({ ...d, agentId: id }));
-      setLoadingAgent(false);
-    }
-    fetchAgent();
-  }, [setDepositData]);
+    if (!coinType || !amount) return;
+
+    setLoadingAgent(true);
+    // compute minimal units using the same decimals
+    const decimals = userDetails?.country?.baseToken?.decimals ?? 0;
+    const humanAmt = Number(amount);
+    const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
+
+    const params = new URLSearchParams({
+      coinType: stripped,
+      amount: minimalAmt.toString(),
+    });
+
+    fetch(`${API_BASE}/agent/best-deposit-agent?${params}`)
+      .then((res) => {
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (data) {
+          setAgent(data);
+          setDepositData((d) => ({ ...d, agentId: data.id }));
+        } else {
+          setAgent(null);
+          setDepositData((d) => ({ ...d, agentId: undefined }));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch deposit agent", err);
+        setAgent(null);
+      })
+      .finally(() => setLoadingAgent(false));
+  }, [coinType, amount, stripped, userDetails, setDepositData]);
 
   if (!overlayStates.confirmDeposit) return null;
 
-  // mock gas fee: 0.5%
   const fee = (Number(amount) * 0.005).toFixed(2);
   const total = (Number(amount) + Number(fee)).toFixed(2);
+  const symbol = userDetails?.country?.currencySymbol ?? "";
 
-  const handleConfirmDeposit = async () => {
-    // simulate backend check
-    const accepted = await new Promise((r) =>
-      setTimeout(() => r(Math.random() > 0.3), 1000)
-    );
-    toggleOverlay("confirmDeposit");
-    toggleOverlay(accepted ? "success" : "failed");
+  const handleNext = async () => {
+    if (!agent) return;
+    // re-compute minimal units
+    const decimals = userDetails?.country?.baseToken?.decimals ?? 0;
+    const humanAmt = Number(amount);
+    const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
+
+    try {
+      await handleDepositRequest(
+        agent.id,
+        minimalAmt,
+        agent.comment,
+        coinType
+      );
+      toggleOverlay("confirmDeposit");
+      toggleOverlay("success");
+    } catch (e) {
+      console.error("Deposit on-chain failed", e);
+      toggleOverlay("confirmDeposit");
+      toggleOverlay("failed");
+    }
   };
 
   return (
@@ -41,10 +106,9 @@ const ConfirmDepositOverlay = () => {
         <LuMoveLeft
           style={{
             position: "absolute",
-            left: "30px",
-            top: "20px",
-            fontSize: "30px",
-            // marginBottom: "40px",
+            left: 30,
+            top: 20,
+            fontSize: 30,
             cursor: "pointer",
             color: "#bf8555",
           }}
@@ -55,13 +119,19 @@ const ConfirmDepositOverlay = () => {
         />
 
         <h4>You are Depositing</h4>
-        <h2>NGN {Number(amount).toLocaleString()}</h2>
-        <p>Your wallet will receive NGN {Number(amount).toLocaleString()}</p>
+        <h2>
+          {symbol} {Number(amount).toLocaleString()}
+        </h2>
+        <p>
+          Your wallet will receive {symbol} {Number(amount).toLocaleString()}
+        </p>
 
         <div className="confirm-summary">
           <div>
             <span>You receive</span>
-            <strong>NGN {Number(amount).toLocaleString()}</strong>
+            <strong>
+              {symbol} {Number(amount).toLocaleString()}
+            </strong>
           </div>
           <div>
             <span>Payment method</span>
@@ -69,24 +139,42 @@ const ConfirmDepositOverlay = () => {
           </div>
           <div>
             <span>Agent ID</span>
-            <strong>{loadingAgent ? "Loading…" : agentId}</strong>
+            <strong>{loadingAgent ? "Loading…" : agent?.id ?? "—"}</strong>
+          </div>
+          <div>
+            <span>Agent Name</span>
+            <strong>{agent?.name ?? "—"}</strong>
+          </div>
+          <div>
+            <span>Bank</span>
+            <strong>{agent?.bank ?? "—"}</strong>
+          </div>
+          <div>
+            <span>Account #</span>
+            <strong>{agent?.accountNumber ?? "—"}</strong>
           </div>
           <div>
             <span>Total charged</span>
-            <strong>NGN {total}</strong>
+            <strong>
+              {symbol} {total}
+            </strong>
           </div>
+          {agent?.comment && (
+            <div>
+              <span>Note</span>
+              <strong>{agent.comment}</strong>
+            </div>
+          )}
         </div>
 
         <button
           className="next-btn"
-          disabled={loadingAgent}
-          onClick={handleConfirmDeposit}
+          disabled={loadingAgent || !agent}
+          onClick={handleNext}
         >
           Next
         </button>
       </div>
     </div>
   );
-};
-
-export default ConfirmDepositOverlay;
+}

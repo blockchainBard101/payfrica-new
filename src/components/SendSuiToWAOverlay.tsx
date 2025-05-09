@@ -1,67 +1,73 @@
+// src/components/SendSuiToWAOverlay.tsx
 "use client";
+
 import { useState, useEffect } from "react";
 import { LuMoveLeft } from "react-icons/lu";
 import { BsQrCodeScan } from "react-icons/bs";
-import { useGlobalState } from "../GlobalStateProvider";
-import { nameExists, getNsAddress } from "@/hooks/registerNsName";
-import { useSendCoinNs, useSendCoinAdd } from "@/hooks/send";
-import { useCustomWallet } from "@/contexts/CustomWallet";
-import { getTokenBalance } from "@/hooks/getCoinBalance";
 import Image from "next/image";
+import { useGlobalState } from "@/GlobalStateProvider";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { usePools, useTokenExchange } from "@/hooks/useTokenExchange";
+import { nameExists, getNsAddress } from "@/hooks/registerNsName";
 
 export const SendSuiToWAOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
   const isVisible = overlayStates.sendSuiToWA;
-
   const { address: myAddress } = useCustomWallet();
-  const sendCoinNs = useSendCoinNs();
-  const sendCoinAdd = useSendCoinAdd();
+
+  // only USDC
+  const { pools } = usePools();
+  const usdcPool = pools.find((p) => p.coinName === "USDC");
+  const coinType = usdcPool?.coinType;
+
+  const { getBalance, sendToAddress, sendToNameService } = useTokenExchange();
 
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
-  const [token, setToken] = useState<"NGNC" | "GHSC">("NGNC");
-  const [balance, setBalance] = useState<number | null>(null);
+  const [balance, setBalance] = useState("0");
   const [loadingBal, setLoadingBal] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [nsValid, setNsValid] = useState<boolean | null>(null);
 
+  const [nsValid, setNsValid] = useState<boolean | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  const [isSending, setIsSending] = useState(false);
+
+  // load USDC balance
   useEffect(() => {
-    if (!myAddress) {
-      setBalance(null);
+    if (!myAddress || !coinType) return setBalance("0");
+    setLoadingBal(true);
+    getBalance(coinType)
+      .then((b) => setBalance(b))
+      .catch(() => setBalance("0"))
+      .finally(() => setLoadingBal(false));
+  }, [myAddress, coinType, getBalance]);
+
+  // validate NS handles
+  useEffect(() => {
+    if (!recipient.includes("@")) {
+      setNsValid(null);
+      setChecking(false);
       return;
     }
-
-    setLoadingBal(true);
-    getTokenBalance(myAddress, token)
-      .then((bal) => setBalance(Number(bal)))
-      .catch(() => setBalance(null))
-      .finally(() => setLoadingBal(false));
-  }, [myAddress, token]);
-
-  useEffect(() => {
-    if (recipient.includes("@")) {
-      nameExists(recipient).then((exists) => setNsValid(exists));
-    } else {
-      setNsValid(null);
-    }
+    setChecking(true);
+    nameExists(recipient)
+      .then((exists) => setNsValid(exists))
+      .catch(() => setNsValid(false))
+      .finally(() => setChecking(false));
   }, [recipient]);
 
   const handleSend = async () => {
-    if (!amount || !recipient) return;
-    if (recipient.includes("@") && !nsValid) return;
-
+    if (!amount || !recipient || !coinType) return;
     setIsSending(true);
-    let rawAddr = recipient;
-
-    if (recipient.includes("@")) {
-      rawAddr = await getNsAddress(recipient);
-    }
-
     try {
-      const success = recipient.includes("@")
-        ? await sendCoinNs(token, Number(amount), recipient)
-        : await sendCoinAdd(token, Number(amount), rawAddr);
-
+      let success: boolean;
+      if (recipient.includes("@")) {
+        const response = await sendToNameService(coinType, Number(amount), recipient);
+        success = response && response.effects?.status?.status === "success"; // Adjust based on actual response structure
+      } else {
+        const response = await sendToAddress(coinType, Number(amount), recipient);
+        success = response && response.effects?.status?.status === "success"; // Adjust based on actual response structure
+      }
       toggleOverlay("sendSuiToWA");
       toggleOverlay(success ? "sending" : "failed");
     } catch {
@@ -75,25 +81,15 @@ export const SendSuiToWAOverlay = () => {
   const canSend =
     !!amount &&
     !!recipient &&
+    !!coinType &&
     !isSending &&
     (recipient.includes("@") ? nsValid === true : true);
 
+  if (!isVisible) return null;
+  if (!usdcPool) return <div className="text-red-500 p-4">USDC pool not found</div>;
+
   return (
-    <div
-      className="overlay-background"
-      style={{
-        display: isVisible ? "flex" : "none",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        width: "100vw",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 999,
-      }}
-    >
+    <div className="overlay-background">
       <div className="enter-amount-overlay">
         <div className="overlay-header">
           <LuMoveLeft
@@ -108,23 +104,21 @@ export const SendSuiToWAOverlay = () => {
 
         <div className="recipient-info">
           <Image
-            src={"/ProfileDP.jpg"}
+            src="/ProfileDP.jpg"
             alt="Profile Picture"
-            className="profile-picture"
             width={40}
             height={40}
+            className="profile-picture"
           />
           <div>
-            <h3>Team Sushi</h3>
-            <p>@teamsushi</p>
+            <h3>Recipient</h3>
+            <p>{recipient || "—"}</p>
           </div>
         </div>
 
         <div className="amount-entry">
-          <h3>Enter Amount & Token</h3>
-          <div
-            style={{ display: "flex", alignItems: "center", marginBottom: 8 }}
-          >
+          <h3>Enter Amount (USDC only)</h3>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
             <input
               type="number"
               placeholder="0.00"
@@ -132,94 +126,61 @@ export const SendSuiToWAOverlay = () => {
               onChange={(e) => setAmount(e.target.value)}
               style={{
                 flex: 1,
-                padding: "10px",
-                borderRadius: "5px",
-                fontFamily: "InterLight",
-                fontSize: "16px",
+                padding: 10,
+                borderRadius: 5,
+                fontSize: 16,
                 border: "1px solid #ccc",
-                outline: "none",
               }}
             />
-            <select
-              value={token}
-              onChange={(e) => setToken(e.target.value as "NGNC" | "GHSC")}
-              style={{
-                marginLeft: "8px",
-                padding: "10px",
-                borderRadius: "5px",
-                fontFamily: "InterLight",
-                fontSize: "16px",
-                border: "1px solid #ccc",
-                outline: "none",
-              }}
-            >
-              <option value="NGNC">NGNC</option>
-              <option value="GHSC">GHSC</option>
-            </select>
             <button
-              onClick={() => balance !== null && setAmount(balance.toString())}
-              disabled={loadingBal || balance === null}
+              onClick={() => setAmount(balance)}
+              disabled={loadingBal}
               style={{
-                marginLeft: "8px",
+                marginLeft: 8,
                 padding: "10px 12px",
-                borderRadius: "5px",
-                fontFamily: "InterLight",
-                fontSize: "16px",
+                borderRadius: 5,
+                fontSize: 16,
                 border: "1px solid #ccc",
                 background: "white",
-                cursor:
-                  loadingBal || balance === null ? "not-allowed" : "pointer",
-                opacity: loadingBal || balance === null ? 0.5 : 1,
+                cursor: loadingBal ? "not-allowed" : "pointer",
+                opacity: loadingBal ? 0.5 : 1,
               }}
             >
               Max
             </button>
           </div>
 
-          <div
-            style={{
-              marginBottom: 16,
-              fontFamily: "InterLight",
-              fontSize: "14px",
-              color: "#333",
-            }}
-          >
-            {loadingBal
-              ? "Loading balance…"
-              : `Balance: ${balance ?? "0"} ${token}`}
-          </div>
-
-          <div className="amount-options" style={{ marginBottom: 20 }}>
-            {["1", "5", "10", "50"].map((a) => (
-              <button
-                key={a}
-                onClick={() => setAmount(a)}
-                style={{ marginRight: 8 }}
-              >
-                {a}
-              </button>
-            ))}
+          <div style={{ marginBottom: 16, fontSize: 14, color: "#333" }}>
+            {loadingBal ? "Loading balance…" : `Balance: ${balance} USDC`}
           </div>
 
           <h3>Recipient (Address or NS)</h3>
           <input
             type="text"
-            placeholder="e.g. 0x… or alice@payfrica"
+            placeholder="0x.. or alice@payfrica"
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             style={{
               width: "100%",
-              padding: "10px",
-              borderRadius: "5px",
-              fontFamily: "InterLight",
-              fontSize: "16px",
+              padding: 10,
+              borderRadius: 5,
+              fontSize: 16,
               border: "1px solid #ccc",
-              outline: "none",
             }}
           />
-          {recipient.includes("@") && nsValid === false && (
-            <small style={{ color: "red", fontFamily: "InterLight" }}>
+
+          {/* show checking / invalid / valid */}
+          {recipient.includes("@") && checking && (
+            <small style={{ color: "#666", fontSize: 14 }}>Checking…</small>
+          )}
+          {recipient.includes("@") && !checking && nsValid === false && (
+            <small style={{ color: "red", fontSize: 14 }}>
               Payfrica name does not exist
+            </small>
+          )}
+          {recipient.includes("@") && !checking && nsValid === true && (
+            <small style={{ color: "green", fontSize: 14 }}>
+              Payfrica name is valid!
             </small>
           )}
         </div>
@@ -231,10 +192,10 @@ export const SendSuiToWAOverlay = () => {
           style={{
             opacity: canSend ? 1 : 0.5,
             cursor: canSend ? "pointer" : "not-allowed",
-            marginTop: "15px",
+            marginTop: 15,
           }}
         >
-          {isSending ? "Sending…" : "Send Token"}
+          {isSending ? "Sending…" : "Send USDC"}
         </button>
       </div>
     </div>

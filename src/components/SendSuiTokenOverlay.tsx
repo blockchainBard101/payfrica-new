@@ -23,7 +23,7 @@ export const SendSuiTokenOverlay = () => {
           <div
             className="option"
             onClick={() => {
-              toggleOverlay("payfricaPadiSui");
+              // toggleOverlay("payfricaPadiSui");
               toggleOverlay("enterSuiAmount");
             }}
           >

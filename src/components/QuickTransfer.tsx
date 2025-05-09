@@ -1,41 +1,41 @@
-import React, { useState, useEffect } from "react";
+// src/components/QuickTransfer.tsx
+"use client";
+
+import React, { useMemo } from "react";
 import { FaArrowLeft, FaExpand } from "react-icons/fa";
 import { useGlobalState } from "@/GlobalStateProvider";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { useUserDetails } from "@/hooks/useTokenExchange";
 
 const presets = [100, 200, 500, 1000];
 
 const QuickTransfer = () => {
   const { overlayStates, toggleOverlay, depositData, setDepositData } =
     useGlobalState();
+  const { address } = useCustomWallet();
+  const userDetails = useUserDetails(address);
 
-  const [localCurrency, setLocalCurrency] = useState("");
+  // derive your local‐currency code (e.g. NGNC) from whatever's on the user
+  const localCurrency = useMemo(() => {
+    return (
+      userDetails?.country?.baseToken?.symbol ?? // e.g. "NGNC"
+      userDetails?.country?.currencySymbol ??   // fallback to a symbol like "₦"
+      ""
+    );
+  }, [userDetails]);
 
-  // fetch base currency once
-  useEffect(() => {
-    async function fetchCurrency() {
-      // simulate API
-      const currency = "NGN";
-      setLocalCurrency(currency);
-    }
-    fetchCurrency();
-  }, []);
-
-  // keep hooks above any early returns
   if (!overlayStates.quickTransfer) return null;
 
-  // preset button sets depositData.amount
-  const handlePreset = (value) => {
-    setDepositData((d) => ({ ...d, amount: value.toString() }));
-  };
+  const amt = depositData.amount;
 
-  // on Next: store method + close/open overlays
+  const handlePreset = (value: number) =>
+    setDepositData((d) => ({ ...d, amount: value.toString() }));
+
   const handleTransferNext = () => {
     setDepositData((d) => ({ ...d, method: "Quick Transfer" }));
     toggleOverlay("quickTransfer");
     toggleOverlay("confirmDeposit");
   };
-
-  const amt = depositData.amount;
 
   return (
     <div className="overlay-background">

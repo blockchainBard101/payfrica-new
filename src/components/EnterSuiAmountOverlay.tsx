@@ -1,93 +1,103 @@
+// src/components/EnterSuiAmountOverlay.tsx
 "use client";
+
 import { useState, useEffect } from "react";
 import { LuMoveLeft } from "react-icons/lu";
-import { useGlobalState } from "../GlobalStateProvider";
 import { BsQrCodeScan } from "react-icons/bs";
-import { nameExists } from "@/hooks/registerNsName";
-import { getTokenBalance } from "@/hooks/getCoinBalance";
-import { useCustomWallet } from "@/contexts/CustomWallet";
 import Image from "next/image";
+import { useGlobalState } from "@/GlobalStateProvider";
+import { useCustomWallet } from "@/contexts/CustomWallet";
+import { nameExists, getNsAddress } from "@/hooks/registerNsName";
+import { usePools, useTokenExchange } from "@/hooks/useTokenExchange";
 
 export const EnterSuiAmountOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
-  const isVisible = overlayStates.enterSuiAmount; // ✅ control visibility, don't skip hooks
+  const isVisible = overlayStates.enterSuiAmount;
 
-  const { address } = useCustomWallet();
+  const { address: myAddress } = useCustomWallet();
+  const { pools } = usePools();
+  const { getBalance, sendToAddress, sendToNameService } = useTokenExchange();
+
+  // find USDC pool
+  const usdc = pools.find((p) => p.coinName === "USDC");
+  const coinType = usdc?.coinType;
+
   const [amount, setAmount] = useState("");
   const [tagInput, setTagInput] = useState("");
-  const [tagExists, setTagExists] = useState(null);
-  const [currency, setCurrency] = useState("NGNC");
-  const [balance, setBalance] = useState(null);
-  const [loadingBalance, setLoadingBalance] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [nsValid, setNsValid] = useState<boolean | null>(null);
+
+  const [balance, setBalance] = useState("0");
+  const [loadingBal, setLoadingBal] = useState(false);
+
+  const [isSending, setIsSending] = useState(false);
   const suffix = "@payfrica";
 
+  // load USDC balance
   useEffect(() => {
-    if (tagInput.trim().length > 4) {
-      const fullTag = tagInput + suffix;
-      nameExists(fullTag).then((exists) => {
-        setTagExists(exists);
-      });
-    } else {
-      setTagExists(null);
-    }
-  }, [tagInput, suffix]);
+    if (!myAddress || !coinType) return;
+    setLoadingBal(true);
+    getBalance(coinType)
+      .then((b) => setBalance(b))
+      .catch(() => setBalance("0"))
+      .finally(() => setLoadingBal(false));
+  }, [myAddress, coinType, getBalance]);
 
+  // validate Payfrica tag
   useEffect(() => {
-    async function fetchBalance() {
-      if (!address) return;
-      setLoadingBalance(true);
-      try {
-        const bal = await getTokenBalance(address, currency);
-        setBalance(bal);
-      } catch (err) {
-        console.error(err);
-        setBalance(null);
-      } finally {
-        setLoadingBalance(false);
-      }
+    const trimmed = tagInput.trim();
+    if (trimmed.length < 4) {
+      setNsValid(null);
+      setChecking(false);
+      return;
     }
-    fetchBalance();
-  }, [currency, address]);
+    setChecking(true);
+    const full = `${trimmed}${suffix}`;
+    nameExists(full)
+      .then((exists) => setNsValid(exists))
+      .catch(() => setNsValid(false))
+      .finally(() => setChecking(false));
+  }, [tagInput]);
 
-  const isTagValid = tagInput.trim().length > 3 && !tagInput.includes(" ");
-  const isAmountValid = amount && parseFloat(amount) > 0;
-  const isSendActive = isTagValid && isAmountValid;
+  const fullTag = `${tagInput.trim()}${suffix}`;
+  const isAmountValid = !!amount && parseFloat(amount) > 0;
+  const isTagValid = tagInput.trim().length >= 4 && !tagInput.includes(" ");
+  const canSend =
+    !!coinType &&
+    isAmountValid &&
+    (tagInput.includes("@") // we never include @ in input, so always treat as NS
+      ? nsValid === true
+      : isTagValid);
 
-  let tagMessage = "*Tag must be at least 4 characters long*";
-  let tagMessageColor = "#555";
-
-  if (tagInput.trim().length > 4) {
-    if (tagExists) {
-      tagMessage = "Valid Payfrica Tag";
-      tagMessageColor = "green";
-    } else {
-      tagMessage = "Tag Does not exist";
-      tagMessageColor = "red";
+  const handleSend = async () => {
+    if (!coinType || !isAmountValid) return;
+    setIsSending(true);
+    try {
+      let success: boolean;
+      // always treat as name service
+      const response = await sendToNameService(coinType, Number(amount), fullTag);
+      success = response?.effects?.status?.status === "success"; // Adjusted based on typical Sui response structure
+      toggleOverlay("enterSuiAmount");
+      toggleOverlay(success ? "sending" : "failed");
+    } catch {
+      toggleOverlay("enterSuiAmount");
+      toggleOverlay("failed");
+    } finally {
+      setIsSending(false);
     }
-  }
+  };
+
+  if (!isVisible) return null;
+  if (!usdc) return <div className="p-4 text-red-500">USDC not available</div>;
 
   return (
-    <div
-      className="overlay-background"
-      style={{
-        display: isVisible ? "flex" : "none",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        width: "100vw",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
-    >
+    <div className="overlay-background">
       <div className="enter-amount-overlay">
         <div className="overlay-header">
           <LuMoveLeft
             className="back-icon"
             onClick={() => {
-              toggleOverlay("payfricaPadiSui");
+              // toggleOverlay("payfricaPadiSui");
               toggleOverlay("enterSuiAmount");
             }}
           />
@@ -96,7 +106,7 @@ export const EnterSuiAmountOverlay = () => {
 
         <div className="recipient-info">
           <Image
-            src={"/PayfricaNavLogo.png"}
+            src="/PayfricaNavLogo.png"
             alt="Payfrica Logo"
             width={40}
             height={40}
@@ -104,55 +114,54 @@ export const EnterSuiAmountOverlay = () => {
         </div>
 
         <div className="payfrica-tag-section" style={{ margin: "20px 0" }}>
-          <h3 style={{ color: "#333" }}>Enter Recipient Tag</h3>
-          <div
-            className="payfrica-tag-wrapper"
-            style={{ position: "relative", width: "100%" }}
-          >
+          <h3 style={{ color: "#333" }}>Recipient Payfrica Tag</h3>
+          <div style={{ position: "relative", width: "100%" }}>
             <input
               type="text"
-              placeholder="Recipient Tag"
+              placeholder="alice"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               style={{
                 width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                fontFamily: "InterLight",
-                fontSize: "16px",
-                outline: "none",
+                padding: "10px 100px 10px 10px",
+                borderRadius: 5,
+                fontSize: 16,
                 border: "1px solid #ccc",
-                paddingRight: "100px",
+                outline: "none",
               }}
             />
             <span
-              className="payfrica-tag-suffix"
               style={{
                 position: "absolute",
-                right: "10px",
+                right: 10,
                 top: "50%",
                 transform: "translateY(-50%)",
-                pointerEvents: "none",
                 color: "#555",
+                pointerEvents: "none",
               }}
             >
               {suffix}
             </span>
           </div>
-          <small
-            style={{
-              display: "block",
-              marginTop: "5px",
-              fontFamily: "InterLight",
-              color: tagMessageColor,
-            }}
-          >
-            {tagMessage}
-          </small>
+          {checking && (
+            <small style={{ color: "#666", display: "block", marginTop: 4 }}>
+              Checking…
+            </small>
+          )}
+          {!checking && nsValid === false && (
+            <small style={{ color: "red", display: "block", marginTop: 4 }}>
+              Payfrica name does not exist
+            </small>
+          )}
+          {!checking && nsValid === true && (
+            <small style={{ color: "green", display: "block", marginTop: 4 }}>
+              Payfrica name is valid!
+            </small>
+          )}
         </div>
 
         <div className="amount-entry">
-          <h3 style={{ color: "#333" }}>Enter Amount</h3>
+          <h3 style={{ color: "#333" }}>Enter Amount (USDC)</h3>
           <input
             type="number"
             placeholder="0.00"
@@ -160,52 +169,29 @@ export const EnterSuiAmountOverlay = () => {
             onChange={(e) => setAmount(e.target.value)}
             style={{
               width: "100%",
-              padding: "10px",
-              borderRadius: "5px",
-              fontFamily: "InterLight",
-              fontSize: "16px",
-              outline: "none",
+              padding: 10,
+              borderRadius: 5,
+              fontSize: 16,
               border: "1px solid #ccc",
+              outline: "none",
             }}
           />
-          <select
-            name="currency"
-            id="currency"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              fontFamily: "InterLight",
-              fontSize: "16px",
-              outline: "none",
-              border: "1px solid #ccc",
-              marginTop: "10px",
-            }}
-          >
-            <option value="USDC">USDC</option>
-            <option value="SUI">SUI</option>
-          </select>
           <div
-            style={{
-              marginTop: "5px",
-              fontFamily: "InterLight",
-              fontSize: "14px",
-              color: "#333",
-            }}
+            style={{ marginTop: 8, fontSize: 14, color: "#333" }}
           >
-            {loadingBalance
-              ? "Loading balance..."
-              : `Balance: ${balance ?? "0"}`}
+            {loadingBal
+              ? "Loading balance…"
+              : `Balance: ${balance} USDC`}
           </div>
-          <div className="amount-options" style={{ marginTop: "10px" }}>
-            {["100", "200", "500", "1000"].map((amt) => (
+          <div style={{ marginTop: 10 }}>
+            {["10", "50", "100", balance].map((amt) => (
               <button
                 key={amt}
                 onClick={() => setAmount(amt)}
-                style={{ marginRight: "5px" }}
+                disabled={amt === balance && loadingBal}
+                style={{ marginRight: 8 }}
               >
-                {amt}
+                {amt === balance ? "Max" : amt}
               </button>
             ))}
           </div>
@@ -213,18 +199,15 @@ export const EnterSuiAmountOverlay = () => {
 
         <button
           className="send-money-button"
-          disabled={!isSendActive}
+          onClick={handleSend}
+          disabled={!canSend || isSending}
           style={{
-            opacity: isSendActive ? 1 : 0.5,
-            cursor: isSendActive ? "pointer" : "not-allowed",
-            marginTop: "15px",
-          }}
-          onClick={() => {
-            toggleOverlay("sending");
-            toggleOverlay("enterSuiAmount");
+            opacity: canSend ? 1 : 0.5,
+            cursor: canSend ? "pointer" : "not-allowed",
+            marginTop: 15,
           }}
         >
-          Send Sui Token
+          {isSending ? "Sending…" : "Send USDC"}
         </button>
       </div>
     </div>
