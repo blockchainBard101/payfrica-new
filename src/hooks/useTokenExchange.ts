@@ -172,6 +172,7 @@ export function useTokenExchange() {
   const getBaseBalance = useCallback(async () => {
     if (!address) throw new Error('No wallet');
     if (!userDetails) throw new Error('No user details');
+    // console.log(userDetails);
     const token = poolMap.get(userDetails.country.baseTokencoinType);
     // console.log(token);
     if (!token) throw new Error(`Unknown base token: ${userDetails.country.baseTokencoinType}`);

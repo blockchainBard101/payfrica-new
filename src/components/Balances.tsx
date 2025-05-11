@@ -27,28 +27,28 @@ export const BalanceCards = () => {
   const initialBalanceData = [
     {
       title: "Base Currency",
-      amount: fundingBalance || "₦--",
+      amount: fundingBalance || "--",
       actionText: "Fund Wallet",
       actionIcon: <FaPlus />,
       tokens: null,
     },
     {
       title: "All Balances",
-      amount: portfolioBalance || "₦--",
+      amount: portfolioBalance || "--",
       actionText: "Tokens: Sui, USDC",
       actionIcon: null,
       tokens: "Sui, USDC",
     },
     {
       title: "Savings Balance",
-      amount: "₦0",
+      amount: "--",
       actionText: "View more",
       actionIcon: null,
       tokens: null,
     },
     {
       title: "Card Balance",
-      amount: "₦0",
+      amount: "--",
       actionText: "Details",
       actionIcon: null,
       tokens: null,

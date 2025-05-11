@@ -100,7 +100,6 @@ export const TransactionHistory = () => {
                   "Amount",
                   "Fee",
                   "Status",
-                  "Action",
                 ].map((h, i) => (
                   <th
                     key={i}
@@ -121,19 +120,17 @@ export const TransactionHistory = () => {
                 const nonConvertValue =
                   txn.incomingAmount != null
                     ? {
-                        text: `+${txn.incomingAmount.toLocaleString()} ${
-                          txn.incomingAsset
+                      text: `+${txn.incomingAmount.toLocaleString()} ${txn.incomingAsset
                         }`,
-                        color: "#027a48",
-                      }
+                      color: "#027a48",
+                    }
                     : txn.outgoingAmount != null
-                    ? {
-                        text: `-${txn.outgoingAmount.toLocaleString()} ${
-                          txn.outgoingAsset
-                        }`,
+                      ? {
+                        text: `-${txn.outgoingAmount.toLocaleString()} ${txn.outgoingAsset
+                          }`,
                         color: "#b91c1c",
                       }
-                    : { text: "-", color: "#000" };
+                      : { text: "-", color: "#000" };
 
                 let statusStyle: React.CSSProperties = {
                   border: "none",
@@ -164,7 +161,28 @@ export const TransactionHistory = () => {
 
                 return (
                   <tr key={txn.id}>
-                    <td>{txn.transactionId}</td>
+                    <td>
+                      {txn.transactionId.startsWith("0x") ? (
+                        <a
+                          href={`https://testnet.suivision.xyz/object/${txn.transactionId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: 'blue', textDecoration: 'underline' }}
+                        >
+                          {txn.transactionId.slice(0, 6)}...{txn.transactionId.slice(-4)}
+                        </a>
+                      ) : (
+                        <a
+                          href={`https://testnet.suivision.xyz/txblock/${txn.transactionId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: 'blue', textDecoration: 'underline' }}
+                        >
+                          {txn.transactionId.slice(0, 6)}...{txn.transactionId.slice(-4)}
+                        </a>
+                      )}
+                    </td>
+
                     <td>{txn.interactedWith}</td>
                     <td>{txn.type}</td>
                     <td>{formatDate(txn.date)}</td>
@@ -191,9 +209,6 @@ export const TransactionHistory = () => {
                     <td style={{ textAlign: "center" }}>{txn.fees}</td>
                     <td style={{ textAlign: "center" }}>
                       <button style={statusStyle}>{txn.status}</button>
-                    </td>
-                    <td style={{ textAlign: "center", cursor: "pointer" }}>
-                      <FaEllipsisV />
                     </td>
                   </tr>
                 );
