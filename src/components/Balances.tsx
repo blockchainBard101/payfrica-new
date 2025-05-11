@@ -1,126 +1,87 @@
+// components/BalanceCards.tsx
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
-import { FaEye, FaEyeSlash, FaEllipsisV, FaPlus } from "react-icons/fa";
-import { useCustomWallet } from "@/contexts/CustomWallet";
+
+import React, { useState, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useRealTimeBalances } from "@/hooks/useRealTimeBalance";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import BalanceCard from "./BalanceCard";
 
-export const BalanceCards = () => {
-  const { address } = useCustomWallet();
+// Dynamically load only the icons we need
+const FaEye       = dynamic(() => import("react-icons/fa").then(m => m.FaEye),       { ssr: false });
+const FaEyeSlash  = dynamic(() => import("react-icons/fa").then(m => m.FaEyeSlash),  { ssr: false });
+const FaEllipsisV = dynamic(() => import("react-icons/fa").then(m => m.FaEllipsisV), { ssr: false });
+const FaPlus      = dynamic(() => import("react-icons/fa").then(m => m.FaPlus),      { ssr: false });
+
+const CARD_CONFIG = [
+  { title: "Base Currency",   defaultAmt: "--", actionText: "Fund Wallet",      ActionIcon: FaPlus },
+  { title: "All Balances",    defaultAmt: "--", actionText: "Tokens: Sui, USDC", ActionIcon: null   },
+  { title: "Savings Balance", defaultAmt: "--", actionText: "View more",         ActionIcon: null   },
+  { title: "Card Balance",    defaultAmt: "--", actionText: "Details",           ActionIcon: null   },
+];
+
+export default React.memo(function BalanceCards() {
+  const { address } = useCurrentAccount();
   const { fundingBalance, portfolioBalance } = useRealTimeBalances(address);
+  const [visible, setVisible] = useState<boolean[]>(() => CARD_CONFIG.map(() => true));
 
-  // 1. Compute real total balance:
-  const totalBalance = useMemo(() => {
-    // strip out any non‐numeric, then parse
-    const fundNum = parseFloat(
-      (fundingBalance || "0").replace(/[^0-9.-]+/g, "")
-    );
-    const portNum = parseFloat(
-      (portfolioBalance || "0").replace(/[^0-9.-]+/g, "")
-    );
-    return (fundNum + portNum).toLocaleString("en-NG", {
-      style: "currency",
-      currency: "NGN",
+  // Build each card’s data, including a per-card loading flag
+  const cards = useMemo(() => {
+    return CARD_CONFIG.map((cfg, i) => {
+      const isBalCard = i === 0 || i === 1;
+      const loading    = isBalCard
+        ? (i === 0 ? fundingBalance === undefined : portfolioBalance === undefined)
+        : false;
+      const amountRaw  = isBalCard
+        ? (i === 0 ? fundingBalance : portfolioBalance)
+        : cfg.defaultAmt;
+
+      return {
+        title:        cfg.title,
+        amount:       amountRaw ?? cfg.defaultAmt,
+        loading,
+        visible:      visible[i],
+        actionText:   cfg.actionText,
+        ActionIcon:   cfg.ActionIcon,
+        ToggleIcon:   visible[i] ? FaEye : FaEyeSlash,
+        EllipsisIcon: FaEllipsisV,
+      };
     });
-  }, [fundingBalance, portfolioBalance]);
+  }, [fundingBalance, portfolioBalance, visible]);
 
-  // 2. Set up your cards with proper defaults (use ₦-- for both):
-  const initialBalanceData = [
-    {
-      title: "Base Currency",
-      amount: fundingBalance || "--",
-      actionText: "Fund Wallet",
-      actionIcon: <FaPlus />,
-      tokens: null,
-    },
-    {
-      title: "All Balances",
-      amount: portfolioBalance || "--",
-      actionText: "Tokens: Sui, USDC",
-      actionIcon: null,
-      tokens: "Sui, USDC",
-    },
-    {
-      title: "Savings Balance",
-      amount: "--",
-      actionText: "View more",
-      actionIcon: null,
-      tokens: null,
-    },
-    {
-      title: "Card Balance",
-      amount: "--",
-      actionText: "Details",
-      actionIcon: null,
-      tokens: null,
-    },
-  ];
-
-  const [balanceData, setBalanceData] = useState(initialBalanceData);
-  const [visibleCards, setVisibleCards] = useState(
-    initialBalanceData.map(() => true)
-  );
-
-  // 3. Update both fundingBalance (index 0) AND portfolioBalance (index 1)
-  useEffect(() => {
-    setBalanceData((prev) => {
-      const updated = prev.map((card, idx) => {
-        if (idx === 0) {
-          return { ...card, amount: fundingBalance || "₦--" };
-        }
-        if (idx === 1) {
-          return { ...card, amount: portfolioBalance || "₦--" };
-        }
-        return card;
-      });
-      return updated;
+  const toggle = useCallback((idx: number) => {
+    setVisible(v => {
+      const copy = [...v];
+      copy[idx] = !copy[idx];
+      return copy;
     });
-  }, [fundingBalance, portfolioBalance]);
-
-  const toggleCardBalance = (idx) =>
-    setVisibleCards((vis) => vis.map((v, i) => (i === idx ? !v : v)));
+  }, []);
 
   return (
     <div className="balances-container">
       <div className="balance-container">
         <div className="balance-header">
           <h1>Welcome to Payfrica</h1>
-          <div className="total-balance">
-          </div>
+          <div className="total-balance"></div>
         </div>
-
         <div className="cards-wrapper">
-          {balanceData.map((card, index) => (
-            <div key={index} className="balance-card">
-              <div className="balance-card-header">
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
-                >
-                  <span>{card.title}</span>
-                  <span onClick={() => toggleCardBalance(index)}>
-                    {visibleCards[index] ? (
-                      <FaEye style={{ cursor: "pointer" }} />
-                    ) : (
-                      <FaEyeSlash style={{ cursor: "pointer" }} />
-                    )}
-                  </span>
-                </div>
-                <FaEllipsisV className="icon" />
-              </div>
-
-              <div className="card-amount">
-                <h2>{visibleCards[index] ? card.amount : "******"}</h2>
-              </div>
-
-              <div className="card-footer">
-                {card.actionIcon && (
-                  <span className="action-icon">{card.actionIcon}</span>
-                )}
-                <span>{card.actionText}</span>
-              </div>
-            </div>
+          {cards.map((c, idx) => (
+            <BalanceCard
+              key={idx}
+              title={c.title}
+              amount={c.amount}
+              loading={c.loading}
+              visible={c.visible}
+              actionText={c.actionText}
+              ActionIcon={c.ActionIcon}
+              ToggleIcon={c.ToggleIcon}
+              EllipsisIcon={c.EllipsisIcon}
+              onToggle={() => toggle(idx)}
+              onMore={() => {/* open menu */}}
+            />
           ))}
         </div>
       </div>
     </div>
   );
-};
+});

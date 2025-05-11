@@ -6,6 +6,9 @@ import { LuMoveLeft } from "react-icons/lu";
 import { useGlobalState } from "@/GlobalStateProvider";
 import { useCustomWallet } from "@/contexts/CustomWallet";
 import { useUserDetails, useTokenExchange } from "@/hooks/useTokenExchange";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
@@ -17,70 +20,42 @@ export default function ConfirmDepositOverlay() {
 
   // pull in the user so we can get their baseToken / currency
   const userDetails = useUserDetails(address);
+  // console.log(userDetails);
   // bring in the on-chain deposit request handler
   const { handleDepositRequest } = useTokenExchange();
 
-  // derive coinType (on-chain) and stripped version for your agent API
-  const coinType = userDetails?.country?.baseToken?.coinType ?? "";
+  const coinType = userDetails?.details?.country?.baseToken?.coinType ?? "";
   const stripped = coinType.replace(/^0x/, "");
 
-  // local state for the selected agent
-  const [agent, setAgent] = useState<{
-    id: string;
-    accountNumber: string;
-    bank: string;
-    name: string;
-    comment: string;
-  } | null>(null);
-  const [loadingAgent, setLoadingAgent] = useState(false);
+  // const [isLoading, setisLoading] = useState(false);
 
-  // fetch best‐deposit‐agent whenever coinType or amount changes
-  useEffect(() => {
-    if (!coinType || !amount) return;
+  const decimals = userDetails?.details?.country?.baseToken?.decimals ?? 0;
+  const humanAmt = Number(amount);
+  const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
 
-    setLoadingAgent(true);
-    // compute minimal units using the same decimals
-    const decimals = userDetails?.country?.baseToken?.decimals ?? 0;
-    const humanAmt = Number(amount);
-    const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
+  const params = new URLSearchParams({
+    coinType: stripped,
+    amount: minimalAmt.toString(),
+  });
 
-    const params = new URLSearchParams({
-      coinType: stripped,
-      amount: minimalAmt.toString(),
-    });
 
-    fetch(`${API_BASE}/agent/best-deposit-agent?${params}`)
-      .then((res) => {
-        if (res.status === 404) return null;
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setAgent(data);
-          setDepositData((d) => ({ ...d, agentId: data.id }));
-        } else {
-          setAgent(null);
-          setDepositData((d) => ({ ...d, agentId: undefined }));
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch deposit agent", err);
-        setAgent(null);
-      })
-      .finally(() => setLoadingAgent(false));
-  }, [coinType, amount, stripped, userDetails, setDepositData]);
+  const { isLoading, data: agent, error } = useQuery({
+    queryKey: ['get-best-deposit', coinType, amount, stripped, userDetails],
+    queryFn: async () => (await axios.get<{ id: string; accountNumber: string; comment: string; name: string; bank: string }>(`${API_BASE}/agent/best-deposit-agent?${params}`)).data,
+    enabled: Boolean(stripped && amount > 0)
+  });
+
+  console.log({ isLoading, agent, error })
 
   if (!overlayStates.confirmDeposit) return null;
 
   const fee = (Number(amount) * 0.005).toFixed(2);
   const total = (Number(amount) + Number(fee)).toFixed(2);
-  const symbol = userDetails?.country?.currencySymbol ?? "";
-
+  const symbol = userDetails?.details?.country?.currencySymbol ?? "";
   const handleNext = async () => {
     if (!agent) return;
     // re-compute minimal units
-    const decimals = userDetails?.country?.baseToken?.decimals ?? 0;
+    const decimals = userDetails?.details?.country?.baseToken?.decimals ?? 0;
     const humanAmt = Number(amount);
     const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
 
@@ -139,7 +114,7 @@ export default function ConfirmDepositOverlay() {
           </div>
           <div>
             <span>Agent ID</span>
-            <strong>{loadingAgent ? "Loading…" : agent?.id ?? "—"}</strong>
+            {isLoading ? "Loading…" : agent?.id ? <Link target="__blank" href={`https://testnet.suivision.xyz/object/${agent.id}`}>{agent?.id.slice(0, 6) + "..." + agent?.id.slice(-4)}</Link> : "—"}
           </div>
           <div>
             <span>Agent Name</span>
@@ -169,7 +144,7 @@ export default function ConfirmDepositOverlay() {
 
         <button
           className="next-btn"
-          disabled={loadingAgent || !agent}
+          disabled={isLoading || !agent}
           onClick={handleNext}
         >
           Next

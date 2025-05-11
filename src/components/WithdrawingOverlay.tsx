@@ -14,19 +14,15 @@ const WithdrawingOverlay: React.FC = () => {
       <div className="withdrawing-container">
         <FaHourglassHalf className="hourglass-icon" />
         <h3>Please wait ......</h3>
-        <p>Your transaction is being confirmed</p>
+        <p>Your Withdrawal is being confirmed, You'll be credited soon</p>
         <button
           className="notify-btn"
           onClick={async () => {
-            // simulate backend check
-            const accepted = await new Promise((r) =>
-              setTimeout(() => r(Math.random() > 0.3), 1000)
-            );
+            
             toggleOverlay("withdrawing");
-            toggleOverlay(accepted ? "success" : "failed");
           }}
         >
-          Get notified when your transaction is complete
+          OK
         </button>
       </div>
     </div>

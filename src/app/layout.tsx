@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalStateProvider } from "@/GlobalStateProvider";
+import { ClientProvider } from "@/components/client-provider";
 
 export default function RootLayout({
   children,
@@ -20,22 +21,24 @@ export default function RootLayout({
         <title>Payfrica</title>
       </head>
       <body className="antialiased bg-background text-foreground">
-        <GlobalStateProvider>
-          <ProvidersAndLayout>{children}</ProvidersAndLayout>
-        </GlobalStateProvider>
+        <ClientProvider>
+          <GlobalStateProvider>
+            <ProvidersAndLayout>{children}</ProvidersAndLayout>
+          </GlobalStateProvider>
 
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </ClientProvider>
       </body>
     </html>
   );

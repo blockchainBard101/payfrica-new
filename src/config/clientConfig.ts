@@ -16,6 +16,8 @@ const clientConfigSchema = z.object({
   PACKAGE_ID: z.string(),
   PAYFRICA_PRIVATE_KEY: z.string(),
   PAYFRICA_AGENT_ID: z.string(),
+  NS_REGISTRY_ID: z.string(),
+  ENOKI: z.string()
 });
 
 const clientConfig = clientConfigSchema.parse({
@@ -28,6 +30,8 @@ const clientConfig = clientConfigSchema.parse({
   PACKAGE_ID: process.env.NEXT_PUBLIC_PACKAGE_ID!,
   PAYFRICA_PRIVATE_KEY: process.env.NEXT_PUBLIC_PAYFRICA_PRIVATE_KEY!,
   PAYFRICA_AGENT_ID: process.env.NEXT_PUBLIC_PAYFRICA_AGENT_ID!,
+  NS_REGISTRY_ID: process.env.NEXT_PUBLIC_NS_REGISTRY_ID!,
+  ENOKI: process.env.NEXT_PUBLIC_ENOKI_SECRET_KEY!
 });
 
 export default clientConfig;

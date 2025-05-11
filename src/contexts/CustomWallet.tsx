@@ -13,7 +13,8 @@ import {
 import { SponsorTxRequestBody } from "@/types/SponsorTx";
 import axios from "axios";
 import { fromBase64, toBase64 } from "@mysten/sui/utils";
-
+import { enokiClient } from "@/utils";
+import clientConfig from "@/config/clientConfig";
 export interface CreateSponsoredTransactionApiResponse {
   bytes: string;
   digest: string;
@@ -42,7 +43,7 @@ interface CustomWalletContextProps {
   address?: string;
   sponsorAndExecuteTransactionBlock: (
     props: SponsorAndExecuteTransactionBlockProps
-  ) => Promise<SuiTransactionBlockResponse>;
+  ) => Promise<boolean>;
   executeTransactionBlockWithoutSponsorship: (
     props: ExecuteTransactionBlockWithoutSponsorshipProps
   ) => Promise<SuiTransactionBlockResponse | void>;
@@ -54,7 +55,7 @@ export const CustomWalletContext = createContext<CustomWalletContextProps>({
   sponsorAndExecuteTransactionBlock: async () => {
     throw new Error("Not implemented");
   },
-  executeTransactionBlockWithoutSponsorship: async () => {},
+  executeTransactionBlockWithoutSponsorship: async () => { },
 });
 
 export const useCustomWallet = () => useContext(CustomWalletContext);
@@ -67,9 +68,9 @@ export default function CustomWalletProvider({ children }: { children: React.Rea
   const isConnected = !!currentAccount?.address;
   const address = currentAccount?.address;
 
-  const signTransaction = async (bytes: Uint8Array): Promise<string> => {
-    const txBlock = Transaction.from(bytes);
-    const { signature } = await signTransactionBlock({ transaction: txBlock });
+  const signTransaction = async (bytes: string): Promise<string> => {
+    // const txBlock = Transaction.from(bytes);
+    const { signature } = await signTransactionBlock({ transaction: bytes });
     return signature;
   };
 
@@ -79,35 +80,54 @@ export default function CustomWalletProvider({ children }: { children: React.Rea
     options,
     includesTransferTx,
     allowedAddresses = [],
-  }: SponsorAndExecuteTransactionBlockProps): Promise<SuiTransactionBlockResponse> => {
+  }: SponsorAndExecuteTransactionBlockProps): Promise<boolean> => {
     try {
       let digest = "";
 
       if (includesTransferTx) {
         console.log("Sponsoring transaction block...");
         const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
-        const sponsorTxBody: SponsorTxRequestBody = {
-          network,
-          txBytes: toBase64(txBytes),
-          sender: currentAccount?.address!,
-          allowedAddresses,
-        };
+        // const sponsorTxBody: SponsorTxRequestBody = {
+        //   network,
+        //   txBytes: toBase64(txBytes),
+        //   sender: currentAccount?.address!,
+        //   allowedAddresses,
+        // };
 
-        const { data: { bytes, digest: sponsorDigest } } = await axios.post<CreateSponsoredTransactionApiResponse>("/api/sponsor", sponsorTxBody, { timeout: 7000 });
+        // const { data: { bytes, digest: sponsorDigest } } = await axios.post<CreateSponsoredTransactionApiResponse>("/api/sponsor", sponsorTxBody, { timeout: 7000 });
 
-        const signature = await signTransaction(fromBase64(bytes));
+        const {bytes, digest} = await enokiClient.createSponsoredTransaction({
+          network: clientConfig.SUI_NETWORK_NAME,
+          transactionKindBytes: toBase64(txBytes),
+          sender: address,
+          allowedMoveCallTargets: ['0x2::kiosk::set_owner_custom'],
+          allowedAddresses: allowedAddresses,
+        });
+
+
+        const signature = await signTransaction(bytes);
         console.log("Executing sponsored transaction block...");
-        await axios.post<unknown>("/api/execute", {
-          signature,
-          digest: sponsorDigest,
-        }, { timeout: 7000 });
 
-        digest = sponsorDigest;
+        const resp = await enokiClient.executeSponsoredTransaction({
+          digest,
+          signature,
+        });
+        if (resp){
+          return true
+        }
+        return false
+        // console.log(resp)
+        // await axios.post<unknown>("/api/execute", {
+        //   signature,
+        //   digest: sponsorDigest,
+        // }, { timeout: 7000 });
+
+        // digest = sponsorDigest;
+        // return suiClient.getTransactionBlock({ digest, options });
       }
 
-      await suiClient.waitForTransaction({ digest, timeout: 5000 });
+      // await suiClient.waitForTransaction({ digest, timeout: 5000 });
 
-      return suiClient.getTransactionBlock({ digest, options });
     } catch (error) {
       console.error("Sponsor and execute failed", error);
       throw new Error("Failed to sponsor and execute transaction block");
@@ -122,7 +142,7 @@ export default function CustomWalletProvider({ children }: { children: React.Rea
 
     tx.setSender(currentAccount.address);
     const txBytes = await tx.build({ client: suiClient });
-    const signature = await signTransaction(txBytes);
+    const signature = await signTransaction(txBytes as unknown as string);
 
     return suiClient.executeTransactionBlock({
       transactionBlock: txBytes,

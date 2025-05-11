@@ -88,10 +88,10 @@ export const EnterAmountOverlay = () => {
       let ok: boolean;
       if (fullTag.includes(suffix)) {
         const response = await sendToNameService(currency, Number(amount), fullTag);
-        ok = response?.effects?.status?.status === "success";
+        ok = response;
       } else {
         const response = await sendToAddress(currency, Number(amount), fullTag);
-        ok = response?.effects?.status?.status === "success";
+        ok = response;
       }
       toggleOverlay("enterAmount");
       toggleOverlay(ok ? "sending" : "failed");

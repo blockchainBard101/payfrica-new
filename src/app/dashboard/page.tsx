@@ -1,116 +1,125 @@
+// app/page.tsx (or pages/index.tsx)
 "use client";
-import { useEffect, useState } from "react";
+
+import React, { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import useSWR from "swr";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 
-import { SendMoneyOverlay } from "@/components/SendMoneyOverlay";
-import { Navigation } from "@/components/Navigations";
-import { BalanceCards } from "@/components/Balances";
-import { QuickActions } from "@/components/QuickActions";
-import { SavingsCircle } from "@/components/SavingsCircle";
-import { TransactionHistory } from "@/components/TransactionHistory";
-import { PayfricaPadiOverlay } from "@/components/PayfricaPadiOverlay";
-import { EnterAmountOverlay } from "@/components/EnterAmountOverlay";
-import { SendingOverlay } from "@/components/SendingOverlay";
-import { FeedbackOverlay } from "@/components/FeedbackOverlay";
-import { SuccessOverlay } from "@/components/SuccessOverlay";
-import { FailedOverlay } from "@/components/FailedOverlay";
-import { SendSuiTokenOverlay } from "@/components/SendSuiTokenOverlay";
-import { PayfricaPadiSuiOverlay } from "@/components/PayfricaPadiSuiOverlay";
-import { EnterSuiAmountOverlay } from "@/components/EnterSuiAmountOverlay";
-import { SendSuiToWAOverlay } from "@/components/SendSuiToWAOverlay";
-import { ReceiveMoneyOverlay } from "@/components/ReceiveMoneyOverlay";
-import { ReceiveCardOverlay } from "@/components/ReceiveCardOverlay";
-import { ConvertOverlay } from "@/components/ConvertOverlay";
-import { ConfirmConvertOverlay } from "@/components/ConfirmConvertOverlay";
-import { DepositTypeOverlay } from "@/components/DepositTypeOverlay";
-import QuickTransfer from "@/components/QuickTransfer";
-import ConfirmDepositOverlay from "@/components/ConfirmDepositOverlay";
-import MakeDepositOverlay from "@/components/MakeDepositOverlay";
-import EnterWithdrawAmount from "@/components/EnterWithdrawAmount";
-import ConfirmWithdrawOverlay from "@/components/ConfirmWithdrawOverlay";
-import WithdrawingOverlay from "@/components/WithdrawingOverlay";
+// Dashboard widgets
+const Navigation         = dynamic(() => import("@/components/Navigations").then(mod => mod.Navigation),               { ssr: false });
+const BalanceCards       = dynamic(() => import("@/components/Balances").then(mod => mod.default),                   { ssr: false });
+const QuickActions       = dynamic(() => import("@/components/QuickActions").then(mod => mod.QuickActions),           { ssr: false });
+const SavingsCircle      = dynamic(() => import("@/components/SavingsCircle").then(mod => mod.SavingsCircle),         { ssr: false });
+const TransactionHistory = dynamic(() => import("@/components/TransactionHistory").then(mod => mod.TransactionHistory),{ ssr: false });
 
-const Page = () => {
-  const router = useRouter();
+// Overlays
+const SendMoneyOverlay       = dynamic(() => import("@/components/SendMoneyOverlay").then(mod => mod.SendMoneyOverlay),       { ssr: false });
+const PayfricaPadiOverlay    = dynamic(() => import("@/components/PayfricaPadiOverlay").then(mod => mod.PayfricaPadiOverlay), { ssr: false });
+const EnterAmountOverlay     = dynamic(() => import("@/components/EnterAmountOverlay").then(mod => mod.EnterAmountOverlay),   { ssr: false });
+const SendingOverlay         = dynamic(() => import("@/components/SendingOverlay").then(mod => mod.SendingOverlay),           { ssr: false });
+const FeedbackOverlay        = dynamic(() => import("@/components/FeedbackOverlay").then(mod => mod.FeedbackOverlay),         { ssr: false });
+const SuccessOverlay         = dynamic(() => import("@/components/SuccessOverlay").then(mod => mod.SuccessOverlay),           { ssr: false });
+const FailedOverlay          = dynamic(() => import("@/components/FailedOverlay").then(mod => mod.FailedOverlay),             { ssr: false });
+const SendSuiTokenOverlay    = dynamic(() => import("@/components/SendSuiTokenOverlay").then(mod => mod.SendSuiTokenOverlay), { ssr: false });
+const PayfricaPadiSuiOverlay = dynamic(() => import("@/components/PayfricaPadiSuiOverlay").then(mod => mod.PayfricaPadiSuiOverlay),{ ssr: false });
+const EnterSuiAmountOverlay  = dynamic(() => import("@/components/EnterSuiAmountOverlay").then(mod => mod.EnterSuiAmountOverlay),{ ssr: false });
+const SendSuiToWAOverlay     = dynamic(() => import("@/components/SendSuiToWAOverlay").then(mod => mod.SendSuiToWAOverlay),    { ssr: false });
+const ReceiveMoneyOverlay    = dynamic(() => import("@/components/ReceiveMoneyOverlay").then(mod => mod.ReceiveMoneyOverlay),   { ssr: false });
+const ReceiveCardOverlay     = dynamic(() => import("@/components/ReceiveCardOverlay").then(mod => mod.ReceiveCardOverlay),     { ssr: false });
+const ConvertOverlay         = dynamic(() => import("@/components/ConvertOverlay").then(mod => mod.ConvertOverlay),             { ssr: false });
+const ConfirmConvertOverlay  = dynamic(() => import("@/components/ConfirmConvertOverlay").then(mod => mod.ConfirmConvertOverlay),{ ssr: false });
+const DepositTypeOverlay     = dynamic(() => import("@/components/DepositTypeOverlay").then(mod => mod.DepositTypeOverlay),   { ssr: false });
+const QuickTransfer          = dynamic(() => import("@/components/QuickTransfer"),                                             { ssr: false });
+const ConfirmDepositOverlay  = dynamic(() => import("@/components/ConfirmDepositOverlay"),                                     { ssr: false });
+const MakeDepositOverlay     = dynamic(() => import("@/components/MakeDepositOverlay"),                                        { ssr: false });
+const EnterWithdrawAmount    = dynamic(() => import("@/components/EnterWithdrawAmount"),                                       { ssr: false });
+const ConfirmWithdrawOverlay = dynamic(() => import("@/components/ConfirmWithdrawOverlay"),                                    { ssr: false });
+const WithdrawingOverlay     = dynamic(() => import("@/components/WithdrawingOverlay"),                                        { ssr: false });
+
+// SWR fetcher
+const fetcher = (url: string) =>
+  fetch(url).then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  });
+
+export default function Page() {
+  // const router = useRouter();
+  const Window = typeof window !== 'undefined' ? globalThis.window : undefined;
   const currentAccount = useCurrentAccount();
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [error, setError] = useState<string>("");
 
-  // simulate your existing loading + redirect logic
-  useEffect(() => {
-    if (!isLoading) return;
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, [isLoading]);
+  // Fetch user data as soon as we have an address
+  const { data: user, error } = useSWR(
+    currentAccount?.address
+      ? `${process.env.NEXT_PUBLIC_API_URL}/users/${currentAccount.address}/basic`
+      : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!currentAccount) {
-      router.push("/login");
-      return;
-    }
+  // Redirect to login if not connected
+  if (!currentAccount && Window) {
+    Window.location.href = "/login"
+    return null;
+  }
 
-    (async () => {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-        const res = await fetch(`${baseUrl}/users/${currentAccount.address}/basic`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        setUser(data);
-      } catch (e: any) {
-        console.error("Failed to fetch user:", e);
-        setError(e.message);
-      }
-    })();
-  }, [currentAccount, isLoading, router]);
-
-  if (isLoading) return <div>Loading…</div>;
+  // Determine loading state
+  const isLoading = !user && !error;
 
   return (
-    <div className="min-h-screen w-full bg-background">
-      <Navigation />
-      <BalanceCards />
-      <QuickActions />
-      <SavingsCircle />
-      <TransactionHistory />
+    <div className="min-h-screen w-full bg-background relative">
+      {/* Dashboard widgets mount and start fetching balances immediately */}
+      <Suspense fallback={null}>
+        <Navigation />
+        <BalanceCards />
+        <QuickActions />
+        <SavingsCircle />
+        <TransactionHistory />
+      </Suspense>
 
-      {/* Send Overlays */}
-      <SendMoneyOverlay />
-      <PayfricaPadiOverlay />
-      <EnterAmountOverlay />
-      <SendingOverlay />
-      <FeedbackOverlay />
-      <SuccessOverlay />
-      <FailedOverlay />
+      {/* All overlays, loaded on demand */}
+      <Suspense fallback={null}>
+        <SendMoneyOverlay />
+        <PayfricaPadiOverlay />
+        <EnterAmountOverlay />
+        <SendingOverlay />
+        <FeedbackOverlay />
+        <SuccessOverlay />
+        <FailedOverlay />
+        <SendSuiTokenOverlay />
+        <PayfricaPadiSuiOverlay />
+        <EnterSuiAmountOverlay />
+        <SendSuiToWAOverlay />
+        <ReceiveMoneyOverlay />
+        <ReceiveCardOverlay />
+        <ConvertOverlay />
+        <ConfirmConvertOverlay />
+        <DepositTypeOverlay />
+        <QuickTransfer />
+        <ConfirmDepositOverlay />
+        <MakeDepositOverlay />
+        <EnterWithdrawAmount />
+        <ConfirmWithdrawOverlay />
+        <WithdrawingOverlay />
+      </Suspense>
 
-      {/* SUI Send Overlays */}
-      <SendSuiTokenOverlay />
-      <PayfricaPadiSuiOverlay />
-      <EnterSuiAmountOverlay />
-      <SendSuiToWAOverlay />
+      {/* Full-page loading spinner overlay */}
+      {isLoading && (
+        <div className="overlay-background">
+          <div className="loader" />
+        </div>
+      )}
 
-      {/* Receive Overlays */}
-      <ReceiveMoneyOverlay />
-      <ReceiveCardOverlay />
-
-      {/* Convert Overlays */}
-      <ConvertOverlay />
-      <ConfirmConvertOverlay />
-
-      {/* Deposit Overlays */}
-      <DepositTypeOverlay />
-      <QuickTransfer />
-      <ConfirmDepositOverlay />
-      <MakeDepositOverlay />
-
-      {/* Withdraw Overlays */}
-      <EnterWithdrawAmount />
-      <ConfirmWithdrawOverlay />
-      <WithdrawingOverlay />
+      {/* Full-page error message overlay */}
+      {error && (
+        <div className="overlay-background flex items-center justify-center">
+          <p className="text-red-600 bg-white p-4 rounded">
+            Error loading profile: {error.message}
+          </p>
+        </div>
+      )}
     </div>
   );
-};
-
-export default Page;
+}

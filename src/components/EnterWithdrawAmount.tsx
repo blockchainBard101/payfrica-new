@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from "react";
+"use client";
+import React, { useMemo, useEffect } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useGlobalState } from "@/GlobalStateProvider";
+import { useUserDetails } from "@/hooks/useTokenExchange";
+import { useCustomWallet } from "@/contexts/CustomWallet";
 
 const presets = [100, 200, 500, 1000];
 
 const EnterWithdrawAmount = () => {
   const { overlayStates, toggleOverlay, withdrawData, setWithdrawData } =
     useGlobalState();
+  const { address } = useCustomWallet();
+  const userDetails = useUserDetails(address);
 
-  const [localCurrency, setLocalCurrency] = useState("");
-
-  // fetch base currency once
-  useEffect(() => {
-    async function fetchCurrency() {
-      // simulate API
-      const currency = "NGN";
-      setLocalCurrency(currency);
-    }
-    fetchCurrency();
-  }, []);
+  // console.log(userDetails);
+  const localCurrency = useMemo(() => {
+    return (  
+      userDetails?.details.country?.baseToken?.symbol ?? // e.g. "NGNC"
+      userDetails?.details.country?.currencySymbol ??   // fallback to a symbol like "₦"
+      ""
+    );
+  }, [userDetails]);
 
   // keep hooks above any early returns
   if (!overlayStates.withdraw) return null;

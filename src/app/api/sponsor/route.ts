@@ -12,30 +12,34 @@ import { enokiClient } from "../EnokiClient";
 */
 
 export const POST = async (request: NextRequest) => {
-  const { network, txBytes, sender, allowedAddresses }: SponsorTxRequestBody =
-    await request.json();
-    console.log("Sponsoring transaction...");
-  return enokiClient
-    .createSponsoredTransaction({
-      network,
-      transactionKindBytes: txBytes,
-      sender,
-      allowedAddresses,
-    })
-    .then((resp) => {
-      return NextResponse.json(resp, {
-        status: 200,
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-      return NextResponse.json(
-        {
-          error: "Could not create sponsored transaction block.",
-        },
-        {
-          status: 500,
-        }
-      );
+
+  try {
+    const { network, txBytes, sender, allowedAddresses, ...rest }: SponsorTxRequestBody =
+      await request.json();
+
+    console.log({ network, txBytes, sender, allowedAddresses, rest })
+
+    const resp = await enokiClient
+      .createSponsoredTransaction({
+        network,
+        transactionKindBytes: txBytes,
+        sender,
+        allowedAddresses,
+      })
+
+    return NextResponse.json(resp, {
+      status: 200,
     });
+  } catch (error) {
+    console.log(error)
+    const err = error as Error
+    return NextResponse.json(
+      {
+        error: err?.message || "Could not create sponsored transaction block.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 };

@@ -62,6 +62,7 @@ export const TransactionHistory = () => {
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
+  // console.log(transactions);
 
   if (loading) return <div>Loading transactions…</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -116,7 +117,7 @@ export const TransactionHistory = () => {
             </thead>
             <tbody>
               {filtered.map((txn) => {
-                const isConvert = txn.type === "CONVERT";
+                const isConvert = txn.type === "SWAP";
                 const nonConvertValue =
                   txn.incomingAmount != null
                     ? {

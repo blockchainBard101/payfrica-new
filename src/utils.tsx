@@ -1,3 +1,6 @@
+import { EnokiClient } from '@mysten/enoki';
+import clientConfig from './config/clientConfig';
+
 export const coins = [
   {
     symbol: "SUI",
@@ -15,3 +18,9 @@ export const coins = [
     logo: "/SuiLogo.png",
   },
 ];
+
+
+ 
+export const enokiClient = new EnokiClient({
+	apiKey: clientConfig.ENOKI
+});
