@@ -31,7 +31,7 @@ export const ReceiveMoneyOverlay: React.FC = () => {
       return;
     }
     if (!userDetails.isLoading){
-      setPayTag(userDetails.details.username + "@payfrica");
+      setPayTag(userDetails?.details.username + "@payfrica");
     }
     
   }, [userDetails]);

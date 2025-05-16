@@ -5,7 +5,6 @@ import { client } from '@/config/suiClient';
 import clientConfig from '@/config/clientConfig';
 import { useCustomWallet } from '@/contexts/CustomWallet';
 import { getNsAddress } from './registerNsName';
-import { SuiTransactionBlockResponse } from '@mysten/sui/client';
 
 // Local Pool type matching your backend response
 export interface Pool {
@@ -101,6 +100,33 @@ export function useTokenExchange() {
         coinArg,
         tx.pure.u64(scaled),
         tx.pure.u8(a.coinDecimal)
+      ],
+    });
+    return sponsorAndExecuteTransactionBlock({
+      tx,
+      network: clientConfig.SUI_NETWORK_NAME,
+      includesTransferTx: true,
+      allowedAddresses: [address],
+      options: { showEffects: true, showObjectChanges: true, showEvents: true }
+    });
+  }, [address, poolMap, sponsorAndExecuteTransactionBlock, getConversionRate, toMinimalUnits, handleMergeSplit]);
+
+  const handleAddtoLiquidity = useCallback(async (coinType: string,amount: number) => {
+    if (!address) throw new Error('No wallet');
+    const a = poolMap.get(coinType)!;
+    const amt = toMinimalUnits(amount, a.coinDecimal);
+    const tx = new Transaction();
+    const coins = await client.getCoins({ owner: address, coinType: a.coinType });
+    const coinArg = handleMergeSplit(tx, coins.data, amt);
+
+    tx.moveCall({
+      target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity`,
+      typeArguments: [a.coinType],
+      arguments: [
+        tx.object(a.id),
+        tx.object(clientConfig.PAYFRICA_POOL_ID),
+        tx.object.option({ type: `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket<${a.coinType}>`, value: null }),
+        coinArg,
       ],
     });
     return sponsorAndExecuteTransactionBlock({
@@ -245,7 +271,6 @@ export function useTokenExchange() {
           id: pool.id,
           balance,
           coinBalance: pool.coinBalance / 10 ** pool.coinDecimal,
-          // coinBalanece: pool.coinDecimal,
           coinName: pool.coinName,
           formatted: formatter.format(balance)
         };
@@ -299,6 +324,7 @@ export function useTokenExchange() {
     getBaseBalance,
     getAllPools,
     getPortfolio,
-    handleWithdrawalRequest
+    handleWithdrawalRequest,
+    handleAddtoLiquidity
   };
 }
