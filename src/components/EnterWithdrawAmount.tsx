@@ -14,13 +14,14 @@ const EnterWithdrawAmount = () => {
   const userDetails = useUserDetails(address);
 
   // console.log(userDetails);
+
   const localCurrency = useMemo(() => {
-    return (  
-      userDetails?.details.country?.baseToken?.symbol ?? // e.g. "NGNC"
-      userDetails?.details.country?.currencySymbol ??   // fallback to a symbol like "₦"
-      ""
-    );
-  }, [userDetails]);
+  if (!userDetails?.details?.country) return "";
+  
+  const { baseToken, currencySymbol } = userDetails.details.country;
+  return baseToken?.symbol ?? currencySymbol ?? "";
+}, [userDetails]);
+
 
   // keep hooks above any early returns
   if (!overlayStates.withdraw) return null;

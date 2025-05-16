@@ -10,7 +10,7 @@ export const SendingOverlay = () => {
       setTimeout(() => {
         toggleOverlay("sending");
         toggleOverlay("success"); // Automatically trigger success after animation
-      }, 3000); // Animation duration
+      }, 500); // Animation duration
     }
   }, [overlayStates.sending, toggleOverlay]);
 

@@ -9,6 +9,7 @@ import { SuiTransactionBlockResponse } from '@mysten/sui/client';
 
 // Local Pool type matching your backend response
 export interface Pool {
+  coinBalance: number;
   id: string;
   coinType: string;
   coinName: string;
@@ -114,7 +115,7 @@ export function useTokenExchange() {
   const handleWithdrawalRequest = useCallback(async (coinType: string, amount: number, agent: string) => {
     if (!address) throw new Error('No wallet');
     const tx = new Transaction();
-    const coins = await client.getCoins({ owner: address, coinType});
+    const coins = await client.getCoins({ owner: address, coinType });
     // Convert amount to bigint using toMinimalUnits
     // const t = poolMap.get(coinType)!;
     // console.log(agent)
@@ -226,13 +227,36 @@ export function useTokenExchange() {
   const getBalance = useCallback(async (coinType: string) => {
     if (!address) throw new Error('No wallet');
     const t = poolMap.get(coinType)!;
+    console.log(t);
     const r = await client.getBalance({ owner: address, coinType: t.coinType });
     return formatter.format(Number(r.totalBalance) / 10 ** t.coinDecimal);
   }, [address, poolMap]);
 
+
+  const getAllPools = useCallback(async () => {
+    if (!address) throw new Error('No wallet connected');
+    const result = await Promise.all(
+      Array.from(poolMap.values()).map(async pool => {
+        const balanceRaw = await client.getBalance({ owner: address, coinType: pool.coinType });
+        const balance = Number(balanceRaw.totalBalance) / 10 ** pool.coinDecimal;
+        return {
+          coinType: pool.coinType,
+          symbol: pool.coinName,
+          id: pool.id,
+          balance,
+          coinBalance: pool.coinBalance / 10 ** pool.coinDecimal,
+          // coinBalanece: pool.coinDecimal,
+          coinName: pool.coinName,
+          formatted: formatter.format(balance)
+        };
+      })
+    );
+    return result;
+  }, [address, poolMap]);
+
   const getBaseBalance = useCallback(async () => {
     if (!address) throw new Error('No wallet');
-    if (!userDetails) throw new Error('No user details');
+    if (!userDetails) return
     const baseType = userDetails.country.baseTokencoinType;
     const token = poolMap.get(baseType)!;
     const r = await client.getBalance({ owner: address, coinType: token.coinType });
@@ -273,6 +297,7 @@ export function useTokenExchange() {
     sendToNameService,
     getBalance,
     getBaseBalance,
+    getAllPools,
     getPortfolio,
     handleWithdrawalRequest
   };

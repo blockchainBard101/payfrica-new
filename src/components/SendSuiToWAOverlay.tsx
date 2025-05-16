@@ -63,10 +63,10 @@ export const SendSuiToWAOverlay = () => {
       let success: boolean;
       if (recipient.includes("@")) {
         const response = await sendToNameService(coinType, Number(amount), recipient);
-        success = response && response.effects?.status?.status === "success"; // Adjust based on actual response structure
+        success = response
       } else {
         const response = await sendToAddress(coinType, Number(amount), recipient);
-        success = response && response.effects?.status?.status === "success"; // Adjust based on actual response structure
+        success = response 
       }
       toggleOverlay("sendSuiToWA");
       toggleOverlay(success ? "sending" : "failed");

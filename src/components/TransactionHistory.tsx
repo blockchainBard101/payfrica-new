@@ -36,17 +36,16 @@ export const TransactionHistory = () => {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    if (!address) return;
+  if (!address) return;
 
-    setLoading(true);
-    setError("");
+  let intervalId: NodeJS.Timeout;
 
+  const fetchTransactions = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
     fetch(`${baseUrl}/users/${address}/transactions`)
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const payload = await res.json();
-        // your controller returns { user, transactions }
         setTransactions(payload.transactions);
       })
       .catch((err) => {
@@ -54,7 +53,13 @@ export const TransactionHistory = () => {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  }, [address]);
+  };
+
+  fetchTransactions(); // Fetch immediately on mount
+  intervalId = setInterval(fetchTransactions, 5000); // Poll every 5 seconds
+
+  return () => clearInterval(intervalId); // Clean up interval on unmount
+}, [address]);
 
   // filter client-side
   const filtered = transactions.filter((txn) =>
@@ -191,13 +196,13 @@ export const TransactionHistory = () => {
                       {isConvert ? (
                         <div style={{ display: "flex", flexDirection: "column" }}>
                           <span
-                            style={{ marginBottom: "4px", color: "#b91c1c" }}
+                            style={{ marginBottom: "4px", color: "#027a48" }}
                           >
-                            -{txn.outgoingAmount?.toLocaleString()}{" "}
+                            +{txn.outgoingAmount?.toLocaleString()}{" "}
                             {txn.outgoingAsset}
                           </span>
-                          <span style={{ color: "#027a48" }}>
-                            +{txn.incomingAmount?.toLocaleString()}{" "}
+                          <span style={{ color: "#b91c1c" }}>
+                            -{txn.incomingAmount?.toLocaleString()}{" "}
                             {txn.incomingAsset}
                           </span>
                         </div>

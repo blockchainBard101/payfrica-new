@@ -1,25 +1,67 @@
 "use client";
 import { Navigation } from "@/components/Navigations";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { FaCoins } from "react-icons/fa";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useTokenExchange } from "@/hooks/useTokenExchange";
+
+function formatNumber(num: number): string {
+  if (num >= 1e9) {
+    return (num / 1e9).toFixed(1) + 'b'; // Billions
+  } else if (num >= 1e6) {
+    return (num / 1e6).toFixed(1) + 'm'; // Millions
+  } else if (num >= 1e3) {
+    return (num / 1e3).toFixed(1) + 'k';
+  }
+  return num as unknown as string;
+}
 
 const userSuppliedPools = [
-  { symbol: "SUI", wallet: 4.48, APR: 5.06, mc: 800, status: "online" },
-  { symbol: "NGNC", wallet: 1200, APR: 4.77, mc: 500, status: "online" },
+  { coinName: "SUI", amountSupplied: 100, balance: 4.48, coinBalance: 800 },
+  { coinName: "NGNC", ammountSupplied: 100, balance: 1200, coinBalance: 500 },
 ];
 
 const availablePools = [
-  { symbol: "USDC", wallet: 0, APR: 3.21, mc: 650, status: "offline" },
-  { symbol: "GHNC", wallet: 0, APR: 6.12, mc: 320, status: "online" },
+  { symbol: "USDC", wallet: 0,  mc: 650 },
+  { symbol: "GHNC", wallet: 0, mc: 320 },
 ];
 
 const PoolsPage = () => {
   // Combine both lists for selection logic
-  const allPools = useMemo(() => [...userSuppliedPools, ...availablePools], []);
-  const [activePool, setActivePool] = useState(allPools[0]);
-  const [mode, setMode] = useState("Supply"); // or 'Withdraw'
+  const { address } = useCurrentAccount() || {};
+  const [activePool, setActivePool] = useState<any>({});
+  const [mode, setMode] = useState("Supply");
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [pools, setPools] = useState([]);
+  const { getAllPools } = useTokenExchange();
 
+  useEffect(() => {
+    const fetchPools = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const poolData = await getAllPools();
+        console.log(poolData);
+        setPools(poolData);
+        setActivePool(poolData[0]); 
+      } catch (err: any) {
+        console.error("Failed fetching pools:", err);
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (address) fetchPools();
+  }, [address, getAllPools]);
+
+  console.log(loading, error, pools);
+
+  if (loading) return <div>Loading pools…</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
+  console.log(address)
   const percentPresets = ["10%", "20%", "50%", "100%"];
 
   const applyPreset = (pct) => {
@@ -30,21 +72,20 @@ const PoolsPage = () => {
   };
 
   const confirmTransaction = () => {
-    alert(`${mode} ${amount} ${activePool.symbol}`);
+    alert(`${mode} ${amount} ${activePool.coinName}`);
   };
 
-  const renderTable = (title, pools, showStatus) => (
+ const renderTable = (title, pools) => {
+  const isUserSupplied = title === "Pools Supplied";
+
+  return (
     <div className="pools-list-section">
-      <h3>
-        {title}{" "}
-        {showStatus && (
-          <span className={`status-dot ${activePool.status}`}></span>
-        )}
-      </h3>
+      <h3>{title}</h3>
       <table className="pools-table">
         <thead>
           <tr>
             <th>Token</th>
+            {isUserSupplied && <th>Amount Supplied</th>}
             <th>Wallet Balance</th>
             <th>TVL</th>
             <th>Actions</th>
@@ -53,15 +94,23 @@ const PoolsPage = () => {
         <tbody>
           {pools.map((pool) => (
             <tr
-              key={pool.symbol}
-              className={pool.symbol === activePool.symbol ? "active" : ""}
+              key={pool.coinName || pool.symbol}
+              className={
+                pool.coinName === activePool?.coinName ||
+                pool.symbol === activePool?.coinName
+                  ? "active"
+                  : ""
+              }
               onClick={() => setActivePool(pool)}
             >
               <td>
-                <FaCoins className="token-icon" /> {pool.symbol}
+                <FaCoins className="token-icon" /> {pool.coinName || pool.symbol}
               </td>
-              <td>{pool.wallet.toLocaleString()}</td>
-              <td>${pool.mc.toLocaleString()}M</td>
+              {isUserSupplied && (
+                <td>{formatNumber(pool.amountSupplied || 0)}</td>
+              )}
+              <td>{formatNumber(pool.balance || pool.wallet)}</td>
+              <td>{formatNumber(pool.coinBalance || pool.mc)}</td>
               <td className="actions-cell">
                 <button
                   onClick={(e) => {
@@ -72,15 +121,17 @@ const PoolsPage = () => {
                 >
                   Supply
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActivePool(pool);
-                    setMode("Withdraw");
-                  }}
-                >
-                  Withdraw
-                </button>
+                {isUserSupplied && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePool(pool);
+                      setMode("Withdraw");
+                    }}
+                  >
+                    Withdraw
+                  </button>
+                )}
               </td>
             </tr>
           ))}
@@ -88,76 +139,98 @@ const PoolsPage = () => {
       </table>
     </div>
   );
+};
+
 
   return (
     <div>
       <Navigation />
       <div className="pools-page">
-        {/* LEFT: Pools Lists */}
+
         <div className="pools-list-wrapper">
-          {renderTable("Your Total Supply", userSuppliedPools, true)}
-          {renderTable("Available for Supply", availablePools, false)}
+          {renderTable("Pools Supplied", userSuppliedPools)}
+          {renderTable("Available for Supply", pools)}
         </div>
 
-        {/* RIGHT: Supply/Withdraw Panel */}
         <div className="supply-panel">
-          <h4>
-            {mode} {activePool.symbol}
-          </h4>
+  <h4>
+    {mode} {activePool?.coinName || activePool?.symbol}
+  </h4>
 
-          <div className="tab-buttons">
-            <button
-              className={mode === "Supply" ? "active" : ""}
-              onClick={() => setMode("Supply")}
-            >
-              Supply
-            </button>
-            <button
-              className={mode === "Withdraw" ? "active" : ""}
-              onClick={() => setMode("Withdraw")}
-            >
-              Withdraw
-            </button>
-          </div>
+  <div className="tab-buttons">
+    <button
+      className={mode === "Supply" ? "active" : ""}
+      onClick={() => setMode("Supply")}
+    >
+      Supply
+    </button>
 
-          <div className="amount-input">
-            <label>
-              Amount
-              <div className="input-with-currency">
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-                <span className="currency">{activePool.symbol}</span>
-              </div>
-            </label>
-          </div>
+    {/* Show Withdraw only if activePool is in userSuppliedPools */}
+    {userSuppliedPools.some(p => p.coinName === activePool?.coinName) && (
+      <button
+        className={mode === "Withdraw" ? "active" : ""}
+        onClick={() => setMode("Withdraw")}
+      >
+        Withdraw
+      </button>
+    )}
+  </div>
 
-          <div className="presets">
-            {percentPresets.map((p) => (
-              <button key={p} onClick={() => applyPreset(p)}>
-                {p}
-              </button>
-            ))}
-          </div>
+  <div className="amount-input">
+    <label>
+      Amount
+      <div className="input-with-currency">
+        <input
+          type="number"
+          placeholder="0.00"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <span className="currency">{activePool?.coinName || activePool?.symbol}</span>
+      </div>
+    </label>
+  </div>
 
-          <div className="details-box">
-            <div>
-              <span>Fee</span>
-              <strong>$0.00</strong>
-            </div>
-            <div>
-              <span>TVL</span>
-              <strong>${activePool.mc.toLocaleString()}M</strong>
-            </div>
-          </div>
+  <div className="presets">
+    {percentPresets.map((p) => (
+      <button key={p} onClick={() => applyPreset(p)}>
+        {p}
+      </button>
+    ))}
+  </div>
 
-          <button className="confirm-btn" onClick={confirmTransaction}>
-            Confirm Transaction
-          </button>
-        </div>
+  {/* Show Amount Supplied if the pool is user-supplied */}
+  {userSuppliedPools.some(p => p.coinName === activePool?.coinName) && (
+    <div className="details-box">
+      <div>
+        <span>Amount Supplied</span>
+        <strong>
+          {
+            formatNumber(
+              userSuppliedPools.find(p => p.coinName === activePool?.coinName)?.amountSupplied || 0
+            )
+          }
+        </strong>
+      </div>
+    </div>
+  )}
+
+  <div className="details-box">
+    <div>
+      <span>Fee</span>
+      <strong>$0.00</strong>
+    </div>
+    <div>
+      <span>TVL</span>
+      <strong>{formatNumber(activePool?.coinBalance || activePool?.mc)}</strong>
+    </div>
+  </div>
+
+  <button className="confirm-btn" onClick={confirmTransaction}>
+    Confirm Transaction
+  </button>
+</div>
+
       </div>
     </div>
   );

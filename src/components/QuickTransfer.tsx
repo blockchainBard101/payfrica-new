@@ -14,15 +14,13 @@ const QuickTransfer = () => {
     useGlobalState();
   const { address } = useCustomWallet();  
   const userDetails = useUserDetails(address);
-
-  // derive your local‐currency code (e.g. NGNC) from whatever's on the user
+  if (!userDetails) return;
   const localCurrency = useMemo(() => {
-    return (
-      userDetails?.details.country?.baseToken?.symbol ?? // e.g. "NGNC"
-      userDetails?.details.country?.currencySymbol ??   // fallback to a symbol like "₦"
-      ""
-    );
-  }, [userDetails]);
+  if (!userDetails?.details?.country) return "";
+  
+  const { baseToken, currencySymbol } = userDetails.details.country;
+  return baseToken?.symbol ?? currencySymbol ?? "";
+}, [userDetails]);
 
   if (!overlayStates.quickTransfer) return null;
 

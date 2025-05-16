@@ -76,7 +76,7 @@ export const EnterSuiAmountOverlay = () => {
       let success: boolean;
       // always treat as name service
       const response = await sendToNameService(coinType, Number(amount), fullTag);
-      success = response?.effects?.status?.status === "success"; // Adjusted based on typical Sui response structure
+      success = response; // Adjusted based on typical Sui response structure
       toggleOverlay("enterSuiAmount");
       toggleOverlay(success ? "sending" : "failed");
     } catch {

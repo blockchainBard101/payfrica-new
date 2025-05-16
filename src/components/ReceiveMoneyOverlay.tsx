@@ -30,7 +30,10 @@ export const ReceiveMoneyOverlay: React.FC = () => {
       setPayTag("");
       return;
     }
-    setPayTag(userDetails.username + "@payfrica");
+    if (!userDetails.isLoading){
+      setPayTag(userDetails.details.username + "@payfrica");
+    }
+    
   }, [userDetails]);
 
   const walletAddress = address ?? "";
