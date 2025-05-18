@@ -24,7 +24,19 @@ const quickActions = [
 ];
 
 export const QuickActions = () => {
-  const { toggleOverlay } = useGlobalState();
+  const { toggleOverlay, numberOfCardsCreated } = useGlobalState();
+
+  const handleQuickAction = (action) => {
+    if (action.command === "manageCards") {
+      if (numberOfCardsCreated === 0) {
+        toggleOverlay("cardTypeSelect");
+      } else {
+        toggleOverlay("manageCards");
+      }
+    } else {
+      toggleOverlay(action.command);
+    }
+  };
 
   return (
     <div className="quick-actions-container">
@@ -34,7 +46,7 @@ export const QuickActions = () => {
           <div
             key={index}
             className="quick-action-card"
-            onClick={() => toggleOverlay(action.command)}
+            onClick={() => handleQuickAction(action)}
           >
             <div className="quick-action-icon">{action.icon}</div>
             <p className="quick-action-name">{action.name}</p>

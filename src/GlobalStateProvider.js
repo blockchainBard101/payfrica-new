@@ -36,6 +36,11 @@ export const GlobalStateProvider = ({ children }) => {
     EnterWithdrawAmount: false,
     confirmWithdraw: false,
     withdrawing: false,
+    // Card Overlays
+    manageCards: false,
+    cardDetails: false,
+    confirmCardCreate: false,
+    cardTypeSelect: false,
   });
 
   // SINGLE SOURCE OF TRUTH for deposit
@@ -63,6 +68,98 @@ export const GlobalStateProvider = ({ children }) => {
     setOverlayStates(all);
   };
 
+  const [cards, setCards] = useState([
+    {
+      name: "Flexing Card",
+      address: "0x1234abcd5678efgh",
+      amount: 45567.87,
+      expense: 12000.5,
+      pin: "1234",
+      deadline: "2024-12-31",
+      transactions: [
+        {
+          receiver: "Tesco Market",
+          type: "Shopping",
+          date: "13 Dec 2020",
+          amount: "NGN 2000",
+        },
+        {
+          receiver: "ElectroMen Market",
+          type: "Shopping",
+          date: "14 Dec 2020",
+          amount: "NGN 1000",
+        },
+        {
+          receiver: "Fiorgio Restaurant",
+          type: "Food",
+          date: "07 Dec 2020",
+          amount: "NGN 5000",
+        },
+        {
+          receiver: "John Mathew Kayne",
+          type: "Sport",
+          date: "06 Dec 2020",
+          amount: "NGN 2000",
+        },
+        {
+          receiver: "Ann Marlin",
+          type: "Shopping",
+          date: "31 Nov 2020",
+          amount: "20 USDC",
+        },
+      ],
+      status: true,
+    },
+    {
+      name: "Gift Card",
+      address: "0x5678ijkl9012mnop",
+      amount: 45567.87,
+      expense: 2000,
+      pin: "5678",
+      deadline: "2025-01-15",
+      transactions: [],
+      status: true,
+    },
+    {
+      name: "Family Card",
+      address: "0x9abcqrst3456uvwx",
+      amount: 45567.87,
+      expense: 500,
+      pin: "4321",
+      deadline: "2024-10-10",
+      transactions: [],
+      status: true,
+    },
+  ]);
+  const [numberOfCardsCreated, setNumberOfCardsCreated] = useState(
+    cards.length
+  );
+
+  const [cardType, setCardType] = useState("temporary");
+
+  const [cardDetails, setCardDetails] = useState({
+    name: "",
+    amount: "",
+    pin: "",
+    verifyPin: "",
+    deadline: "",
+  });
+
+  function formatCurrency(amount, currency = "NGN") {
+    return Number(amount).toLocaleString("en-NG", {
+      // style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    });
+  }
+
+  function formatWithCommas(amount) {
+    return Number(amount).toLocaleString();
+  }
+
+  // TODO: Change to the actual user's currency
+  const currency = "NGNC";
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -73,6 +170,17 @@ export const GlobalStateProvider = ({ children }) => {
         setDepositData,
         withdrawData,
         setWithdrawData,
+        numberOfCardsCreated,
+        setNumberOfCardsCreated,
+        setCardType,
+        cardType,
+        cardDetails,
+        setCardDetails,
+        currency,
+        cards,
+        setCards,
+        formatCurrency,
+        formatWithCommas,
       }}
     >
       {children}

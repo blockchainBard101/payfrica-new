@@ -39,7 +39,6 @@ export const Navigation = () => {
         <div className="profile">
           <a href="/profile" className="profile-img">
             <RxAvatar style={{ fontSize: "30px" }} />
-            <p className="profile-name">John Doe</p>
           </a>
         </div>
       </div>

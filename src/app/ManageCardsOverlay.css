@@ -1,0 +1,342 @@
+/* Additional styles for ManageCardsOverlay */
+.manage-card-overlay-container {
+  background-color: #fff;
+  color: #fbe19a;
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem 1rem;
+  height: 100%;
+  position: relative;
+  /* overflow-y: auto; */
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent; /* Custom scrollbar color */
+}
+
+/* Card Overview (right panel) */
+.card-overview-panel {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid #c43e26;
+}
+
+.card-overview-panel h3 {
+  color: #c43e26;
+  font-family: LexendExtraBold;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.card-overview-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-overview-item {
+  background: #fbe19a;
+  color: #3c53a4;
+  border-radius: 8px;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.card-overview-item.selected {
+  background: #3c53a4;
+  color: #fff;
+}
+
+.card-overview-item .status {
+  font-size: 12px;
+  color: #00c851;
+}
+.card-overview-item.inactive .status {
+  color: #c43e26;
+}
+
+.create-card-btn {
+  background: #fff;
+  color: #c43e26;
+  border: 1.5px dashed #c43e26;
+  font-weight: 700;
+  font-size: 18px;
+  margin-top: 24px;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.create-card-btn:hover {
+  background: #fbe19a;
+}
+
+/* Create Card Modal */
+.card-overlay-modal {
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 12px;
+  min-width: 320px;
+  max-width: 400px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.card-overlay-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #c04a2b;
+  margin-bottom: 36px;
+  margin-top: 8px;
+  font-family: "LexendExtraBold", "InterBold", Arial, sans-serif;
+}
+.card-overlay-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: 2px solid #d97b4a;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #d97b4a;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.card-overlay-close-btn:hover {
+  background: #ffe0b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+  .card-overlay-container {
+    flex-direction: column;
+    max-width: 98vw;
+    min-width: 0;
+    padding: 0;
+  }
+  .card-overview-panel {
+    min-height: unset;
+    margin-top: 24px;
+  }
+}
+@media (max-width: 900px) {
+  .card-overlay-container {
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+  .card-overview-panel {
+    margin-top: 24px;
+    min-width: 0;
+  }
+}
+@media (max-width: 768px) {
+  .card-overlay-container {
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    min-width: 0;
+    max-width: 100vw;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .pay-card.front,
+  .pay-card.back {
+    width: 98vw !important;
+    min-width: 0;
+    max-width: 100vw;
+    height: auto !important;
+    margin: 0 auto;
+  }
+  .card-overlay-header {
+    padding: 0.5rem 0.5rem;
+    font-size: 15px;
+  }
+  .card-overlay-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+  .card-overlay-modal {
+    min-width: 95vw;
+    max-width: 99vw;
+    padding: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+  .card-overview-panel,
+  [style*="minHeight: 600px"] {
+    min-height: unset !important;
+    margin-top: 16px !important;
+    padding: 10px !important;
+    width: 98vw !important;
+    max-width: 100vw !important;
+    border-radius: 8px !important;
+  }
+  .transaction-table,
+  .empty-state {
+    width: 98vw !important;
+    max-width: 100vw !important;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  .transaction-table th,
+  .transaction-table td {
+    padding: 8px;
+    font-size: 13px;
+  }
+  .save-btn {
+    width: 90vw !important;
+    max-width: 100vw !important;
+    font-size: 15px !important;
+  }
+}
+@media (max-width: 500px) {
+  .card-overlay-modal {
+    min-width: 99vw;
+    max-width: 100vw;
+    padding: 0.2rem 0.2rem 0.8rem 0.2rem;
+  }
+  .pay-card.front,
+  .pay-card.back {
+    width: 99vw !important;
+    min-width: 0;
+    max-width: 100vw;
+    height: auto !important;
+    margin: 0 auto;
+  }
+  .card-overlay-header {
+    font-size: 13px;
+    padding: 0.3rem 0.3rem;
+  }
+}
+
+.card-usage-row {
+  background: #fcf8e3;
+  border-radius: 8px;
+  padding: 12px 18px 8px 18px;
+  margin: 18px 0 0 0;
+}
+
+.card-usage-bar {
+  width: 100%;
+  height: 8px;
+  background: #f5f5dc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.card-usage-bar-fill {
+  height: 100%;
+  background: #2b7bb9;
+  border-radius: 6px 0 0 6px;
+  transition: width 0.4s;
+}
+
+.card-usage-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  margin-top: 2px;
+}
+
+.usage-label {
+  color: #444;
+  font-size: 14px;
+  font-family: InterLight, Arial, sans-serif;
+}
+
+.usage-amount {
+  color: #3c53a4;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: InterBold, Arial, sans-serif;
+}
+
+.deactivate-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #444;
+  font-family: InterLight, Arial, sans-serif;
+  cursor: pointer;
+  user-select: none;
+}
+
+.deactivate-toggle {
+  appearance: none;
+  width: 32px;
+  height: 18px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  position: relative;
+  outline: none;
+  transition: background 0.2s;
+  margin-left: 6px;
+}
+
+.deactivate-toggle:checked {
+  background: #c43e26;
+}
+
+.deactivate-toggle + .deactivate-slider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 18px;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.deactivate-toggle::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left 0.2s;
+}
+
+.deactivate-toggle:checked::before {
+  left: 17px;
+  background: #fff;
+}
+
+@media (max-width: 600px) {
+  .card-usage-labels {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 13px;
+  }
+  .card-usage-row {
+    padding: 10px 6px 6px 6px;
+  }
+}

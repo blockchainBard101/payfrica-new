@@ -13,24 +13,23 @@ const Navigation = dynamic(
   () => import("@/components/Navigations").then((m) => m.Navigation),
   { ssr: false }
 );
-const FaEdit = dynamic(
-  () => import("react-icons/fa").then((m) => m.FaEdit),
-  { ssr: false }
-);
-const FaSave = dynamic(
-  () => import("react-icons/fa").then((m) => m.FaSave),
-  { ssr: false }
-);
+const FaEdit = dynamic(() => import("react-icons/fa").then((m) => m.FaEdit), {
+  ssr: false,
+});
+const FaSave = dynamic(() => import("react-icons/fa").then((m) => m.FaSave), {
+  ssr: false,
+});
 const FaTimesCircle = dynamic(
   () => import("react-icons/fa").then((m) => m.FaTimesCircle),
   { ssr: false }
 );
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-const fetcher = (url: string) => fetch(url).then(res => {
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
-});
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json();
+  });
 
 function shortenAddress(addr: string): string {
   return addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
@@ -41,11 +40,13 @@ export default function ProfilePage() {
   const current = useCurrentAccount();
   const address = current?.address;
 
-  const { data: user, error, isValidating: loading } = useSWR(
-    address ? `${API}/users/${address}` : null,
-    fetcher,
-    { revalidateOnFocus: false }
-  );
+  const {
+    data: user,
+    error,
+    isValidating: loading,
+  } = useSWR(address ? `${API}/users/${address}` : null, fetcher, {
+    revalidateOnFocus: false,
+  });
 
   const hasUsername = Boolean(user?.username?.trim());
 
@@ -79,7 +80,8 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  const shouldCheck = editingProfile && !hasUsername && profileForm.username.trim().length >= 4;
+  const shouldCheck =
+    editingProfile && !hasUsername && profileForm.username.trim().length >= 4;
   const { data: exists, isValidating: checkingUsername } = useSWR(
     shouldCheck ? ["username", profileForm.username] : null,
     (_, name) => nameExists(name)
@@ -92,14 +94,17 @@ export default function ProfilePage() {
     if (!address) router.push("/login");
   }, [address, router]);
 
-  const onProfileChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setProfileForm(f => ({ ...f, [name]: value }));
-  }, []);
+  const onProfileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setProfileForm((f) => ({ ...f, [name]: value }));
+    },
+    []
+  );
 
   const onBankChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setBankForm(f => ({ ...f, [name]: value }));
+    setBankForm((f) => ({ ...f, [name]: value }));
   }, []);
 
   const saveProfile = useCallback(async () => {
@@ -109,6 +114,7 @@ export default function ProfilePage() {
       countryName: profileForm.countryName,
       language: profileForm.language,
     };
+    console.log(payload);
     await fetch(`${API}/users/${address}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -145,12 +151,21 @@ export default function ProfilePage() {
     );
   }
   if (!user) {
-    return <div className="min-h-screen flex items-center justify-center">User not found</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        User not found
+      </div>
+    );
   }
 
-  const displayName = user.username?.trim() ? user.username : shortenAddress(address!);
+  const displayName = user.username?.trim()
+    ? user.username
+    : shortenAddress(address!);
   const today = new Date().toLocaleDateString("en-GB", {
-    weekday: "short", day: "2-digit", month: "long", year: "numeric"
+    weekday: "short",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
 
   return (
@@ -164,15 +179,18 @@ export default function ProfilePage() {
       </header>
       <main className="main-content">
         <div className="profile-header">
-          <button className="edit-btn" onClick={() => setEditingProfile(e => !e)}>
-            {editingProfile ? <FaTimesCircle /> : <FaEdit />} 
+          <button
+            className="edit-btn"
+            onClick={() => setEditingProfile((e) => !e)}
+          >
+            {editingProfile ? <FaTimesCircle /> : <FaEdit />}
             {editingProfile ? "Cancel" : "Edit"}
           </button>
         </div>
         <div className="two-column">
           <section className="column">
             <h2>Profile Details</h2>
-            <form onSubmit={e => e.preventDefault()}>
+            <form onSubmit={(e) => e.preventDefault()}>
               <label>
                 Username
                 <input
@@ -189,9 +207,9 @@ export default function ProfilePage() {
                   ) : checkingUsername ? (
                     <small>Checking...</small>
                   ) : exists ? (
-                    <small style={{ color: 'red' }}>Taken</small>
+                    <small style={{ color: "red" }}>Taken</small>
                   ) : (
-                    <small style={{ color: 'green' }}>Available</small>
+                    <small style={{ color: "green" }}>Available</small>
                   )}
                 </div>
               )}
@@ -225,7 +243,7 @@ export default function ProfilePage() {
                   type="button"
                   className="save-btn"
                   onClick={saveProfile}
-                  disabled={!hasUsername && (!usernameAvailable || checkingUsername)}
+                  disabled={!usernameAvailable || checkingUsername}
                 >
                   <FaSave /> Save Details
                 </button>
@@ -234,17 +252,22 @@ export default function ProfilePage() {
           </section>
           <section className="column">
             <h2>Withdrawal Account</h2>
-            <button className="edit-btn" onClick={() => setEditingBank(b => !b)}>
-              {editingBank ? <FaTimesCircle /> : <FaEdit />} 
+            <button
+              className="edit-btn"
+              onClick={() => setEditingBank((b) => !b)}
+            >
+              {editingBank ? <FaTimesCircle /> : <FaEdit />}
               {editingBank ? "Cancel" : "Edit"}
             </button>
-            {(!user.accountDetails && !editingBank) ? (
+            {!user.accountDetails && !editingBank ? (
               <div className="empty-state">
                 <p>You haven’t added withdrawal details yet.</p>
-                <p><em>Click “Edit” above to enter bank details.</em></p>
+                <p>
+                  <em>Click “Edit” above to enter bank details.</em>
+                </p>
               </div>
             ) : (
-              <form onSubmit={e => e.preventDefault()}>
+              <form onSubmit={(e) => e.preventDefault()}>
                 <label>
                   Bank Name
                   <input

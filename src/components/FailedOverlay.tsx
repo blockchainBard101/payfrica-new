@@ -9,11 +9,24 @@ export const FailedOverlay = () => {
 
   return (
     <div className="overlay-background">
-      <div className="feedback-overlay">
-        <FaTimesCircle className="feedback-icon failed-icon" />
-        <h3>Failed</h3>
-        <button onClick={() => toggleOverlay("failed")}>Retry</button>
-        <button onClick={() => closeAllOverlays()}>Home</button>
+      <div className="feedback-overlay animated-failed">
+        <FaTimesCircle className="feedback-icon failed-icon animated-shake" />
+        <h3 className="feedback-title">Failed</h3>
+        <p className="feedback-message">
+          Something went wrong. Please try again.
+        </p>
+        <button
+          className="feedback-btn"
+          onClick={() => toggleOverlay("failed")}
+        >
+          Retry
+        </button>
+        <button
+          className="feedback-btn secondary"
+          onClick={() => closeAllOverlays()}
+        >
+          Home
+        </button>
       </div>
     </div>
   );

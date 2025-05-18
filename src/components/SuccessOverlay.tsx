@@ -9,11 +9,19 @@ export const SuccessOverlay = () => {
 
   return (
     <div className="overlay-background">
-      <div className="feedback-overlay">
-        <FaCheckCircle className="feedback-icon success-icon" />
-        <h3>Success</h3>
-        <button onClick={() => closeAllOverlays()}>View Receipt</button>
-        <button onClick={() => closeAllOverlays()}>Home</button>
+      <div className="feedback-overlay animated-success">
+        <FaCheckCircle className="feedback-icon success-icon animated-pop" />
+        <h3 className="feedback-title">Success!</h3>
+        <p className="feedback-message">Your card was created successfully.</p>
+        {/* <button className="feedback-btn" onClick={() => closeAllOverlays()}>
+          View Receipt
+        </button> */}
+        <button
+          className="feedback-btn secondary"
+          onClick={() => closeAllOverlays()}
+        >
+          Home
+        </button>
       </div>
     </div>
   );

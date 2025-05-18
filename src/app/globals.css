@@ -1295,49 +1295,141 @@ body {
 /* Feedback Overlay */
 .feedback-overlay {
   background-color: #fff5e1;
-  padding: 2rem;
-  border-radius: 10px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  border-radius: 16px;
   text-align: center;
-  width: 80%;
+  width: 90%;
   max-width: 400px;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  margin: 0 auto;
+  position: relative;
+  animation: fadeInUp 0.5s cubic-bezier(0.23, 1.01, 0.32, 1) both;
 }
 
+.feedback-title {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.feedback-message {
+  font-size: 1.1rem;
+  color: #474747;
+  margin-bottom: 1.5rem;
+  font-family: InterLight, Arial, sans-serif;
+}
+
+.feedback-btn {
+  background-color: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin: 0.5rem 0.25rem;
+  width: 80%;
+  max-width: 250px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold, Arial, sans-serif;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.feedback-btn.secondary {
+  background: #fff;
+  color: #3c53a4;
+  border: 2px solid #3c53a4;
+}
+.feedback-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+.feedback-btn.secondary:hover {
+  background: #fbe19a;
+  color: #2b3d7a;
+}
+
+/* Feedback Icon Animations */
 .feedback-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  display: inline-block;
+  animation: popIn 0.6s cubic-bezier(0.23, 1.01, 0.32, 1) both;
 }
-
 .success-icon {
   color: #00c851;
+  filter: drop-shadow(0 0 8px #00c85144);
 }
-
 .failed-icon {
   color: #ff4444;
+  filter: drop-shadow(0 0 8px #ff444444);
 }
 
-.feedback-overlay h3 {
-  font-size: 3rem;
-  margin-bottom: 2rem;
-  color: #3c53a4;
-  font-family: LexendExtraBold;
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.15) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+.animated-pop {
+  animation: popIn 0.7s cubic-bezier(0.23, 1.01, 0.32, 1) both;
+}
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.animated-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-.feedback-overlay button {
-  background-color: #3c53a4;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 0.5rem 0;
-  width: 100%;
-  transition: background-color 0.3s;
-  font-family: InterBold;
-  font-size: 20px;
-}
-
-.feedback-overlay button:hover {
-  background-color: #2b3d7a;
+/* Responsive */
+@media (max-width: 500px) {
+  .feedback-overlay {
+    padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+    max-width: 98vw;
+  }
+  .feedback-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.8rem 0;
+  }
 }
 
 Overlay Background .overlay-background {
@@ -1576,7 +1668,7 @@ Overlay Background .overlay-background {
 
 /* Payfrica Card Front */
 .pay-card.front {
-  width: 280px;
+  max-width: 280px;
   height: 455px;
   background-color: white;
   border-radius: 8px;
@@ -2145,7 +2237,7 @@ Overlay Background .overlay-background {
   font-family: InterLight;
 }
 
-/* “Zero fees” / “Few minutes” badges */
+/* "Zero fees" / "Few minutes" badges */
 .badges {
   display: flex;
   gap: 0.5rem;
@@ -2573,7 +2665,7 @@ Overlay Background .overlay-background {
   }
 }
 
-/* “Please wait” */
+/* "Please wait" */
 .withdrawing-container h3 {
   margin: 0.5rem 0;
   font-size: 2rem;
@@ -3091,5 +3183,316 @@ Overlay Background .overlay-background {
 @media (max-width: 900px) {
   .pools-page {
     flex-direction: column;
+  }
+}
+
+/* Manage Cards Stylings */
+/* Overlay background */
+.card-overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+/* Modal box */
+.card-overlay-modal {
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 12px;
+  min-width: 420px;
+  min-height: 260px;
+  padding: 40px 32px 48px 32px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 600px;
+}
+
+.card-details-modal {
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 12px;
+  min-width: 420px;
+  min-height: 260px;
+  /* height: 95vh; */
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 600px;
+}
+
+/* Close button */
+.card-overlay-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: 2px solid #d97b4a;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #d97b4a;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.card-overlay-close-btn:hover {
+  background: #ffe0b8;
+}
+
+/* Title */
+.card-overlay-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #c04a2b;
+  margin-bottom: 36px;
+  margin-top: 8px;
+  font-family: "LexendExtraBold", "InterBold", Arial, sans-serif;
+}
+
+/* Options row */
+.card-overlay-options {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+
+/* Card type option */
+.card-type-option {
+  cursor: pointer;
+  background: #232323;
+  border-radius: 12px;
+  border: 3px solid #ffc43a;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card-type-option:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Card type label (tab) */
+.card-type-label {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background: #ffc43a;
+  border-radius: 8px;
+  color: #232323;
+  font-weight: 500;
+  font-size: 18px;
+  padding: 4px 0;
+  text-align: center;
+  width: 90%;
+  font-family: "InterMedium", Arial, sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.card-type-option.permanent:hover {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+/* Card type icon */
+.card-type-icon {
+  margin-top: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-type-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card-overlay-modal {
+    min-width: 90vw;
+    padding: 24px 8px 32px 8px;
+  }
+  .card-overlay-options {
+    gap: 16px;
+  }
+  .card-type-option {
+    width: 90px;
+    height: 90px;
+  }
+  .card-type-icon img {
+    width: 36px;
+    height: 36px;
+  }
+  .card-type-label {
+    font-size: 15px;
+    top: -16px;
+  }
+}
+
+/* Card Details Stylings */
+label {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+}
+.temp-card-input {
+  /* display: flex;
+  flex-direction: column; */
+  width: 100%;
+  margin: 8px 0 18px 0;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #ffd6a0;
+  font-size: 16px;
+  font-family: inherit;
+  color: #232323;
+  outline: none;
+  transition: box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.temp-card-input:focus {
+  box-shadow: 0 0 0 2px #ffc43a;
+}
+
+.temp-card-next-btn {
+  margin-top: 24px;
+  width: 100%;
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.temp-card-next-btn:hover {
+  background: #2b3d7a;
+}
+
+/* Confirm Card Create Overlay */
+.confirm-card-modal {
+  min-width: 500px;
+  max-width: 600px;
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+}
+
+.confirm-card-header {
+  text-align: center;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+
+.confirm-card-title {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.confirm-card-currency {
+  font-weight: 700;
+  font-size: 40px;
+  margin-bottom: 4px;
+}
+
+.confirm-card-desc {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.confirm-card-details {
+  background: #fcf6d9;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+  margin: 0 auto 24px auto;
+  width: 100%;
+  max-width: 500px;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.confirm-card-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.confirm-card-label {
+  color: #c04a2b;
+  font-size: 20px;
+}
+
+.confirm-card-value {
+  color: #c04a2b;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.confirm-card-btn {
+  width: 180px;
+  margin: 0 auto;
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: block;
+  transition: background 0.15s;
+}
+.confirm-card-btn:hover {
+  background: #2b3d7a;
+}
+
+@media (max-width: 600px) {
+  .confirm-card-modal {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 0 0 16px 0;
+  }
+  .confirm-card-details {
+    padding: 16px;
+    max-width: 98vw;
   }
 }
