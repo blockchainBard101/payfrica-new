@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 
-// Dashboard widgets
 const Navigation = dynamic(
   () => import("@/components/Navigations").then((mod) => mod.Navigation),
   { ssr: false }

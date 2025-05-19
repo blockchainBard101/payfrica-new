@@ -26,14 +26,14 @@ export default function LoginPage() {
     new Map<AuthProvider, EnokiWallet>()
   );
 
-  // Redirect as soon as we're connected
+  // console.log(currentAccount);
+
   useEffect(() => {
     if (currentAccount) {
       router.push("/dashboard");
     }
   }, [currentAccount, router]);
 
-  // Don't flash the login page if already connected
   if (currentAccount) return null;
 
   return (

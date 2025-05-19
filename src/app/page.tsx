@@ -26,19 +26,18 @@ export default function Page() {
     new Map<AuthProvider, EnokiWallet>()
   );
 
-  // Redirect as soon as we're connected
+  console.log(currentAccount?.address);
+
   useEffect(() => {
     if (currentAccount) {
       router.push("/dashboard");
     }
   }, [currentAccount, router]);
 
-  // Don't flash the login page if already connected
   if (currentAccount) return null;
 
   return (
     <div className="login-page-container flex">
-      {/* Left-side image */}
       <div className="image-container relative flex-1">
         <Image
           src={"/LoginFeaturedImage.png"}
@@ -49,7 +48,6 @@ export default function Page() {
         />
       </div>
 
-      {/* Right-side login box */}
       <div className="login-container flex-1 flex items-center justify-center p-8">
         <div className="login-box bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
           <h2 className="login-title text-2xl font-semibold mb-6 text-center">
@@ -75,7 +73,6 @@ export default function Page() {
                       await connect({ wallet });
                     } catch (error) {
                       console.error("Login failed:", error);
-                      // you may want to show an error toast here
                       setIsLoading(false);
                     }
                   }}

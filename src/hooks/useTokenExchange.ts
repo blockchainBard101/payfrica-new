@@ -5,8 +5,8 @@ import { client } from '@/config/suiClient';
 import clientConfig from '@/config/clientConfig';
 import { useCustomWallet } from '@/contexts/CustomWallet';
 import { getNsAddress } from './registerNsName';
+import { getObject } from './suiRpc';
 
-// Local Pool type matching your backend response
 export interface Pool {
   coinBalance: number;
   id: string;
@@ -28,7 +28,6 @@ const fetcher = (url: string) => fetch(url).then(res => {
   return res.json();
 });
 
-/** Fetch list of pools (tokens) from backend */
 export function usePools() {
   const { data, error } = useSWR<Pool[]>(`${API_BASE}/pools`, fetcher);
   const pools = data ?? [];
@@ -36,7 +35,6 @@ export function usePools() {
   return { pools, poolMap, isLoading: !data && !error, error };
 }
 
-/** Fetch user details (including base token name & symbol) */
 export function useUserDetails(address?: string) {
   const { data, error } = useSWR(
     address ? `${API_BASE}/users/${address}` : null,
@@ -45,7 +43,6 @@ export function useUserDetails(address?: string) {
   return { details: data, isLoading: !data && !error, error };
 }
 
-// Number formatter memoized once
 const formatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -119,16 +116,30 @@ export function useTokenExchange() {
     const coins = await client.getCoins({ owner: address, coinType: a.coinType });
     const coinArg = handleMergeSplit(tx, coins.data, amt);
 
-    tx.moveCall({
+    const liqObj = await getObject(address, `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket`);
+    console.log(liqObj);
+    if (liqObj === null){
+      tx.moveCall({
+      target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity_new`,
+      typeArguments: [a.coinType],
+      arguments: [
+        tx.object(a.id),
+        tx.object(clientConfig.PAYFRICA_POOL_ID),
+        coinArg,
+      ],
+    });
+    } else {
+      tx.moveCall({
       target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity`,
       typeArguments: [a.coinType],
       arguments: [
         tx.object(a.id),
         tx.object(clientConfig.PAYFRICA_POOL_ID),
-        tx.object.option({ type: `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket<${a.coinType}>`, value: null }),
+        tx.object(liqObj),
         coinArg,
       ],
     });
+    }
     return sponsorAndExecuteTransactionBlock({
       tx,
       network: clientConfig.SUI_NETWORK_NAME,
@@ -136,13 +147,40 @@ export function useTokenExchange() {
       allowedAddresses: [address],
       options: { showEffects: true, showObjectChanges: true, showEvents: true }
     });
-  }, [address, poolMap, sponsorAndExecuteTransactionBlock, getConversionRate, toMinimalUnits, handleMergeSplit]);
+  }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits, handleMergeSplit]);
+
+  const handleRemoveLiquidity = useCallback(async (coinType: string,amount: number) => {
+    if (!address) throw new Error('No wallet');
+    const a = poolMap.get(coinType)!;
+    const amt = toMinimalUnits(amount, a.coinDecimal);
+    const tx = new Transaction();
+
+    const liqObj = await getObject(address, `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket`);
+    if (liqObj === null){
+      throw new Error('No liquidity');
+    }
+    tx.moveCall({
+    target: `${clientConfig.PACKAGE_ID}::pool::remove_liquidity`,
+    typeArguments: [a.coinType],
+    arguments: [
+      tx.object(a.id),
+      tx.object(liqObj),
+      tx.pure.u64(amt),
+    ],
+  });
+    return sponsorAndExecuteTransactionBlock({
+      tx,
+      network: clientConfig.SUI_NETWORK_NAME,
+      includesTransferTx: true,
+      allowedAddresses: [address],
+      options: { showEffects: true, showObjectChanges: true, showEvents: true }
+    });
+  }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits]);
 
   const handleWithdrawalRequest = useCallback(async (coinType: string, amount: number, agent: string) => {
     if (!address) throw new Error('No wallet');
     const tx = new Transaction();
     const coins = await client.getCoins({ owner: address, coinType });
-    // Convert amount to bigint using toMinimalUnits
     // const t = poolMap.get(coinType)!;
     // console.log(agent)
     const coinArg = handleMergeSplit(tx, coins.data, BigInt(amount));
@@ -253,7 +291,6 @@ export function useTokenExchange() {
   const getBalance = useCallback(async (coinType: string) => {
     if (!address) throw new Error('No wallet');
     const t = poolMap.get(coinType)!;
-    console.log(t);
     const r = await client.getBalance({ owner: address, coinType: t.coinType });
     return formatter.format(Number(r.totalBalance) / 10 ** t.coinDecimal);
   }, [address, poolMap]);
@@ -261,10 +298,13 @@ export function useTokenExchange() {
 
   const getAllPools = useCallback(async () => {
     if (!address) throw new Error('No wallet connected');
+    console.log("fetching pools");
     const result = await Promise.all(
       Array.from(poolMap.values()).map(async pool => {
         const balanceRaw = await client.getBalance({ owner: address, coinType: pool.coinType });
+        // console.log(balanceRaw);
         const balance = Number(balanceRaw.totalBalance) / 10 ** pool.coinDecimal;
+        // console.log("Balance", balance);
         return {
           coinType: pool.coinType,
           symbol: pool.coinName,
@@ -276,6 +316,7 @@ export function useTokenExchange() {
         };
       })
     );
+    console.log(result);
     return result;
   }, [address, poolMap]);
 
@@ -284,6 +325,7 @@ export function useTokenExchange() {
     if (!userDetails) return
     const baseType = userDetails.country.baseTokencoinType;
     const token = poolMap.get(baseType)!;
+    console.log(token);
     const r = await client.getBalance({ owner: address, coinType: token.coinType });
     return `${userDetails.country.currencySymbol}${formatter.format(
       Number(r.totalBalance) / 10 ** token.coinDecimal
@@ -311,7 +353,7 @@ export function useTokenExchange() {
     return {
       breakdown,
       totalUSD,
-      totalLocal: `${userDetails.country.currencySymbol}${formatter.format(totalLocal)}`
+      totalLocal: `${userDetails?.country.currencySymbol}${formatter.format(totalLocal)}`
     };
   }, [address, poolMap, userDetails, getBalance]);
 
@@ -325,6 +367,7 @@ export function useTokenExchange() {
     getAllPools,
     getPortfolio,
     handleWithdrawalRequest,
-    handleAddtoLiquidity
+    handleAddtoLiquidity,
+    handleRemoveLiquidity
   };
 }
