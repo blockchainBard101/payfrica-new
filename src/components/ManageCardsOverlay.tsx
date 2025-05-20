@@ -8,6 +8,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaChevronCircleLeft,
+  FaMinus,
 } from "react-icons/fa";
 import { BsQuestionCircleFill } from "react-icons/bs";
 import { toPng } from "html-to-image";
@@ -16,6 +17,8 @@ import PayfricaCardHeadImg from "../../public/PayfricaCardHeadImg.jpg";
 import { useGlobalState } from "../GlobalStateProvider";
 import CardOverlay from "./CardOverlay";
 import "../app/ManageCardsOverlay.css";
+import AddFundsOverlay from "./AddFundsOverlay";
+import RemoveFundsOverlay from "./RemoveFundsOverlay";
 
 const ManageCardsOverlay = ({}) => {
   const {
@@ -25,6 +28,8 @@ const ManageCardsOverlay = ({}) => {
     numberOfCardsCreated,
     toggleOverlay,
     formatWithCommas,
+    addFundsCardIdx,
+    setAddFundsCardIdx,
   } = useGlobalState();
   const [selectedCardIdx, setSelectedCardIdx] = useState(0);
   const [showBack, setShowBack] = useState(false);
@@ -37,6 +42,9 @@ const ManageCardsOverlay = ({}) => {
   });
   const [creating, setCreating] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
+  const [removeFundsCardIdx, setRemoveFundsCardIdx] = useState<number | null>(
+    null
+  );
   const cardRef = useRef(null);
 
   const selectedCard = cards[selectedCardIdx];
@@ -116,18 +124,7 @@ const ManageCardsOverlay = ({}) => {
   if (!overlayStates.manageCards || numberOfCardsCreated === 0) return null;
   return (
     <div className="overlay-background" style={{ zIndex: 3000 }}>
-      <div
-        className="manage-card-overlay-container"
-        style={{
-          maxWidth: 1200,
-          width: "98vw",
-          minHeight: "90vh",
-          display: "flex",
-          flexDirection: "row",
-          gap: 32,
-          padding: "2rem",
-        }}
-      >
+      <div className="manage-card-overlay-container">
         {/* Left: Card & Details */}
         <div style={{ flex: 2, minWidth: 0 }}>
           {/* Header */}
@@ -140,17 +137,7 @@ const ManageCardsOverlay = ({}) => {
             <BsQuestionCircleFill className="icon" />
           </div>
           {/* Card Carousel */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "2rem 0 1rem",
-              backgroundColor: "#fcf5d7",
-              padding: "1rem 0",
-              borderRadius: 10,
-            }}
-          >
+          <div className="card-carousel" style={{}}>
             <FaChevronCircleLeft
               //   className="icon"
               style={{ fontSize: 35, cursor: "pointer", color: "#c43e26" }}
@@ -388,7 +375,56 @@ const ManageCardsOverlay = ({}) => {
                   setShowBack(false);
                 }}
               >
-                <div style={{ fontWeight: 700, fontSize: 16 }}>{card.name}</div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>
+                    {card.name}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <button
+                      className="add-funds-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAddFundsCardIdx(idx);
+                        toggleOverlay("addFunds");
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#3c53a4",
+                        fontSize: 20,
+                        cursor: "pointer",
+                        marginLeft: 8,
+                      }}
+                      title="Add Funds"
+                    >
+                      <span style={{ fontSize: 22, fontWeight: 700 }}>+</span>
+                    </button>
+                    <button
+                      className="remove-funds-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRemoveFundsCardIdx(idx);
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#c43e26",
+                        fontSize: 20,
+                        cursor: "pointer",
+                        marginLeft: 8,
+                      }}
+                      title="Remove Funds"
+                    >
+                      <FaMinus style={{ fontSize: 20, fontWeight: 700 }} />
+                    </button>
+                  </div>
+                </div>
                 <div style={{ fontSize: 22, fontWeight: 700, margin: "8px 0" }}>
                   ₦{card.amount.toLocaleString()}
                 </div>
@@ -413,93 +449,12 @@ const ManageCardsOverlay = ({}) => {
                 fontSize: 18,
                 marginTop: 24,
               }}
-              onClick={handleOpenCardTypeSelect}
+              onClick={() => toggleOverlay("cardTypeSelect")}
             >
               <FaPlus style={{ marginRight: 8 }} /> Create New Card
             </button>
           </div>
         </div>
-        {/* Create Card Modal */}
-        {showCreateModal && (
-          <div className="overlay-background" style={{ zIndex: 4000 }}>
-            <form
-              className="card-overlay-modal"
-              style={{
-                minWidth: 320,
-                maxWidth: 400,
-                padding: 32,
-                position: "relative",
-              }}
-              onSubmit={handleCreateCard}
-            >
-              <button
-                type="button"
-                className="card-overlay-close-btn"
-                onClick={() => setShowCreateModal(false)}
-              >
-                <FaTimes />
-              </button>
-              <div className="card-overlay-title">Create New Card</div>
-              <label>
-                Card Name
-                <input
-                  required
-                  value={newCard.name}
-                  onChange={(e) =>
-                    setNewCard((c) => ({ ...c, name: e.target.value }))
-                  }
-                  className="temp-card-input"
-                />
-              </label>
-              <label>
-                Amount
-                <input
-                  required
-                  type="number"
-                  min={1}
-                  value={newCard.amount}
-                  onChange={(e) =>
-                    setNewCard((c) => ({ ...c, amount: e.target.value }))
-                  }
-                  className="temp-card-input"
-                />
-              </label>
-              <label>
-                PIN
-                <input
-                  required
-                  type="password"
-                  minLength={4}
-                  maxLength={6}
-                  value={newCard.pin}
-                  onChange={(e) =>
-                    setNewCard((c) => ({ ...c, pin: e.target.value }))
-                  }
-                  className="temp-card-input"
-                />
-              </label>
-              <label>
-                Deadline
-                <input
-                  required
-                  type="date"
-                  value={newCard.deadline}
-                  onChange={(e) =>
-                    setNewCard((c) => ({ ...c, deadline: e.target.value }))
-                  }
-                  className="temp-card-input"
-                />
-              </label>
-              <button
-                className="temp-card-next-btn"
-                type="submit"
-                disabled={creating}
-              >
-                {creating ? "Creating..." : "Create Card"}
-              </button>
-            </form>
-          </div>
-        )}
         {/* Card Type Select Overlay */}
         <CardOverlay onTypeSelect={() => setShowCreateModal(true)} />
         {/* Deactivating Loader */}
@@ -510,6 +465,14 @@ const ManageCardsOverlay = ({}) => {
               <h3>Deactivating card...</h3>
             </div>
           </div>
+        )}
+        <AddFundsOverlay />
+        {/* Remove Funds Overlay */}
+        {removeFundsCardIdx !== null && (
+          <RemoveFundsOverlay
+            cardIdx={removeFundsCardIdx}
+            onClose={() => setRemoveFundsCardIdx(null)}
+          />
         )}
       </div>
     </div>

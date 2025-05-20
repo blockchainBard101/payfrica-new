@@ -165,6 +165,13 @@ const ManageCardsOverlay = dynamic(
   () => import("@/components/ManageCardsOverlay"),
   { ssr: false }
 );
+const ScanCode = dynamic(() => import("@/components/ScanCode"), {
+  ssr: false,
+});
+const ReceiveFundsFlowOverlay = dynamic(
+  () => import("@/components/ReceiveFundsFlowOverlay"),
+  { ssr: false }
+);
 
 // SWR fetcher
 const fetcher = (url: string) =>
@@ -214,6 +221,8 @@ export default function Page() {
         <EnterAmountOverlay />
         <SendingOverlay />
         <FeedbackOverlay />
+        <ManageCardsOverlay />
+        <CardDetails />
         <SuccessOverlay />
         <FailedOverlay />
         <SendSuiTokenOverlay />
@@ -232,9 +241,9 @@ export default function Page() {
         <ConfirmWithdrawOverlay />
         <WithdrawingOverlay />
         <CardOverlay />
-        <CardDetails />
         <ConfirmCardCreate />
-        <ManageCardsOverlay />
+        <ScanCode />
+        <ReceiveFundsFlowOverlay />
       </Suspense>
 
       {/* Full-page loading spinner overlay */}

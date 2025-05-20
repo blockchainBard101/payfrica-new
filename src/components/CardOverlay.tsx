@@ -22,7 +22,7 @@ const CardOverlay: React.FC<CardOverlayProps> = ({ onTypeSelect }) => {
 
   return (
     <div className="card-overlay-background">
-      <div className="card-overlay-modal">
+      <div className="card-overlay-modal-select-card-type">
         <button
           className="card-overlay-close-btn"
           onClick={() => {
@@ -48,7 +48,7 @@ const CardOverlay: React.FC<CardOverlayProps> = ({ onTypeSelect }) => {
           </div>
           <div
             className="card-type-option permanent"
-            onClick={() => handleTypeSelect("permanent")}
+            // onClick={() => handleTypeSelect("permanent")}
           >
             <div className="card-type-label">Permanent</div>
             <div className="card-type-icon">

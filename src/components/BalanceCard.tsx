@@ -44,7 +44,10 @@ export default React.memo(function BalanceCard({
 
       <div className="card-amount">
         {loading ? (
-          <div className="loader" style={{ width: 30, height: 30, margin: "auto" }} />
+          <div
+            className="loader"
+            style={{ width: 30, height: 30, margin: "auto" }}
+          />
         ) : (
           <h2>{visible ? amount : "******"}</h2>
         )}

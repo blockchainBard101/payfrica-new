@@ -8,7 +8,7 @@ export const FailedOverlay = () => {
   if (!overlayStates.failed) return null;
 
   return (
-    <div className="overlay-background">
+    <div className="overlay-background failed-overlay-background">
       <div className="feedback-overlay animated-failed">
         <FaTimesCircle className="feedback-icon failed-icon animated-shake" />
         <h3 className="feedback-title">Failed</h3>

@@ -591,7 +591,7 @@ body {
 /* Wrapper for the cards */
 .quick-actions-wrapper {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 1.5rem;
   transition: all 0.3s;
 }
@@ -607,7 +607,7 @@ body {
   justify-content: center;
   transition: transform 0.3s;
   cursor: pointer;
-  gap: 30px;
+  gap: 10px;
 }
 
 .quick-action-card:hover {
@@ -3222,7 +3222,7 @@ Overlay Background .overlay-background {
   border-radius: 12px;
   min-width: 420px;
   min-height: 260px;
-  /* height: 95vh; */
+  height: 95vh;
   padding: 10px;
   position: relative;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
@@ -3231,6 +3231,14 @@ Overlay Background .overlay-background {
   align-items: center;
   width: 90%;
   max-width: 600px;
+  overflow: scroll;
+  padding-top: 10px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.card-details-modal::-webkit-scrollbar {
+  display: none;
 }
 
 /* Close button */
@@ -3332,11 +3340,33 @@ Overlay Background .overlay-background {
   object-fit: contain;
 }
 
+.card-overlay-modal-select-card-type {
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 12px;
+  min-width: 420px;
+  min-height: 260px;
+  padding: 40px 32px 48px 32px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 90%;
+  max-width: 600px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
-  .card-overlay-modal {
+  .card-details-modal {
     min-width: 90vw;
-    padding: 24px 8px 32px 8px;
+    padding: 32px 8px 32px 8px;
+  }
+
+  .card-overlay-modal-select-card-type {
+    min-width: 90vw;
+    padding: 32px 8px 32px 8px;
   }
   .card-overlay-options {
     gap: 16px;
@@ -3350,7 +3380,7 @@ Overlay Background .overlay-background {
     height: 36px;
   }
   .card-type-label {
-    font-size: 15px;
+    font-size: 12px;
     top: -16px;
   }
 }
@@ -3495,4 +3525,319 @@ label {
     padding: 16px;
     max-width: 98vw;
   }
+}
+
+/* .card-overlay-background .card-details-modal {
+  z-index: 5100 !important;
+} */
+
+/* For SuccessOverlay and FailedOverlay backgrounds */
+.success-overlay-background,
+.failed-overlay-background,
+.overlay-background.success,
+.overlay-background.failed {
+  z-index: 6000 !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* For ManageCardsOverlay background */
+.card-overlay-background {
+  z-index: 2000 !important;
+}
+
+/* ScanCode Overlay Modal */
+.scan-code-modal {
+  font-family: "LexendExtraBold", "InterBold", Arial, sans-serif;
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 400px;
+  /* max-width: 400px; */
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scan-code-modal h2 {
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  color: #3c53a4;
+  margin-bottom: 12px;
+  font-size: 2rem;
+}
+
+.scan-code-modal p {
+  color: #555;
+  margin-bottom: 32px;
+  font-size: 1.1rem;
+}
+
+.scan-action-btn {
+  background: linear-gradient(90deg, #3c53a4 60%, #fbe19a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.scan-action-btn:last-child {
+  background: linear-gradient(90deg, #fbe19a 60%, #3c53a4 100%);
+  color: #3c53a4;
+}
+
+.scan-action-btn svg {
+  font-size: 22px;
+}
+
+.scan-code-modal .card-overlay-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: 2px solid #d97b4a;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #d97b4a;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.scan-code-modal .card-overlay-close-btn:hover {
+  background: #ffe0b8;
+}
+
+/* Responsive for ScanCode modal */
+@media (max-width: 500px) {
+  .scan-code-modal {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.5rem 0.5rem;
+  }
+  .scan-action-btn {
+    font-size: 1rem;
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Scan QR Overlay */
+.scan-qr-bg {
+  z-index: 5000;
+}
+.scan-qr-modal {
+  background: #181818;
+  border-radius: 24px;
+  padding: 2rem 1.5rem 3rem 1.5rem;
+  width: 340px;
+  position: relative;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.scan-qr-title {
+  font-size: 1.5rem;
+  font-family: LexendExtraBold;
+  margin-bottom: 0.5rem;
+}
+.scan-qr-desc {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 1.5rem;
+}
+.scan-qr-frame {
+  width: 220px;
+  height: 160px;
+  border: 3px solid #ffc43a;
+  border-radius: 18px;
+  margin-bottom: 1.5rem;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.scan-qr-image {
+  width: 100%;
+  height: 100%;
+  background: url("/your-qr-placeholder.png") center/cover no-repeat;
+}
+.scan-qr-upload-btn {
+  background: #232323;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 80%;
+}
+.scan-qr-snap-btn {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border: 4px solid #ffc43a;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: block;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.scan-qr-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Enter PIN Overlay */
+.enter-pin-bg {
+  z-index: 5100;
+}
+.enter-pin-modal {
+  background: #232323;
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  width: 340px;
+  color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.enter-pin-title {
+  font-size: 1.3rem;
+  font-family: LexendExtraBold;
+  margin-bottom: 0.5rem;
+}
+.enter-pin-desc {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 1.5rem;
+}
+.enter-pin-input {
+  width: 80%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ffc43a;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  background: #181818;
+  color: #fff;
+}
+.enter-pin-error {
+  color: #ff4444;
+  margin-bottom: 1rem;
+}
+.enter-pin-next-btn {
+  background: #ffc43a;
+  color: #232323;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 80%;
+  margin-top: 0.5rem;
+}
+.enter-pin-next-btn:disabled {
+  background: #888;
+  color: #fff;
+  cursor: not-allowed;
+}
+.enter-pin-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Confirm Transaction Overlay */
+.confirm-tx-bg {
+  z-index: 5200;
+}
+.confirm-tx-modal {
+  background: #232323;
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  width: 340px;
+  color: #ffc43a;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.confirm-tx-title {
+  font-size: 1.3rem;
+  font-family: LexendExtraBold;
+  margin-bottom: 1.5rem;
+  color: #ffc43a;
+}
+.confirm-tx-row {
+  width: 100%;
+  background: #2d2d2d;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.7rem;
+  display: flex;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 1.1rem;
+}
+.confirm-tx-btn {
+  background: #ffc43a;
+  color: #232323;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.confirm-tx-cancel {
+  background: none;
+  color: #fff;
+  border: none;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: underline;
 }

@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
 import {
   FaRegMoneyBillAlt,
   FaCreditCard,
   FaMoneyCheckAlt,
+  FaQrcode,
 } from "react-icons/fa";
 import { BsSendFill } from "react-icons/bs";
 import { MdOutlineCallReceived } from "react-icons/md";
@@ -13,7 +13,7 @@ import { useGlobalState } from "../GlobalStateProvider";
 const quickActions = [
   { name: "Send Money", icon: <BsSendFill />, command: "sendMoney" },
   {
-    name: "Receive Money",
+    name: "Receive",
     icon: <MdOutlineCallReceived />,
     command: "receiveMoney",
   },
@@ -21,6 +21,7 @@ const quickActions = [
   { name: "Withdraw", icon: <FaRegMoneyBillAlt />, command: "withdraw" },
   { name: "Convert", icon: <SiConvertio />, command: "convert" },
   { name: "Manage Cards", icon: <FaCreditCard />, command: "manageCards" },
+  { name: "Scan QR", icon: <FaQrcode />, command: "scanQR" },
 ];
 
 export const QuickActions = () => {

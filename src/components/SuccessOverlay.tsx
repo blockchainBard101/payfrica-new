@@ -8,7 +8,7 @@ export const SuccessOverlay = () => {
   if (!overlayStates.success) return null;
 
   return (
-    <div className="overlay-background">
+    <div className="overlay-background success-overlay-background">
       <div className="feedback-overlay animated-success">
         <FaCheckCircle className="feedback-icon success-icon animated-pop" />
         <h3 className="feedback-title">Success!</h3>

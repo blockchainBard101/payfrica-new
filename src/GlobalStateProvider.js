@@ -41,6 +41,8 @@ export const GlobalStateProvider = ({ children }) => {
     cardDetails: false,
     confirmCardCreate: false,
     cardTypeSelect: false,
+    addFunds: false,
+    scanQR: false,
   });
 
   // SINGLE SOURCE OF TRUTH for deposit
@@ -145,6 +147,19 @@ export const GlobalStateProvider = ({ children }) => {
     deadline: "",
   });
 
+  const [addFundsCardIdx, setAddFundsCardIdx] = useState(null);
+
+  // Main/base currency balance and transaction history
+  const [mainBalance, setMainBalance] = useState(100000); // Example starting balance
+  const [mainTransactions, setMainTransactions] = useState([
+    {
+      receiver: "Initial Deposit",
+      type: "Credit",
+      date: "01 Jan 2024",
+      amount: "NGN 100000",
+    },
+  ]);
+
   function formatCurrency(amount, currency = "NGN") {
     return Number(amount).toLocaleString("en-NG", {
       // style: "currency",
@@ -181,6 +196,13 @@ export const GlobalStateProvider = ({ children }) => {
         setCards,
         formatCurrency,
         formatWithCommas,
+        addFundsCardIdx,
+        setAddFundsCardIdx,
+        // Add these to context
+        mainBalance,
+        setMainBalance,
+        mainTransactions,
+        setMainTransactions,
       }}
     >
       {children}
