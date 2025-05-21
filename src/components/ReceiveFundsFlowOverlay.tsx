@@ -3,53 +3,98 @@ import { useGlobalState } from "../GlobalStateProvider";
 import ScanQrOverlay from "./ScanQrOverlay";
 import EnterPinOverlay from "./EnterPinOverlay";
 import ConfirmTransactionOverlay from "./ConfirmTransactionOverlay";
+import { SuccessOverlay } from "./SuccessOverlay";
+import { FailedOverlay } from "./FailedOverlay";
+import InvalidCardAlertOverlay from "./InvalidCardAlertOverlay";
 
-const MOCK_CARD = {
-  name: "Flexing Card",
-  pin: "1234",
-  owner: "John Doe",
-};
-
-const MOCK_AMOUNT = 10000;
+// const MOCK_AMOUNT = 10000;
 
 const ReceiveFundsFlowOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
   const [step, setStep] = useState<"scan" | "pin" | "confirm" | "done">("scan");
   const [pin, setPin] = useState("");
+  const [amount, setAmount] = useState("");
   const [pinError, setPinError] = useState("");
   const [success, setSuccess] = useState<boolean | null>(null);
-  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [scannedData, setScannedData] = useState<any | null>(null);
+  const [showInvalidCardAlert, setShowInvalidCardAlert] = useState(false);
+  const [resetScannerKey, setResetScannerKey] = useState(0);
+
+  // Reset all state when overlay is closed
+  const handleClose = () => {
+    setStep("scan");
+    setPin("");
+    setAmount("");
+    setPinError("");
+    setSuccess(null);
+    setScannedData(null);
+    toggleOverlay("receiveFundsFlow");
+  };
 
   if (!overlayStates.receiveFundsFlow) return null;
 
   // Step 1: Scan QR
   if (step === "scan") {
     return (
-      <ScanQrOverlay
-        onScan={(data) => {
-          setScannedData(data);
-          setStep("pin");
-        }}
-        onClose={() => toggleOverlay("receiveFundsFlow")}
-      />
+      <>
+        <ScanQrOverlay
+          onScan={(data: string) => {
+            let parsed: any = null;
+            try {
+              parsed = JSON.parse(data);
+              console.log("Receive Card QR Data:", parsed);
+            } catch (e) {
+              setShowInvalidCardAlert(true);
+              return;
+            }
+            if (
+              parsed
+              //  &&
+              // parsed.type === "receive"
+              // &&
+              // typeof parsed.wallet === "string" &&
+              // /^0x[a-fA-F0-9]{40,64}$/.test(parsed.wallet.trim())
+            ) {
+              setScannedData(parsed);
+              setStep("pin");
+            } else {
+              setShowInvalidCardAlert(true);
+            }
+          }}
+          onClose={handleClose}
+          reset={resetScannerKey}
+        />
+        {showInvalidCardAlert && (
+          <InvalidCardAlertOverlay
+            onClose={() => {
+              setShowInvalidCardAlert(false);
+              setResetScannerKey((k) => k + 1);
+            }}
+          />
+        )}
+      </>
     );
   }
 
-  // Step 2: Enter PIN
+  // Step 2: Enter PIN and Amount
   if (step === "pin") {
     return (
       <EnterPinOverlay
-        cardName={MOCK_CARD.name}
+        cardName={scannedData?.name || ""}
         pin={pin}
         setPin={setPin}
         pinError={pinError}
-        onClose={() => toggleOverlay("receiveFundsFlow")}
+        amount={amount}
+        setAmount={setAmount}
+        cardBalance={scannedData?.amount || 0}
+        onClose={handleClose}
         onNext={() => {
-          if (pin === MOCK_CARD.pin) {
+          if (pin === scannedData?.pin) {
             setPinError("");
             setStep("confirm");
             console.log("PIN entered:", pin);
             console.log("Scanned QR Data:", scannedData);
+            console.log("Amount entered:", amount);
           } else {
             setPinError("Incorrect PIN");
           }
@@ -62,12 +107,11 @@ const ReceiveFundsFlowOverlay = () => {
   if (step === "confirm") {
     return (
       <ConfirmTransactionOverlay
-        owner={MOCK_CARD.owner}
-        amount={MOCK_AMOUNT}
-        cardName={MOCK_CARD.name}
-        onClose={() => toggleOverlay("receiveFundsFlow")}
+        owner={scannedData?.owner || "Unknown"}
+        amount={amount}
+        cardName={scannedData?.name || ""}
+        onClose={handleClose}
         onConfirm={() => {
-          // Simulate success/failure
           const isSuccess = Math.random() > 0.5;
           setSuccess(isSuccess);
           setStep("done");
@@ -78,24 +122,13 @@ const ReceiveFundsFlowOverlay = () => {
 
   // Step 4: Success/Failed
   if (step === "done") {
-    setTimeout(() => {
-      toggleOverlay("receiveFundsFlow");
-    }, 2000);
-    return success ? (
-      <div className="success-overlay-background">
-        <div className="feedback-overlay">
-          <div className="feedback-icon success-icon">✔️</div>
-          <div className="feedback-title">Success!</div>
-        </div>
-      </div>
-    ) : (
-      <div className="failed-overlay-background">
-        <div className="feedback-overlay">
-          <div className="feedback-icon failed-icon">❌</div>
-          <div className="feedback-title">Failed!</div>
-        </div>
-      </div>
-    );
+    if (success === true) {
+      toggleOverlay("success");
+    } else if (success === false) {
+      toggleOverlay("failed");
+    }
+    handleClose();
+    return null;
   }
 
   return null;

@@ -30,14 +30,16 @@ export const ReceiveMoneyOverlay: React.FC = () => {
       setPayTag("");
       return;
     }
-    if (!userDetails.isLoading){
+    if (!userDetails.isLoading) {
       setPayTag(userDetails?.details.username + "@payfrica");
     }
-    
   }, [userDetails]);
 
   const walletAddress = address ?? "";
-  const shortenedAddress = useMemo(() => shortenAddress(walletAddress), [walletAddress]);
+  const shortenedAddress = useMemo(
+    () => shortenAddress(walletAddress),
+    [walletAddress]
+  );
 
   const copyToClipboard = useCallback((text: string) => {
     navigator.clipboard
@@ -61,14 +63,22 @@ export const ReceiveMoneyOverlay: React.FC = () => {
         </div>
 
         <div className="qr-wrapper">
-          <QRCode value={walletAddress} size={160} bgColor="#FCF5D7" fgColor="#000" />
+          <QRCode
+            value={walletAddress}
+            size={160}
+            bgColor="#FCF5D7"
+            fgColor="#000"
+          />
         </div>
 
         <div className="info-block">
           <h2>Payfrica Tag</h2>
           <div className="copy-box">
             {loadingTag ? <p>Loading…</p> : <p>{payTag || "—"}</p>}
-            <button onClick={() => payTag && copyToClipboard(payTag)} disabled={!payTag}>
+            <button
+              onClick={() => payTag && copyToClipboard(payTag)}
+              disabled={!payTag}
+            >
               <FaCopy /> Copy
             </button>
           </div>
@@ -95,7 +105,7 @@ export const ReceiveMoneyOverlay: React.FC = () => {
             toggleOverlay("receiveCard");
           }}
         >
-          Share address
+          Share Address
         </button>
       </div>
     </div>

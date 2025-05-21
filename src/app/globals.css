@@ -3668,7 +3668,7 @@ label {
 }
 .scan-qr-frame {
   width: 220px;
-  height: 160px;
+  height: 300px;
   border: 3px solid #ffc43a;
   border-radius: 18px;
   margin-bottom: 1.5rem;
@@ -3680,7 +3680,7 @@ label {
 }
 .scan-qr-image {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   background: url("/your-qr-placeholder.png") center/cover no-repeat;
 }
 .scan-qr-upload-btn {
@@ -3724,7 +3724,7 @@ label {
   background: #232323;
   border-radius: 18px;
   padding: 2rem 1.5rem;
-  width: 340px;
+  /* width: 340px; */
   color: #fff;
   position: relative;
   display: flex;
@@ -3754,7 +3754,9 @@ label {
 }
 .enter-pin-error {
   color: #ff4444;
-  margin-bottom: 1rem;
+  font-size: 13px;
+  margin-bottom: 8px;
+  margin-top: -4px;
 }
 .enter-pin-next-btn {
   background: #ffc43a;
@@ -3840,4 +3842,184 @@ label {
   cursor: pointer;
   font-size: 1rem;
   text-decoration: underline;
+}
+
+.scan-qr-frame-outer {
+  /* width: 320px; */
+  /* height: 220px; */
+  margin: 0 auto 1.5rem auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.scan-qr-frame-inner {
+  /* width: 100%; */
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scan-qr-frame-inner video,
+.scan-qr-frame-inner canvas {
+  width: 100%;
+  height: 320px !important;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+/* Corner styles */
+.corner {
+  position: absolute;
+  width: 25px;
+  /* height: 36px; */
+  /* border: 4px solid #ffc43a; */
+  z-index: 2;
+  border-radius: 8px;
+  border-radius: 0;
+}
+
+.corner.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner.top-right {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+.corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+/* QR Code Send Overlay */
+.enter-amount-bg {
+  z-index: 5100;
+}
+.enter-amount-modal {
+  background: #232323;
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  width: 400px;
+  color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.enter-amount-title {
+  font-size: 1.3rem;
+  font-family: LexendExtraBold;
+  margin-bottom: 0.5rem;
+}
+.enter-amount-desc {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 1.5rem;
+}
+.enter-amount-input {
+  width: 80%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ffc43a;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  background: #181818;
+  color: #fff;
+}
+.enter-amount-next-btn {
+  background: #ffc43a;
+  color: #232323;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 80%;
+  margin-top: 0.5rem;
+}
+.enter-amount-next-btn:disabled {
+  background: #888;
+  color: #fff;
+  cursor: not-allowed;
+}
+.enter-amount-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.qr-amount-token-group {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 24px;
+  border: 2px solid #ffc43a; /* gold/yellow border */
+  border-radius: 8px;
+  overflow: hidden;
+  background: #181818;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.qr-amount-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 18px;
+  font-size: 18px;
+  background: transparent;
+  color: #fff;
+  border-radius: 0;
+}
+
+.qr-token-select {
+  border: none;
+  outline: none;
+  background: #232323;
+  color: #fff;
+  font-size: 16px;
+  padding: 0 16px;
+  min-width: 90px;
+  height: 100%;
+  border-left: 2px solid #ffc43a;
+  border-radius: 0;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+  /* Remove default arrow for custom styling if needed */
+}
+
+.qr-amount-input::placeholder {
+  color: #aaa;
+  opacity: 1;
 }

@@ -1,9 +1,17 @@
+import { useRef, useEffect } from "react";
 import { useGlobalState } from "@/GlobalStateProvider";
 import WebcamCapture from "./WebcamCapture";
 import jsQR from "jsqr";
 
-const QRScanner = ({ onDetected }) => {
+const QRScanner = ({ onDetected, reset }) => {
+  const hasDetected = useRef(false);
+
+  useEffect(() => {
+    hasDetected.current = false;
+  }, [reset]);
+
   const handleScan = (imageSrc) => {
+    if (hasDetected.current) return;
     if (imageSrc) {
       const image = new window.Image();
       image.src = imageSrc;
@@ -18,7 +26,7 @@ const QRScanner = ({ onDetected }) => {
           inversionAttempts: "dontInvert",
         });
         if (code) {
-          console.log("QR code detected:", code.data);
+          hasDetected.current = true;
           if (onDetected) onDetected(code.data);
         }
       };
@@ -26,8 +34,15 @@ const QRScanner = ({ onDetected }) => {
   };
 
   return (
-    <div>
-      <WebcamCapture onScan={handleScan} />
+    <div className="scan-qr-frame-outer">
+      <div className="scan-qr-frame-inner">
+        <WebcamCapture onScan={handleScan} />
+        {/* Corner overlays */}
+        {/* <span className="corner top-left" />
+        <span className="corner top-right" />
+        <span className="corner bottom-left" />
+        <span className="corner bottom-right" /> */}
+      </div>
     </div>
   );
 };

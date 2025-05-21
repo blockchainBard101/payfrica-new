@@ -12,7 +12,7 @@ export const SuccessOverlay = () => {
       <div className="feedback-overlay animated-success">
         <FaCheckCircle className="feedback-icon success-icon animated-pop" />
         <h3 className="feedback-title">Success!</h3>
-        <p className="feedback-message">Your card was created successfully.</p>
+        {/* <p className="feedback-message">Your card was created successfully.</p> */}
         {/* <button className="feedback-btn" onClick={() => closeAllOverlays()}>
           View Receipt
         </button> */}

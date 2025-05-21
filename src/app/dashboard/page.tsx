@@ -172,6 +172,10 @@ const ReceiveFundsFlowOverlay = dynamic(
   () => import("@/components/ReceiveFundsFlowOverlay"),
   { ssr: false }
 );
+const SendFundsFlowOverlay = dynamic(
+  () => import("@/components/SendFundsFlowOverlay"),
+  { ssr: false }
+);
 
 // SWR fetcher
 const fetcher = (url: string) =>
@@ -244,6 +248,7 @@ export default function Page() {
         <ConfirmCardCreate />
         <ScanCode />
         <ReceiveFundsFlowOverlay />
+        <SendFundsFlowOverlay />
       </Suspense>
 
       {/* Full-page loading spinner overlay */}

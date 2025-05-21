@@ -1,27 +1,27 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
-const ConfirmTransactionOverlay = ({
-  owner,
+const QRConfirmSendOverlay = ({
+  cardOwner,
   amount,
-  cardName,
+  selectedToken,
+  tokens,
+  setSelectedToken,
   onConfirm,
   onClose,
 }) => (
   <div className="overlay-background confirm-tx-bg">
     <div className="confirm-tx-modal">
-      <div className="confirm-tx-title">Confirm Transaction</div>
+      <div className="confirm-tx-title">Confirm Send</div>
       <div className="confirm-tx-row">
-        <span>Receiving from</span>
-        <span>{owner}</span>
-      </div>
-      <div className="confirm-tx-row">
-        <span>Card</span>
-        <span>{cardName}</span>
+        <span>Recipient</span>
+        <span>{cardOwner}</span>
       </div>
       <div className="confirm-tx-row">
         <span>Amount</span>
-        <span>{Number(amount).toLocaleString()}</span>
+        <span>
+          {Number(amount).toLocaleString()} {selectedToken}
+        </span>
       </div>
       <button className="confirm-tx-btn" onClick={onConfirm}>
         Confirm <FaArrowRight />
@@ -33,4 +33,4 @@ const ConfirmTransactionOverlay = ({
   </div>
 );
 
-export default ConfirmTransactionOverlay;
+export default QRConfirmSendOverlay;

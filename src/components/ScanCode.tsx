@@ -10,7 +10,7 @@ const ScanCode = () => {
   const handleSelect = (type: "send" | "receive") => {
     toggleOverlay("scanQR");
     if (type === "send") {
-      toggleOverlay("sendMoney");
+      toggleOverlay("sendFundsFlow");
     } else {
       toggleOverlay("receiveFundsFlow");
     }
@@ -43,21 +43,7 @@ const ScanCode = () => {
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <button
             className="scan-action-btn"
-            style={{
-              background: "linear-gradient(90deg, #3c53a4 60%, #fbe19a 100%)",
-              color: "#fff",
-              border: "none",
-              borderRadius: 10,
-              padding: "1.2rem 1rem",
-              fontSize: 20,
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(60, 83, 164, 0.08)",
-              transition: "background 0.2s",
-            }}
+            style={{}}
             onClick={() => handleSelect("send")}
           >
             <FaArrowRight style={{ fontSize: 22, color: "#fbe19a" }} />
@@ -65,21 +51,6 @@ const ScanCode = () => {
           </button>
           <button
             className="scan-action-btn"
-            style={{
-              background: "linear-gradient(90deg, #fbe19a 60%, #3c53a4 100%)",
-              color: "#3c53a4",
-              border: "none",
-              borderRadius: 10,
-              padding: "1.2rem 1rem",
-              fontSize: 20,
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(60, 83, 164, 0.08)",
-              transition: "background 0.2s",
-            }}
             onClick={() => handleSelect("receive")}
           >
             <FaArrowDown style={{ fontSize: 22, color: "#3c53a4" }} />

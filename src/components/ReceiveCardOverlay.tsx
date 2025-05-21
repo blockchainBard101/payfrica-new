@@ -14,14 +14,14 @@ export const ReceiveCardOverlay = () => {
   const cardRef = useRef(null);
   const { address } = useCustomWallet();
 
-  const qrValue = address;
+  const qrValue = JSON.stringify({ type: "receive", wallet: address });
   const payfricaID = "Payfrica Wallet";
 
   const downloadCard = () => {
     if (cardRef.current) {
       toPng(cardRef.current).then((dataUrl) => {
         const link = document.createElement("a");
-        link.download = "payfrica-card.png";
+        link.download = "my-payfrica-card.png";
         link.href = dataUrl;
         link.click();
       });
