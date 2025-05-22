@@ -14,11 +14,12 @@ const WithdrawingOverlay: React.FC = () => {
       <div className="withdrawing-container">
         <FaHourglassHalf className="hourglass-icon" />
         <h3>Please wait ......</h3>
-        <p>Your Withdrawal is being confirmed, You'll be credited soon</p>
+        <p>
+          Your Withdrawal is being confirmed, You&apos;ll be credited soon
+        </p>
         <button
           className="notify-btn"
           onClick={async () => {
-            
             toggleOverlay("withdrawing");
           }}
         >

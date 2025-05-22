@@ -258,9 +258,9 @@ export default function ProfilePage() {
             <h2>Withdrawal Account</h2>
             {!user.accountDetails && !editingBank ? (
               <div className="empty-state">
-                <p>You haven't added withdrawal details yet.</p>
+                <p>You haven&apos;t added withdrawal details yet.</p>
                 <p>
-                  <em>Click "Edit" above to enter bank details.</em>
+                  <em>Click &quot;Edit&quot; above to enter bank details.</em>
                 </p>
               </div>
             ) : (

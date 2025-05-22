@@ -1,4 +1,3 @@
-// src/components/QuickTransfer.tsx
 "use client";
 
 import React, { useMemo } from "react";
@@ -12,16 +11,15 @@ const presets = [100, 200, 500, 1000];
 const QuickTransfer = () => {
   const { overlayStates, toggleOverlay, depositData, setDepositData } =
     useGlobalState();
-  const { address } = useCustomWallet();  
+  const { address } = useCustomWallet();
   const userDetails = useUserDetails(address);
-  if (!userDetails) return;
   const localCurrency = useMemo(() => {
-  if (!userDetails?.details?.country) return "";
-  
-  const { baseToken, currencySymbol } = userDetails.details.country;
-  return baseToken?.symbol ?? currencySymbol ?? "";
-}, [userDetails]);
+    if (!userDetails?.details?.country) return "";
 
+    const { baseToken, currencySymbol } = userDetails.details.country;
+    return baseToken?.symbol ?? currencySymbol ?? "";
+  }, [userDetails]);
+  if (!userDetails) return;
   if (!overlayStates.quickTransfer) return null;
 
   const amt = depositData.amount;

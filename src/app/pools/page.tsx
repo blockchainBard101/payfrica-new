@@ -1,6 +1,6 @@
 "use client";
 import { Navigation } from "@/components/Navigations";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FaCoins } from "react-icons/fa";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useTokenExchange } from "@/hooks/useTokenExchange";
@@ -27,7 +27,7 @@ const PoolsPage = () => {
 
   const { getAllPools, handleAddtoLiquidity, handleRemoveLiquidity } =
     useTokenExchange();
-  const memoizedGetAllPools = useCallback(getAllPools, []);
+  const memoizedGetAllPools = useCallback(getAllPools, [getAllPools]);
 
   useEffect(() => {
     const fetchPools = async () => {
@@ -69,8 +69,7 @@ const PoolsPage = () => {
     };
 
     if (address) fetchPools();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
+  }, [address, memoizedGetAllPools]);
 
   const percentPresets = ["10%", "20%", "50%", "100%"];
 

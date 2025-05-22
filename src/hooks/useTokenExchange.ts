@@ -30,7 +30,7 @@ const fetcher = (url: string) => fetch(url).then(res => {
 
 export function usePools() {
   const { data, error } = useSWR<Pool[]>(`${API_BASE}/pools`, fetcher);
-  const pools = data ?? [];
+  const pools = useMemo(() => data ?? [], [data]);
   const poolMap = useMemo(() => new Map(pools.map(p => [p.coinType, p])), [pools]);
   return { pools, poolMap, isLoading: !data && !error, error };
 }
@@ -201,7 +201,7 @@ export function useTokenExchange() {
       allowedAddresses: [address],
       options: { showEffects: true, showObjectChanges: true, showEvents: true }
     });
-  }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits, handleMergeSplit]);
+  }, [address, sponsorAndExecuteTransactionBlock, handleMergeSplit]);
 
   const handleDepositRequest = useCallback(async (
     agent: string,

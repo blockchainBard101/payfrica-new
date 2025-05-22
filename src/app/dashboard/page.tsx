@@ -114,13 +114,13 @@ const ConvertOverlay = dynamic(
   () => import("@/components/ConvertOverlay").then((mod) => mod.ConvertOverlay),
   { ssr: false }
 );
-const ConfirmConvertOverlay = dynamic(
-  () =>
-    import("@/components/ConfirmConvertOverlay").then(
-      (mod) => mod.ConfirmConvertOverlay
-    ),
-  { ssr: false }
-);
+// const ConfirmConvertOverlay = dynamic(
+//   () =>
+//     import("@/components/ConfirmConvertOverlay").then(
+//       (mod) => mod.ConfirmConvertOverlay
+//     ),
+//   { ssr: false }
+// );
 const DepositTypeOverlay = dynamic(
   () =>
     import("@/components/DepositTypeOverlay").then(
@@ -228,7 +228,7 @@ export default function Page() {
         <ManageCardsOverlay />
         <CardDetails />
         <SuccessOverlay />
-        <FailedOverlay />
+        <FailedOverlay onClose={() => {}} />
         <SendSuiTokenOverlay />
         <PayfricaPadiSuiOverlay />
         <EnterSuiAmountOverlay />
@@ -236,7 +236,7 @@ export default function Page() {
         <ReceiveMoneyOverlay />
         <ReceiveCardOverlay />
         <ConvertOverlay />
-        <ConfirmConvertOverlay />
+        {/* <ConfirmConvertOverlay />  */}
         <DepositTypeOverlay />
         <QuickTransfer />
         <ConfirmDepositOverlay />
