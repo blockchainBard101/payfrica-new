@@ -8,6 +8,7 @@ import { getAllowlistedKeyServers, SealClient } from "@mysten/seal";
 import clientConfig from "@/config/clientConfig";
 import { fromHex, toHex } from "@mysten/sui/utils";
 import { useCustomWallet } from "@/contexts/CustomWallet";
+import { useTokenExchange } from "@/hooks/useTokenExchange";
 
 export type Data = {
   status: string;
@@ -54,7 +55,9 @@ const ConfirmCardCreate = () => {
   const [info, setInfo] = useState<Data | null>(null);
   const { address } = useCustomWallet();
 
-  const NUM_EPOCH = 1;
+  const { handleCreateCard } = useTokenExchange();
+
+  const NUM_EPOCH = 10;
   const packageId = clientConfig.PACKAGE_ID;
   const suiClient = useSuiClient();
   const client = new SealClient({
@@ -128,6 +131,7 @@ const ConfirmCardCreate = () => {
     }).then((response) => {
       if (response.status === 200) {
         return response.json().then((info) => {
+          
           return { info };
         });
       } else {
@@ -198,7 +202,7 @@ const ConfirmCardCreate = () => {
       const storageInfo = await storeBlob(encryptedBytes);
       displayUpload(storageInfo.info, "text");
       console.log("Successfully uploaded to Walrus!");
-      console.log(info);
+      
       setIsUploading(false);
     } catch (error) {
       console.error(error);
@@ -207,7 +211,7 @@ const ConfirmCardCreate = () => {
     }
   };
 
-  const handleCreateCard = async () => {
+  const handleCreateCardConfirm = async () => {
     try {
       const res = await fetch("/api/create-cards", {
         method: "POST",
@@ -222,7 +226,12 @@ const ConfirmCardCreate = () => {
       }
 
       const data = await res.json();
-      await sealEncryptAndUpload(data.encrypted);
+      await sealEncryptAndUpload(data.encrypted).then(async () => {
+        await handleCreateCard(data.publicKey, cardDetails.name, cardDetails.ex, data.hashed_password_str, data.pass_salt, info.blobId, info.suiRef, info.blobUrl ).then(() => {
+          
+        });
+      });
+
       console.log(data);
       console.log("Wallet Created:", data);
     } catch (err) {
@@ -300,7 +309,7 @@ const ConfirmCardCreate = () => {
             </div>
           )} */}
         </div>
-        <button className="confirm-card-btn" onClick={handleCreateCard}>
+        <button className="confirm-card-btn" onClick={handleCreateCardConfirm}>
           Create Card
         </button>
       </div>

@@ -117,7 +117,6 @@ export function useTokenExchange() {
     const coinArg = handleMergeSplit(tx, coins.data, amt);
 
     const liqObj = await getObject(address, `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket`);
-    // console.log(liqObj);
     if (liqObj === null) {
       tx.moveCall({
         target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity_new`,

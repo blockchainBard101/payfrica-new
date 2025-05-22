@@ -38,7 +38,7 @@ export default React.memo(function BalanceCards() {
 
       return {
         title:        cfg.title,
-        amount:       amountRaw ?? cfg.defaultAmt,
+        amount:       amountRaw ?? cfg.defaultAmt ?? "0",
         loading,
         visible:      visible[i],
         actionText:   cfg.actionText,
