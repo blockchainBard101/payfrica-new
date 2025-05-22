@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGlobalState } from "../GlobalStateProvider";
 import ScanQrOverlay from "./ScanQrOverlay";
 import { SuccessOverlay } from "./SuccessOverlay";
@@ -27,10 +27,11 @@ const SendFundsFlowOverlay = () => {
   const [showInvalidCardAlert, setShowInvalidCardAlert] = useState(false);
   const [resetScannerKey, setResetScannerKey] = useState(0);
   const [selectedToken, setSelectedToken] = useState(mockedTokens[0].symbol);
+  const prevOpen = useRef(false);
 
-  // Reset all state when overlay is closed or after a send completes
   useEffect(() => {
-    if (!overlayStates.sendFundsFlow) {
+    if (prevOpen.current && !overlayStates.sendFundsFlow) {
+      // Only reset when overlay is closed
       setStep("scan");
       setAmount("");
       setScannedData(null);
@@ -38,6 +39,7 @@ const SendFundsFlowOverlay = () => {
       setShowInvalidCardAlert(false);
       setResetScannerKey(0);
     }
+    prevOpen.current = overlayStates.sendFundsFlow;
   }, [overlayStates.sendFundsFlow]);
 
   // Reset all state and close overlay
@@ -138,7 +140,13 @@ const SendFundsFlowOverlay = () => {
 
   // Step 4: Success/Failed
   if (step === "done") {
-    return success ? <SuccessOverlay /> : <FailedOverlay />;
+    if (success) {
+      toggleOverlay("success");
+      // return <SuccessOverlay />;
+    } else {
+      toggleOverlay("failed");
+      // return <FailedOverlay onClose={handleClose} />;
+    }
   }
 
   return null;

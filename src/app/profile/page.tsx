@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -178,17 +177,15 @@ export default function ProfilePage() {
         </div>
       </header>
       <main className="main-content">
-        <div className="profile-header">
-          <button
-            className="edit-btn"
-            onClick={() => setEditingProfile((e) => !e)}
-          >
-            {editingProfile ? <FaTimesCircle /> : <FaEdit />}
-            {editingProfile ? "Cancel" : "Edit"}
-          </button>
-        </div>
         <div className="two-column">
           <section className="column">
+            <button
+              className="edit-btn"
+              onClick={() => setEditingProfile((e) => !e)}
+            >
+              {editingProfile ? <FaTimesCircle /> : <FaEdit />}
+              {editingProfile ? "Cancel" : "Edit"}
+            </button>
             <h2>Profile Details</h2>
             <form onSubmit={(e) => e.preventDefault()}>
               <label>
@@ -251,7 +248,6 @@ export default function ProfilePage() {
             </form>
           </section>
           <section className="column">
-            <h2>Withdrawal Account</h2>
             <button
               className="edit-btn"
               onClick={() => setEditingBank((b) => !b)}
@@ -259,11 +255,12 @@ export default function ProfilePage() {
               {editingBank ? <FaTimesCircle /> : <FaEdit />}
               {editingBank ? "Cancel" : "Edit"}
             </button>
+            <h2>Withdrawal Account</h2>
             {!user.accountDetails && !editingBank ? (
               <div className="empty-state">
-                <p>You haven’t added withdrawal details yet.</p>
+                <p>You haven't added withdrawal details yet.</p>
                 <p>
-                  <em>Click “Edit” above to enter bank details.</em>
+                  <em>Click "Edit" above to enter bank details.</em>
                 </p>
               </div>
             ) : (

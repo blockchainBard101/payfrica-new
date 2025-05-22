@@ -33,6 +33,12 @@ export const EnterSuiAmountOverlay = () => {
   const [isSending, setIsSending] = useState(false);
   const suffix = "@payfrica";
 
+  // Normalize balance (remove commas if any, ensure string)
+  const normalizedBalance = (balance || "0").split(",").join("");
+  const balNum = Number(parseFloat(normalizedBalance).toFixed(6));
+  const amtNum = Number(parseFloat(amount || "0").toFixed(6));
+  const insufficient = amtNum > balNum;
+
   // load USDC balance
   useEffect(() => {
     if (!myAddress || !coinType) return;
@@ -75,7 +81,11 @@ export const EnterSuiAmountOverlay = () => {
     try {
       let success: boolean;
       // always treat as name service
-      const response = await sendToNameService(coinType, Number(amount), fullTag);
+      const response = await sendToNameService(
+        coinType,
+        Number(amount),
+        fullTag
+      );
       success = response; // Adjusted based on typical Sui response structure
       toggleOverlay("enterSuiAmount");
       toggleOverlay(success ? "sending" : "failed");
@@ -106,15 +116,16 @@ export const EnterSuiAmountOverlay = () => {
 
         <div className="recipient-info">
           <Image
-            src="/PayfricaNavLogo.png"
+            src="/Payfrica_Logo_Logo_Deep_red.png"
             alt="Payfrica Logo"
-            width={40}
-            height={40}
+            width={150}
+            height={60}
           />
         </div>
-
         <div className="payfrica-tag-section" style={{ margin: "20px 0" }}>
-          <h3 style={{ color: "#333" }}>Recipient Payfrica Tag</h3>
+          <h3 style={{ color: "#333", marginBottom: 10 }}>
+            Recipient Payfrica Tag
+          </h3>
           <div style={{ position: "relative", width: "100%" }}>
             <input
               type="text"
@@ -163,7 +174,8 @@ export const EnterSuiAmountOverlay = () => {
         <div className="amount-entry">
           <h3 style={{ color: "#333" }}>Enter Amount (USDC)</h3>
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -176,14 +188,10 @@ export const EnterSuiAmountOverlay = () => {
               outline: "none",
             }}
           />
-          <div
-            style={{ marginTop: 8, fontSize: 14, color: "#333" }}
-          >
-            {loadingBal
-              ? "Loading balance…"
-              : `Balance: ${balance} USDC`}
+          <div style={{ marginTop: 8, fontSize: 14, color: "#333" }}>
+            {loadingBal ? "Loading balance…" : `Balance: ${balance} USDC`}
           </div>
-          <div style={{ marginTop: 10 }}>
+          <div className="amount-entry-buttons" style={{ marginTop: 10 }}>
             {["10", "50", "100", balance].map((amt) => (
               <button
                 key={amt}
@@ -195,6 +203,16 @@ export const EnterSuiAmountOverlay = () => {
               </button>
             ))}
           </div>
+          {amount &&
+            balance &&
+            !loadingBal &&
+            !isNaN(amtNum) &&
+            !isNaN(balNum) &&
+            insufficient && (
+              <div style={{ color: "red", fontSize: 13, marginTop: 4 }}>
+                Insufficient balance
+              </div>
+            )}
         </div>
 
         <button

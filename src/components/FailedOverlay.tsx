@@ -2,8 +2,8 @@
 import { useGlobalState } from "../GlobalStateProvider";
 import { FaTimesCircle } from "react-icons/fa";
 
-export const FailedOverlay = () => {
-  const { overlayStates, toggleOverlay, closeAllOverlays } = useGlobalState();
+export const FailedOverlay = ({ onClose }) => {
+  const { overlayStates, toggleOverlay } = useGlobalState();
 
   if (!overlayStates.failed) return null;
 
@@ -21,11 +21,8 @@ export const FailedOverlay = () => {
         >
           Retry
         </button>
-        <button
-          className="feedback-btn secondary"
-          onClick={() => closeAllOverlays()}
-        >
-          Home
+        <button className="feedback-btn secondary" onClick={onClose}>
+          Done
         </button>
       </div>
     </div>

@@ -31,15 +31,12 @@ export default React.memo(function BalanceCard({
   return (
     <div className="balance-card">
       <div className="balance-card-header">
-        <div>
+        <div className="balance-card-title-row">
           <span>{title}</span>
           <button className="eye-icon" onClick={onToggle} aria-label="toggle">
             <ToggleIcon />
           </button>
         </div>
-        <button className="icon" onClick={onMore} aria-label="more">
-          <EllipsisIcon />
-        </button>
       </div>
 
       <div className="card-amount">

@@ -23,9 +23,7 @@ export const EnterAmountOverlay = () => {
     () => pools.filter((p) => p.coinName !== "USDC"),
     [pools]
   );
-  const [currency, setCurrency] = useState(
-    tokenOptions[0]?.coinType ?? ""
-  );
+  const [currency, setCurrency] = useState(tokenOptions[0]?.coinType ?? "");
 
   const [amount, setAmount] = useState("");
   const [balance, setBalance] = useState<string | null>(null);
@@ -87,7 +85,11 @@ export const EnterAmountOverlay = () => {
     try {
       let ok: boolean;
       if (fullTag.includes(suffix)) {
-        const response = await sendToNameService(currency, Number(amount), fullTag);
+        const response = await sendToNameService(
+          currency,
+          Number(amount),
+          fullTag
+        );
         ok = response;
       } else {
         const response = await sendToAddress(currency, Number(amount), fullTag);
@@ -101,6 +103,18 @@ export const EnterAmountOverlay = () => {
       setIsSending(false);
     }
   };
+
+  const normalize = (val) => Number(Number(val).toFixed(6));
+  const normalizedBalance = String(balance || "0")
+    .split(",")
+    .join("");
+  const bal = parseFloat(normalizedBalance);
+  const amt = parseFloat(amount || "0");
+
+  const balFixed = Number(bal.toFixed(6));
+  const amtFixed = Number(amt.toFixed(6));
+
+  const insufficient = amt > Number(normalizedBalance);
 
   if (!isVisible) return null;
   if (tokenOptions.length === 0)
@@ -123,10 +137,17 @@ export const EnterAmountOverlay = () => {
           <div style={{ position: "relative" }}>
             <input
               type="text"
-              placeholder="alice"
+              placeholder="4our0ero4our"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              style={{ width: "100%", padding: 10, paddingRight: 80 }}
+              style={{
+                width: "100%",
+                padding: 10,
+                paddingRight: 80,
+                fontSize: 16,
+                fontFamily: "LexendLight",
+                margin: "10px 0 10px 0",
+              }}
             />
             <span
               style={{
@@ -153,18 +174,22 @@ export const EnterAmountOverlay = () => {
         {/* Amount & Token */}
         <div className="amount-entry">
           <h3>Amount & Token</h3>
-          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <div className="amount-entry-container">
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => {
+                // Only allow numbers and decimals
+                const val = e.target.value.replace(/[^0-9.]/g, "");
+                setAmount(val);
+              }}
               style={{ flex: 1, padding: 10 }}
             />
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              style={{ padding: 10 }}
             >
               {tokenOptions.map((t) => (
                 <option key={t.coinType} value={t.coinType}>
@@ -172,33 +197,49 @@ export const EnterAmountOverlay = () => {
                 </option>
               ))}
             </select>
-            <button
-              onClick={() => balance !== null && setAmount(balance)}
-              disabled={loadingBal || balance === null}
-            >
-              Max
-            </button>
           </div>
           <div style={{ fontSize: 14, color: "#333" }}>
             {loadingBal
               ? "Loading balance…"
-              : `Balance: ${balance ?? "0"} ${tokenOptions.find(t => t.coinType === currency)?.coinName}`}
+              : `Balance: ${normalizedBalance} ${
+                  tokenOptions.find((t) => t.coinType === currency)?.coinName
+                }`}
           </div>
-          <div style={{ marginTop: 8 }}>
-            {["10", "50", "100", balance].map((v) => (
+          <div className="amount-entry-buttons">
+            {["10", "50", "100"].map((v) => (
               <button
                 key={v}
                 onClick={() => setAmount(v)}
                 style={{ marginRight: 8 }}
               >
-                {v === balance ? "Max" : v}
+                {v}
               </button>
             ))}
+            <button
+              onClick={() => {
+                if (normalizedBalance) setAmount(normalizedBalance);
+              }}
+              style={{ marginRight: 8 }}
+            >
+              Max
+            </button>
           </div>
+          {/* Insufficient balance error */}
+          {amount &&
+            normalizedBalance &&
+            !loadingBal &&
+            !isNaN(amtFixed) &&
+            !isNaN(balFixed) &&
+            insufficient && (
+              <div style={{ color: "red", fontSize: 13, marginTop: 4 }}>
+                Insufficient balance
+              </div>
+            )}
         </div>
 
         {/* Send */}
         <button
+          className="send-money-button"
           onClick={handleSendMoney}
           disabled={!canSend}
           style={{
@@ -207,7 +248,11 @@ export const EnterAmountOverlay = () => {
             cursor: canSend ? "pointer" : "not-allowed",
           }}
         >
-          {isSending ? "Sending…" : `Send ${tokenOptions.find(t => t.coinType === currency)?.coinName}`}
+          {isSending
+            ? "Sending…"
+            : `Send ${
+                tokenOptions.find((t) => t.coinType === currency)?.coinName
+              }`}
         </button>
       </div>
     </div>

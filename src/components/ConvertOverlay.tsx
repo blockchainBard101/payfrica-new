@@ -14,7 +14,9 @@ export function ConvertOverlay() {
   const { pools, poolMap } = usePools();
 
   // Local UI state hooks (always run in same order)
-  const [sellSymbol, setSellSymbol] = useState<string>(pools[0]?.coinType || "");
+  const [sellSymbol, setSellSymbol] = useState<string>(
+    pools[0]?.coinType || ""
+  );
   const [buySymbol, setBuySymbol] = useState<string>(pools[1]?.coinType || "");
   const [sellAmount, setSellAmount] = useState<string>("");
   const [buyAmount, setBuyAmount] = useState<string>("");
@@ -22,7 +24,7 @@ export function ConvertOverlay() {
   const [buyBalance, setBuyBalance] = useState<string>("0.00");
 
   // Generate list of coin-type keys
-  const symbols = useMemo(() => pools.map(p => p.coinType), [pools]);
+  const symbols = useMemo(() => pools.map((p) => p.coinType), [pools]);
 
   // Compute buy amount
   useEffect(() => {
@@ -55,23 +57,29 @@ export function ConvertOverlay() {
   }, [buySymbol, getBalance]);
 
   const handleSwitch = useCallback(() => {
-    setSellSymbol(prev => buySymbol);
-    setBuySymbol(prev => sellSymbol);
+    setSellSymbol((prev) => buySymbol);
+    setBuySymbol((prev) => sellSymbol);
     setSellAmount(buyAmount);
     setBuyAmount(sellAmount);
   }, [sellAmount, buyAmount, sellSymbol, buySymbol]);
 
-  const handleSellChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sym = e.target.value;
-    if (sym === buySymbol) handleSwitch();
-    else setSellSymbol(sym);
-  }, [buySymbol, handleSwitch]);
+  const handleSellChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const sym = e.target.value;
+      if (sym === buySymbol) handleSwitch();
+      else setSellSymbol(sym);
+    },
+    [buySymbol, handleSwitch]
+  );
 
-  const handleBuyChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sym = e.target.value;
-    if (sym === sellSymbol) handleSwitch();
-    else setBuySymbol(sym);
-  }, [sellSymbol, handleSwitch]);
+  const handleBuyChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const sym = e.target.value;
+      if (sym === sellSymbol) handleSwitch();
+      else setBuySymbol(sym);
+    },
+    [sellSymbol, handleSwitch]
+  );
 
   const onConvert = useCallback(async () => {
     const amt = parseFloat(sellAmount);
@@ -106,18 +114,11 @@ export function ConvertOverlay() {
               type="number"
               placeholder="0"
               value={sellAmount}
-              onChange={e => setSellAmount(e.target.value)}
+              onChange={(e) => setSellAmount(e.target.value)}
             />
             <div className="dropdown">
-              <Image
-                src={`/icons/${poolMap.get(sellSymbol)?.coinName || sellSymbol}.png`}
-                alt={poolMap.get(sellSymbol)?.coinName || sellSymbol}
-                width={24}
-                height={24}
-                className="token-icon"
-              />
               <select value={sellSymbol} onChange={handleSellChange}>
-                {symbols.map(sym => (
+                {symbols.map((sym) => (
                   <option key={sym} value={sym}>
                     {poolMap.get(sym)?.coinName}
                   </option>
@@ -133,7 +134,10 @@ export function ConvertOverlay() {
         {/* Switch Button */}
         <div className="switch-container">
           <div className="switch-btn-bg-thin-line" />
-          <BsArrowDownSquareFill className="switch-btn" onClick={handleSwitch} />
+          <BsArrowDownSquareFill
+            className="switch-btn"
+            onClick={handleSwitch}
+          />
           <div className="switch-btn-bg-thin-line" />
         </div>
 
@@ -143,15 +147,8 @@ export function ConvertOverlay() {
           <div className="convert-row">
             <input type="text" placeholder="0" value={buyAmount} readOnly />
             <div className="dropdown">
-              <Image
-                src={`/icons/${poolMap.get(buySymbol)?.coinName || buySymbol}.png`}
-                alt={poolMap.get(buySymbol)?.coinName || buySymbol}
-                width={24}
-                height={24}
-                className="token-icon"
-              />
               <select value={buySymbol} onChange={handleBuyChange}>
-                {symbols.map(sym => (
+                {symbols.map((sym) => (
                   <option key={sym} value={sym}>
                     {poolMap.get(sym)?.coinName}
                   </option>
@@ -166,7 +163,11 @@ export function ConvertOverlay() {
 
         <button
           className="convert-btn"
-          disabled={!sellAmount || isNaN(parseFloat(sellAmount)) || parseFloat(sellAmount) <= 0}
+          disabled={
+            !sellAmount ||
+            isNaN(parseFloat(sellAmount)) ||
+            parseFloat(sellAmount) <= 0
+          }
           onClick={onConvert}
         >
           Continue

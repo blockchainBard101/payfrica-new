@@ -108,7 +108,7 @@ export function useTokenExchange() {
     });
   }, [address, poolMap, sponsorAndExecuteTransactionBlock, getConversionRate, toMinimalUnits, handleMergeSplit]);
 
-  const handleAddtoLiquidity = useCallback(async (coinType: string,amount: number) => {
+  const handleAddtoLiquidity = useCallback(async (coinType: string, amount: number) => {
     if (!address) throw new Error('No wallet');
     const a = poolMap.get(coinType)!;
     const amt = toMinimalUnits(amount, a.coinDecimal);
@@ -117,28 +117,28 @@ export function useTokenExchange() {
     const coinArg = handleMergeSplit(tx, coins.data, amt);
 
     const liqObj = await getObject(address, `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket`);
-    console.log(liqObj);
-    if (liqObj === null){
+    // console.log(liqObj);
+    if (liqObj === null) {
       tx.moveCall({
-      target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity_new`,
-      typeArguments: [a.coinType],
-      arguments: [
-        tx.object(a.id),
-        tx.object(clientConfig.PAYFRICA_POOL_ID),
-        coinArg,
-      ],
-    });
+        target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity_new`,
+        typeArguments: [a.coinType],
+        arguments: [
+          tx.object(a.id),
+          tx.object(clientConfig.PAYFRICA_POOL_ID),
+          coinArg,
+        ],
+      });
     } else {
       tx.moveCall({
-      target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity`,
-      typeArguments: [a.coinType],
-      arguments: [
-        tx.object(a.id),
-        tx.object(clientConfig.PAYFRICA_POOL_ID),
-        tx.object(liqObj),
-        coinArg,
-      ],
-    });
+        target: `${clientConfig.PACKAGE_ID}::pool::add_liquidity`,
+        typeArguments: [a.coinType],
+        arguments: [
+          tx.object(a.id),
+          tx.object(clientConfig.PAYFRICA_POOL_ID),
+          tx.object(liqObj),
+          coinArg,
+        ],
+      });
     }
     return sponsorAndExecuteTransactionBlock({
       tx,
@@ -149,25 +149,25 @@ export function useTokenExchange() {
     });
   }, [address, poolMap, sponsorAndExecuteTransactionBlock, toMinimalUnits, handleMergeSplit]);
 
-  const handleRemoveLiquidity = useCallback(async (coinType: string,amount: number) => {
+  const handleRemoveLiquidity = useCallback(async (coinType: string, amount: number) => {
     if (!address) throw new Error('No wallet');
     const a = poolMap.get(coinType)!;
     const amt = toMinimalUnits(amount, a.coinDecimal);
     const tx = new Transaction();
 
     const liqObj = await getObject(address, `${clientConfig.PACKAGE_ID}::pool::PayfricaPoolTicket`);
-    if (liqObj === null){
+    if (liqObj === null) {
       throw new Error('No liquidity');
     }
     tx.moveCall({
-    target: `${clientConfig.PACKAGE_ID}::pool::remove_liquidity`,
-    typeArguments: [a.coinType],
-    arguments: [
-      tx.object(a.id),
-      tx.object(liqObj),
-      tx.pure.u64(amt),
-    ],
-  });
+      target: `${clientConfig.PACKAGE_ID}::pool::remove_liquidity`,
+      typeArguments: [a.coinType],
+      arguments: [
+        tx.object(a.id),
+        tx.object(liqObj),
+        tx.pure.u64(amt),
+      ],
+    });
     return sponsorAndExecuteTransactionBlock({
       tx,
       network: clientConfig.SUI_NETWORK_NAME,
@@ -243,7 +243,7 @@ export function useTokenExchange() {
   ) => {
     if (!address) throw new Error('No wallet');
     const payfObj = await getObject(address, `${clientConfig.PACKAGE_ID}::temporary_card::PayficaTemporaryCards`);
-    if (payfObj === null){
+    if (payfObj === null) {
       throw new Error('Not Payfrica User');
     }
     const tx = new Transaction();
@@ -254,7 +254,7 @@ export function useTokenExchange() {
         tx.object(payfObj),
         tx.pure.address(card_address),
         tx.pure.string(name),
-        tx.pure.u64(expiration_date), 
+        tx.pure.u64(expiration_date),
         tx.pure.vector('u8', Uint8Array.from(hp, c => c.charCodeAt(0))),
         tx.pure.string(s),
         tx.pure.string(blobId),
@@ -357,7 +357,7 @@ export function useTokenExchange() {
         };
       })
     );
-    console.log(result);
+    // console.log(result);
     return result;
   }, [address, poolMap]);
 
@@ -366,7 +366,7 @@ export function useTokenExchange() {
     if (!userDetails) return
     const baseType = userDetails.country.baseTokencoinType;
     const token = poolMap.get(baseType)!;
-    console.log(token);
+    // console.log(token);
     const r = await client.getBalance({ owner: address, coinType: token.coinType });
     return `${userDetails.country.currencySymbol}${formatter.format(
       Number(r.totalBalance) / 10 ** token.coinDecimal
@@ -390,7 +390,7 @@ export function useTokenExchange() {
       })
     );
     const totalUSD = breakdown.reduce((sum, b) => sum + b.usdValue, 0);
-    const totalLocal = totalUSD * localRate;
+    const totalLocal = (totalUSD || 0) * localRate;
     return {
       breakdown,
       totalUSD,

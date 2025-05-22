@@ -56,20 +56,37 @@ export const SendSuiToWAOverlay = () => {
       .finally(() => setChecking(false));
   }, [recipient]);
 
+  // Normalize balance (remove commas if any, ensure string)
+  const normalizedBalance = (balance || "0").split(",").join("");
+  const balNum = Number(parseFloat(normalizedBalance).toFixed(6));
+  const amtNum = Number(parseFloat(amount || "0").toFixed(6));
+  const insufficient = amtNum > balNum;
+
   const handleSend = async () => {
     if (!amount || !recipient || !coinType) return;
     setIsSending(true);
     try {
       let success: boolean;
       if (recipient.includes("@")) {
-        const response = await sendToNameService(coinType, Number(amount), recipient);
-        success = response
+        const response = await sendToNameService(
+          coinType,
+          Number(amount),
+          recipient
+        );
+        success = response;
       } else {
-        const response = await sendToAddress(coinType, Number(amount), recipient);
-        success = response 
+        const response = await sendToAddress(
+          coinType,
+          Number(amount),
+          recipient
+        );
+        success = response;
       }
       toggleOverlay("sendSuiToWA");
       toggleOverlay(success ? "sending" : "failed");
+      // Clear values after transaction
+      setAmount("");
+      setRecipient("");
     } catch {
       toggleOverlay("sendSuiToWA");
       toggleOverlay("failed");
@@ -86,7 +103,8 @@ export const SendSuiToWAOverlay = () => {
     (recipient.includes("@") ? nsValid === true : true);
 
   if (!isVisible) return null;
-  if (!usdcPool) return <div className="text-red-500 p-4">USDC pool not found</div>;
+  if (!usdcPool)
+    return <div className="text-red-500 p-4">USDC pool not found</div>;
 
   return (
     <div className="overlay-background">
@@ -102,25 +120,24 @@ export const SendSuiToWAOverlay = () => {
           <BsQrCodeScan className="qrcodeicon" />
         </div>
 
-        <div className="recipient-info">
+        <div>
           <Image
-            src="/ProfileDP.jpg"
-            alt="Profile Picture"
-            width={40}
-            height={40}
-            className="profile-picture"
+            src="/Payfrica_Logo_Logo_Deep_red.png"
+            alt="Payfrica Logo"
+            width={150}
+            height={60}
+            style={{ marginBottom: 10 }}
           />
-          <div>
-            <h3>Recipient</h3>
-            <p>{recipient || "—"}</p>
-          </div>
         </div>
 
         <div className="amount-entry">
-          <h3>Enter Amount (USDC only)</h3>
-          <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+          <h3>Enter Amount (USDC)</h3>
+          <div
+            style={{ display: "flex", alignItems: "center", marginBottom: 8 }}
+          >
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -144,6 +161,7 @@ export const SendSuiToWAOverlay = () => {
                 background: "white",
                 cursor: loadingBal ? "not-allowed" : "pointer",
                 opacity: loadingBal ? 0.5 : 1,
+                marginTop: "-15px",
               }}
             >
               Max
@@ -153,6 +171,17 @@ export const SendSuiToWAOverlay = () => {
           <div style={{ marginBottom: 16, fontSize: 14, color: "#333" }}>
             {loadingBal ? "Loading balance…" : `Balance: ${balance} USDC`}
           </div>
+
+          {amount &&
+            balance &&
+            !loadingBal &&
+            !isNaN(amtNum) &&
+            !isNaN(balNum) &&
+            insufficient && (
+              <div style={{ color: "red", fontSize: 13, marginTop: 4 }}>
+                Insufficient balance
+              </div>
+            )}
 
           <h3>Recipient (Address or NS)</h3>
           <input

@@ -42,10 +42,15 @@ const EnterPinOverlay = ({
         )}
         <input
           className="enter-pin-input"
-          type="number"
+          type="text"
+          inputMode="decimal"
+          pattern="^[0-9]*[.,]?[0-9]*$"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          min={1}
+          onChange={(e) => {
+            // Only allow numbers and decimal
+            const val = e.target.value.replace(/[^0-9.]/g, "");
+            setAmount(val);
+          }}
           placeholder="Enter Amount"
           style={{ marginBottom: 8 }}
         />

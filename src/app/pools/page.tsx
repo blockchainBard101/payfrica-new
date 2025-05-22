@@ -1,6 +1,6 @@
 "use client";
 import { Navigation } from "@/components/Navigations";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaCoins } from "react-icons/fa";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useTokenExchange } from "@/hooks/useTokenExchange";
@@ -25,14 +25,16 @@ const PoolsPage = () => {
   const [pools, setPools] = useState<any[]>([]);
   const [userSuppliedPools, setUserSuppliedPools] = useState<any[]>([]);
 
-  const { getAllPools, handleAddtoLiquidity, handleRemoveLiquidity } = useTokenExchange();
+  const { getAllPools, handleAddtoLiquidity, handleRemoveLiquidity } =
+    useTokenExchange();
+  const memoizedGetAllPools = useCallback(getAllPools, []);
 
   useEffect(() => {
     const fetchPools = async () => {
       setLoading(true);
       setError("");
       try {
-        const poolData = await getAllPools();
+        const poolData = await memoizedGetAllPools();
         const userPoolsData = await getUserSuppliedPools(address);
 
         // Create map of user pool IDs for quick lookup
@@ -67,12 +69,15 @@ const PoolsPage = () => {
     };
 
     if (address) fetchPools();
-  }, [address, getAllPools]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   const percentPresets = ["10%", "20%", "50%", "100%"];
 
   const applyPreset = (pct) => {
-    const val = (((activePool.wallet || 0) * parseInt(pct, 10)) / 100).toFixed(2);
+    const val = (((activePool.wallet || 0) * parseInt(pct, 10)) / 100).toFixed(
+      2
+    );
     setAmount(val);
   };
 
@@ -180,7 +185,9 @@ const PoolsPage = () => {
               Supply
             </button>
 
-            {userSuppliedPools.some((p) => p.coinName === activePool?.coinName) && (
+            {userSuppliedPools.some(
+              (p) => p.coinName === activePool?.coinName
+            ) && (
               <button
                 className={mode === "Withdraw" ? "active" : ""}
                 onClick={() => setMode("Withdraw")}
@@ -192,13 +199,40 @@ const PoolsPage = () => {
 
           <div className="amount-input">
             <label>
+              Token
+              <select
+                value={activePool?.id || ""}
+                onChange={(e) => {
+                  const selected = [...userSuppliedPools, ...pools].find(
+                    (pool) => pool.id === e.target.value
+                  );
+                  if (selected) setActivePool(selected);
+                }}
+                style={{
+                  marginBottom: "1rem",
+                  width: "100%",
+                  padding: "0.6rem",
+                  borderRadius: "4px",
+                }}
+              >
+                {[...userSuppliedPools, ...pools].map((pool) => (
+                  <option key={pool.id} value={pool.id}>
+                    {pool.coinName || pool.symbol}
+                  </option>
+                ))}
+              </select>
               Amount
               <div className="input-with-currency">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9.]*"
                   placeholder="0.00"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) =>
+                    setAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                  }
+                  style={{ appearance: "none", MozAppearance: "textfield" }}
                 />
                 <span className="currency">
                   {activePool?.coinName || activePool?.symbol}
@@ -215,7 +249,9 @@ const PoolsPage = () => {
             ))}
           </div>
 
-          {userSuppliedPools.some((p) => p.coinName === activePool?.coinName) && (
+          {userSuppliedPools.some(
+            (p) => p.coinName === activePool?.coinName
+          ) && (
             <div className="details-box">
               <div>
                 <span>Amount Supplied</span>

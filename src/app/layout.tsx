@@ -1,6 +1,4 @@
-// "use client"; // Not needed here unless you use client hooks
 import "./globals.css";
-
 import { ToastContainer } from "react-toastify";
 import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,9 +13,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Optional: Add default metadata */}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.png" />
         <title>Payfrica</title>
       </head>
       <body className="antialiased bg-background text-foreground">
