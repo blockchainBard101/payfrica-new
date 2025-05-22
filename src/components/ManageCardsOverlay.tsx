@@ -63,7 +63,6 @@ const ManageCardsOverlay = ({}) => {
   const handleDeactivate = () => {
     setDeactivating(true);
     setTimeout(() => {
-      // Move funds to main wallet (simulate)
       setCards((prev) =>
         prev.map((c, i) =>
           i === selectedCardIdx ? { ...c, amount: 0, status: false } : c
@@ -88,7 +87,6 @@ const ManageCardsOverlay = ({}) => {
     e.preventDefault();
     setCreating(true);
     setTimeout(() => {
-      // Simulate wallet address
       const address = `0x${Math.random().toString(16).slice(2, 18)}`;
       setCards((prev) => [
         ...prev,
@@ -104,7 +102,7 @@ const ManageCardsOverlay = ({}) => {
       setNewCard({ name: "", amount: "", pin: "", deadline: "" });
       setShowCreateModal(false);
       setCreating(false);
-      setSelectedCardIdx(cards.length); // select new card
+      setSelectedCardIdx(cards.length);
     }, 1200);
   };
 
@@ -112,7 +110,6 @@ const ManageCardsOverlay = ({}) => {
     toggleOverlay("cardTypeSelect");
   };
 
-  // QR code data
   const qrData = JSON.stringify({
     name: selectedCard?.name,
     address: selectedCard?.address,
@@ -136,10 +133,8 @@ const ManageCardsOverlay = ({}) => {
             <h2>Manage Cards</h2>
             <BsQuestionCircleFill className="icon" />
           </div>
-          {/* Card Carousel */}
           <div className="card-carousel" style={{}}>
             <FaChevronCircleLeft
-              //   className="icon"
               style={{ fontSize: 35, cursor: "pointer", color: "#c43e26" }}
               onClick={() => handleFlip("left")}
             />
@@ -153,7 +148,6 @@ const ManageCardsOverlay = ({}) => {
                 alignItems: "center",
               }}
             >
-              {/* Card Front/Back */}
               {!showBack ? (
                 <div
                   style={{
@@ -254,7 +248,6 @@ const ManageCardsOverlay = ({}) => {
                   />
                 </div>
               )}
-              {/* Flip Button */}
               <button
                 className="save-btn"
                 style={{
@@ -266,7 +259,6 @@ const ManageCardsOverlay = ({}) => {
               >
                 {showBack ? "Show Front" : "Show Back"}
               </button>
-              {/* Save Button (only on front) */}
               {!showBack && (
                 <button
                   className="save-btn"
@@ -287,7 +279,6 @@ const ManageCardsOverlay = ({}) => {
               onClick={() => handleFlip("right")}
             />
           </div>
-          {/* Transaction History */}
           <div
             style={{
               background: "#fff",

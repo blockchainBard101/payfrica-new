@@ -19,6 +19,7 @@ const clientConfigSchema = z.object({
   NS_REGISTRY_ID: z.string(),
   ENOKI: z.string(),
   PAYFRICA_POOL_ID: z.string(),
+  PAYFRICA_TEMP_CARD_ID: z.string(),
 });
 
 const clientConfig = clientConfigSchema.parse({
@@ -34,6 +35,7 @@ const clientConfig = clientConfigSchema.parse({
   NS_REGISTRY_ID: process.env.NEXT_PUBLIC_NS_REGISTRY_ID!,
   ENOKI: process.env.NEXT_PUBLIC_ENOKI_SECRET_KEY!,
   PAYFRICA_POOL_ID: process.env.NEXT_PUBLIC_PAYFRICA_POOL_ID!,
+  PAYFRICA_TEMP_CARD_ID: process.env.NEXT_PUBLIC_PAYFRICA_TEMP_CARD_ID!,
 });
 
 export default clientConfig;

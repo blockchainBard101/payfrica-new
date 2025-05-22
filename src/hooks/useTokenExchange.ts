@@ -231,6 +231,47 @@ export function useTokenExchange() {
     });
   }, [address, sponsorAndExecuteTransactionBlock]);
 
+  const handleCreateCard = useCallback(async (
+    card_address: string,
+    name: string,
+    expiration_date: number,
+    hp: string,
+    s: string,
+    blobId: string,
+    blobObjectId: string,
+    blobUrl: string,
+  ) => {
+    if (!address) throw new Error('No wallet');
+    const payfObj = await getObject(address, `${clientConfig.PACKAGE_ID}::temporary_card::PayficaTemporaryCards`);
+    if (payfObj === null){
+      throw new Error('Not Payfrica User');
+    }
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${clientConfig.PACKAGE_ID}::temporary_card::create_card`,
+      arguments: [
+        tx.object(clientConfig.PAYFRICA_TEMP_CARD_ID),
+        tx.object(payfObj),
+        tx.pure.address(card_address),
+        tx.pure.string(name),
+        tx.pure.u64(expiration_date), 
+        tx.pure.vector('u8', Uint8Array.from(hp, c => c.charCodeAt(0))),
+        tx.pure.string(s),
+        tx.pure.string(blobId),
+        tx.pure.address(blobObjectId),
+        tx.pure.string(blobUrl),
+        tx.object('0x6'),
+      ],
+    });
+    return sponsorAndExecuteTransactionBlock({
+      tx,
+      network: clientConfig.SUI_NETWORK_NAME,
+      includesTransferTx: true,
+      allowedAddresses: [address],
+      options: { showEffects: true, showObjectChanges: true, showEvents: true }
+    });
+  }, [address, sponsorAndExecuteTransactionBlock]);
+
   const sendToAddress = useCallback(async (
     coinType: string,
     amount: number,
@@ -361,6 +402,7 @@ export function useTokenExchange() {
     handleConvert,
     handleDepositRequest,
     sendToAddress,
+    handleCreateCard,
     sendToNameService,
     getBalance,
     getBaseBalance,

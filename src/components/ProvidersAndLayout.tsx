@@ -46,7 +46,7 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
       <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
         <RegisterEnokiWallets />
         <WalletProvider
-        autoConnect
+        // autoConnect
         >
           <CustomWalletProvider>
             <main>
