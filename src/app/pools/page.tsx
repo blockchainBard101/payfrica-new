@@ -24,6 +24,9 @@ const PoolsPage = () => {
   const [error, setError] = useState<string>("");
   const [pools, setPools] = useState<any[]>([]);
   const [userSuppliedPools, setUserSuppliedPools] = useState<any[]>([]);
+  const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const { getAllPools, handleAddtoLiquidity, handleRemoveLiquidity } =
     useTokenExchange();
@@ -74,23 +77,34 @@ const PoolsPage = () => {
   const percentPresets = ["10%", "20%", "50%", "100%"];
 
   const applyPreset = (pct) => {
-    const val = (((activePool.wallet || 0) * parseInt(pct, 10)) / 100).toFixed(
-      2
-    );
+    const balance = Number(activePool?.balance || 0);
+    const val = ((balance * parseInt(pct, 10)) / 100).toFixed(2);
     setAmount(val);
   };
 
-  const confirmTransaction = () => {
-    if (mode === "Supply") {
-      const result = handleAddtoLiquidity(activePool.coinType, Number(amount));
-      console.log("Add Liquidity", result);
-    }
-
-    if (mode === "Withdraw") {
-      const result = handleRemoveLiquidity(activePool.coinType, Number(amount));
-      console.log("Remove Liquidity", result);
+  const confirmTransaction = async () => {
+    setSending(true);
+    setSuccess(false);
+    setFailed(false);
+    try {
+      if (mode === "Supply") {
+        console.log(activePool.coinType, Number(amount));
+        await handleAddtoLiquidity(activePool.coinType, Number(amount));
+      }
+      if (mode === "Withdraw") {
+        await handleRemoveLiquidity(activePool.coinType, Number(amount));
+      }
+      setSending(false);
+      setSuccess(true);
+    } catch (err) {
+      setSending(false);
+      setFailed(true);
     }
   };
+
+  const canWithdraw = userSuppliedPools.some(
+    (p) => p.coinName === activePool?.coinName && p.amountSupplied > 0
+  );
 
   const renderTable = (title, pools) => {
     const isUserSupplied = title === "Pools Supplied";
@@ -183,10 +197,7 @@ const PoolsPage = () => {
             >
               Supply
             </button>
-
-            {userSuppliedPools.some(
-              (p) => p.coinName === activePool?.coinName
-            ) && (
+            {canWithdraw && (
               <button
                 className={mode === "Withdraw" ? "active" : ""}
                 onClick={() => setMode("Withdraw")}
@@ -284,6 +295,46 @@ const PoolsPage = () => {
             Confirm Transaction
           </button>
         </div>
+
+        {sending && (
+          <div className="overlay-background">
+            <div className="sending-overlay">
+              <div className="loader" />
+              <h3>Processing transaction…</h3>
+            </div>
+          </div>
+        )}
+        {success && (
+          <div className="overlay-background">
+            <div className="feedback-overlay">
+              <div className="feedback-icon success-icon">✔️</div>
+              <div className="feedback-title">Success!</div>
+              <div className="feedback-message">
+                Your transaction was successful.
+              </div>
+              <button
+                className="feedback-btn"
+                onClick={() => setSuccess(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+        {failed && (
+          <div className="overlay-background">
+            <div className="feedback-overlay">
+              <div className="feedback-icon failed-icon">❌</div>
+              <div className="feedback-title">Failed</div>
+              <div className="feedback-message">
+                Transaction failed. Please try again.
+              </div>
+              <button className="feedback-btn" onClick={() => setFailed(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

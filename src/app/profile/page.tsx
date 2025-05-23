@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import { nameExists } from "@/hooks/registerNsName";
+import { nameExists, createLeafSubname } from "@/hooks/registerNsName";
 
 // Dynamic imports
 const Navigation = dynamic(
@@ -80,7 +80,7 @@ export default function ProfilePage() {
   }, [user]);
 
   const shouldCheck =
-    editingProfile && !hasUsername && profileForm.username.trim().length >= 4;
+    editingProfile && !hasUsername && profileForm.username.trim().length >= 3;
   const { data: exists, isValidating: checkingUsername } = useSWR(
     shouldCheck ? ["username", profileForm.username] : null,
     (_, name) => nameExists(name)
@@ -113,7 +113,10 @@ export default function ProfilePage() {
       countryName: profileForm.countryName,
       language: profileForm.language,
     };
-    console.log(payload);
+    console.log(profileForm.username.trim());
+    if (usernameAvailable) {
+      await createLeafSubname(profileForm.username.trim(), address);
+    }
     await fetch(`${API}/users/${address}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -121,7 +124,7 @@ export default function ProfilePage() {
     });
     await mutate(`${API}/users/${address}`);
     setEditingProfile(false);
-  }, [address, profileForm, user]);
+  }, [address, profileForm, user, usernameAvailable]);
 
   const saveBank = useCallback(async () => {
     if (!address) return;
@@ -200,7 +203,7 @@ export default function ProfilePage() {
               {editingProfile && !hasUsername && (
                 <div>
                   {profileForm.username.trim().length < 4 ? (
-                    <small>Please enter at least 4 characters</small>
+                    <small>Please enter at least 3 characters</small>
                   ) : checkingUsername ? (
                     <small>Checking...</small>
                   ) : exists ? (
@@ -240,7 +243,7 @@ export default function ProfilePage() {
                   type="button"
                   className="save-btn"
                   onClick={saveProfile}
-                  disabled={!usernameAvailable || checkingUsername}
+                  disabled={!usernameAvailable}
                 >
                   <FaSave /> Save Details
                 </button>

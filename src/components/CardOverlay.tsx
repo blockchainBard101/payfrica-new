@@ -22,37 +22,48 @@ const CardOverlay: React.FC<CardOverlayProps> = ({ onTypeSelect }) => {
 
   return (
     <div className="card-overlay-background">
-      <div className="card-overlay-modal-select-card-type">
+      <div className="card-type-modal">
         <button
-          className="card-overlay-close-btn"
-          onClick={() => {
-            toggleOverlay("cardTypeSelect");
-          }}
+          className="card-type-close-btn"
+          onClick={() => toggleOverlay("cardTypeSelect")}
           aria-label="Close"
         >
           ×
         </button>
-        <div className="card-overlay-title">Choose card type</div>
-        <div className="card-overlay-options">
+        <div className="card-type-title">Choose card type</div>
+        <div className="card-type-options">
           <div
-            className="card-type-option temporary"
+            className="card-type-option"
             onClick={() => {
               handleTypeSelect("temporary");
               toggleOverlay("cardDetails");
             }}
           >
-            <div className="card-type-label">Temporary</div>
-            <div className="card-type-icon">
-              <Image src={Temp} alt="Temporary Card Icon" />
+            <div className="card-type-tab">Temporary</div>
+            <div className="card-type-box">
+              <Image
+                src={Temp}
+                alt="Temporary Card Icon"
+                width={48}
+                height={48}
+              />
             </div>
           </div>
           <div
-            className="card-type-option permanent"
-            // onClick={() => handleTypeSelect("permanent")}
+            className="card-type-option"
+            onClick={() => {
+              handleTypeSelect("permanent");
+              toggleOverlay("cardDetails");
+            }}
           >
-            <div className="card-type-label">Permanent</div>
-            <div className="card-type-icon">
-              <Image src={Pin} alt="Permanent Card Icon" />
+            <div className="card-type-tab">Permanent</div>
+            <div className="card-type-box">
+              <Image
+                src={Pin}
+                alt="Permanent Card Icon"
+                width={48}
+                height={48}
+              />
             </div>
           </div>
         </div>

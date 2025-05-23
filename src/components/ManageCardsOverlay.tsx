@@ -16,9 +16,9 @@ import Image from "next/image";
 import PayfricaCardHeadImg from "../../public/PayfricaCardHeadImg.jpg";
 import { useGlobalState } from "../GlobalStateProvider";
 import CardOverlay from "./CardOverlay";
-import "../app/ManageCardsOverlay.css";
 import AddFundsOverlay from "./AddFundsOverlay";
 import RemoveFundsOverlay from "./RemoveFundsOverlay";
+import "../app/ManageCardsOverlay.css";
 
 const ManageCardsOverlay = ({}) => {
   const {

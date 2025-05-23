@@ -111,6 +111,7 @@ export function useTokenExchange() {
   const handleAddtoLiquidity = useCallback(async (coinType: string, amount: number) => {
     if (!address) throw new Error('No wallet');
     const a = poolMap.get(coinType)!;
+    console.log(coinType);
     const amt = toMinimalUnits(amount, a.coinDecimal);
     const tx = new Transaction();
     const coins = await client.getCoins({ owner: address, coinType: a.coinType });

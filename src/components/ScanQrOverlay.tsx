@@ -2,7 +2,7 @@ import React from "react";
 import { FaTimes } from "react-icons/fa";
 import QRScanner from "./QRScanner";
 
-const ScanQrOverlay = ({ onScan, onClose, reset }) => (
+const ScanQrOverlay = ({ onScan, onClose, reset, scanningPaused }) => (
   <div className="overlay-background scan-qr-bg">
     <div className="scan-qr-modal">
       <button className="scan-qr-close-btn" onClick={onClose}>
@@ -13,7 +13,7 @@ const ScanQrOverlay = ({ onScan, onClose, reset }) => (
         Point your camera at a Payfrica Card to scan
       </div>
       <div className="scan-qr-frame" style={{ background: "#000" }}>
-        <QRScanner onDetected={onScan} reset={reset} />
+        {!scanningPaused && <QRScanner onDetected={onScan} reset={reset} />}
       </div>
     </div>
   </div>

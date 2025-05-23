@@ -18,6 +18,7 @@ const ReceiveFundsFlowOverlay = () => {
   const [success, setSuccess] = useState<boolean | null>(null);
   const [scannedData, setScannedData] = useState<any | null>(null);
   const [showInvalidCardAlert, setShowInvalidCardAlert] = useState(false);
+  const [scanningPaused, setScanningPaused] = useState(false);
   const [resetScannerKey, setResetScannerKey] = useState(0);
 
   // Reset all state when overlay is closed
@@ -42,9 +43,9 @@ const ReceiveFundsFlowOverlay = () => {
             let parsed: any = null;
             try {
               parsed = JSON.parse(data);
-              console.log("Receive Card QR Data:", parsed);
             } catch (e) {
               setShowInvalidCardAlert(true);
+              setScanningPaused(true);
               return;
             }
             if (
@@ -59,19 +60,13 @@ const ReceiveFundsFlowOverlay = () => {
               setStep("pin");
             } else {
               setShowInvalidCardAlert(true);
+              setScanningPaused(true);
             }
           }}
           onClose={handleClose}
           reset={resetScannerKey}
+          scanningPaused={scanningPaused}
         />
-        {showInvalidCardAlert && (
-          <InvalidCardAlertOverlay
-            onClose={() => {
-              setShowInvalidCardAlert(false);
-              setResetScannerKey((k) => k + 1);
-            }}
-          />
-        )}
       </>
     );
   }
@@ -129,6 +124,18 @@ const ReceiveFundsFlowOverlay = () => {
     }
     handleClose();
     return null;
+  }
+
+  {
+    showInvalidCardAlert && (
+      <InvalidCardAlertOverlay
+        onClose={() => {
+          setShowInvalidCardAlert(false);
+          setScanningPaused(false);
+          setResetScannerKey((k) => k + 1);
+        }}
+      />
+    );
   }
 
   return null;

@@ -7,11 +7,13 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { BsArrowDownSquareFill } from "react-icons/bs";
 import { useTokenExchange, usePools } from "@/hooks/useTokenExchange";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function ConvertOverlay() {
-  const { overlayStates, toggleOverlay } = useGlobalState();
+  const { overlayStates, toggleOverlay, setOverlayState } = useGlobalState();
   const { handleConvert, getBalance } = useTokenExchange();
   const { pools, poolMap } = usePools();
+  const router = useRouter();
 
   // Local UI state hooks (always run in same order)
   const [sellSymbol, setSellSymbol] = useState<string>(
@@ -81,17 +83,56 @@ export function ConvertOverlay() {
     [sellSymbol, handleSwitch]
   );
 
-  const onConvert = useCallback(async () => {
+  const onConvert = useCallback(() => {
     const amt = parseFloat(sellAmount);
     if (!sellAmount || isNaN(amt) || amt <= 0) return;
-    try {
-      await handleConvert(sellSymbol, buySymbol, amt);
-    } catch (e) {
-      console.error("Convert failed", e);
-    } finally {
-      toggleOverlay("convert");
-    }
-  }, [sellAmount, sellSymbol, buySymbol, handleConvert, toggleOverlay]);
+
+    // Hide convert, show sending
+    toggleOverlay("convert");
+    toggleOverlay("sending");
+
+    setTimeout(async () => {
+      try {
+        await handleConvert(sellSymbol, buySymbol, amt);
+        // Hide all overlays first
+        setOverlayState({
+          convert: false,
+          sending: false,
+          success: false,
+          failed: false,
+        });
+        setOverlayState((prev) => ({ ...prev, success: true }));
+      } catch (e) {
+        setOverlayState({
+          convert: false,
+          sending: false,
+          success: false,
+          failed: false,
+        });
+        setOverlayState((prev) => ({ ...prev, failed: true }));
+      }
+    }, 0);
+  }, [
+    sellAmount,
+    sellSymbol,
+    buySymbol,
+    handleConvert,
+    toggleOverlay,
+    setOverlayState,
+  ]);
+
+  const handleHomeClick = () => {
+    // Hide all overlays
+    setOverlayState({
+      convert: false,
+      sending: false,
+      success: false,
+      failed: false,
+      // ...any others
+    });
+    // Then navigate home
+    router.push("/");
+  };
 
   if (!overlayStates.convert) return null;
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useGlobalState } from "@/GlobalStateProvider";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "@/app/ManageCardsOverlay.css";
 // interface TempCardDetailsProps {
 //   amount: number | string;
 //   currency?: string;

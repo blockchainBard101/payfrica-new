@@ -1054,11 +1054,8 @@ body {
 /* Overlay Background */
 .overlay-background {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -3076,6 +3073,10 @@ form select:focus {
   background: #3c53a4;
   color: white;
 }
+.tab-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .amount-input label {
   display: block;
@@ -3178,4 +3179,676 @@ form select:focus {
   margin-bottom: 1rem;
   font-size: 1rem;
   font-family: inherit;
+}
+
+/* Scan QR Code Overlay */
+.scan-qr-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+}
+.scan-qr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.scan-qr-header h2 {
+  font-size: 1.5rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+}
+.scan-qr-close {
+  font-size: 2rem;
+  color: #c43e26;
+  cursor: pointer;
+}
+.scan-qr-instructions {
+  font-size: 1rem;
+  color: #474747;
+  margin-bottom: 1.5rem;
+}
+.scan-qr-canvas {
+  margin: 0 auto 1.5rem auto;
+  display: block;
+  border: 2px solid #3c53a4;
+  border-radius: 12px;
+  background: #fff;
+  width: 220px;
+  height: 220px;
+}
+.scan-qr-btn {
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin: 0.5rem 0.25rem;
+  width: 80%;
+  max-width: 250px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.scan-qr-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+.card-overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.card-type-modal {
+  background: #ffe7a0;
+  border-radius: 12px;
+  min-width: 320px;
+  max-width: 400px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-type-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: 2px solid #c43e26;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #c43e26;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.card-type-close-btn:hover {
+  background: #ffe0b8;
+}
+
+.card-type-title {
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  font-size: 2rem;
+  color: #c04a2b;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.card-type-options {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+}
+
+.card-type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.card-type-tab {
+  background: #ffc72c;
+  color: #3c3c3c;
+  font-family: InterBold, Arial, sans-serif;
+  font-size: 1.1rem;
+  border-radius: 8px 8px 0 0;
+  padding: 0.5rem 1.5rem 0.3rem 1.5rem;
+  margin-bottom: -8px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.card-type-box {
+  background: #232323;
+  border-radius: 0 0 10px 10px;
+  border: 2px solid #ffc72c;
+  min-width: 100px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card-type-box img,
+.card-type-box svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Scan QR Code Modal Overlay */
+.overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.scan-code-modal {
+  background: #fde7a9;
+  border: 2px solid #d97b4a;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scan-code-modal h2 {
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  color: #3c53a4;
+  margin-bottom: 12px;
+  font-size: 2rem;
+}
+
+.scan-code-modal p {
+  color: #555;
+  margin-bottom: 32px;
+  font-size: 1.1rem;
+}
+
+.card-overlay-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: 2px solid #d97b4a;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #d97b4a;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.card-overlay-close-btn:hover {
+  background: #ffe0b8;
+}
+
+.scan-code-modal .fa-qrcode,
+.scan-code-modal svg[font-size="48"] {
+  font-size: 48px !important;
+  color: #3c53a4 !important;
+  margin-bottom: 12px;
+}
+
+.scan-action-btn {
+  background: linear-gradient(90deg, #3c53a4 60%, #fbe19a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+.scan-action-btn:last-child {
+  background: linear-gradient(90deg, #fbe19a 60%, #3c53a4 100%);
+  color: #3c53a4;
+}
+.scan-action-btn svg {
+  font-size: 22px;
+}
+
+@media (max-width: 500px) {
+  .scan-code-modal {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.5rem 0.5rem;
+  }
+  .scan-action-btn {
+    font-size: 1rem;
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Overlay background for all overlays */
+.overlay-background {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+/* Scan QR Overlay */
+.scan-qr-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+}
+.scan-qr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.scan-qr-header h2 {
+  font-size: 1.5rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+}
+.scan-qr-close {
+  font-size: 2rem;
+  color: #c43e26;
+  cursor: pointer;
+}
+.scan-qr-instructions {
+  font-size: 1rem;
+  color: #474747;
+  margin-bottom: 1.5rem;
+}
+.scan-qr-canvas {
+  margin: 0 auto 1.5rem auto;
+  display: block;
+  border: 2px solid #3c53a4;
+  border-radius: 12px;
+  background: #fff;
+  width: 220px;
+  height: 220px;
+}
+.scan-qr-btn {
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin: 0.5rem 0.25rem;
+  width: 80%;
+  max-width: 250px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.scan-qr-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Enter PIN Overlay */
+.enter-pin-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem 2rem 1.5rem 2rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+}
+.enter-pin-header {
+  font-size: 1.3rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+  margin-bottom: 1rem;
+}
+.enter-pin-label {
+  font-size: 1rem;
+  color: #474747;
+  margin-bottom: 0.5rem;
+  font-family: InterRegular;
+}
+.enter-pin-input {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid #f6b918;
+  background: #fff;
+  font-size: 1.2rem;
+  font-family: InterBold;
+  margin-bottom: 1rem;
+  outline: none;
+  box-sizing: border-box;
+}
+.enter-pin-input:focus {
+  border: 2px solid #3c53a4;
+  box-shadow: 0 2px 8px #3c53a422;
+}
+.enter-pin-error {
+  color: #ff4444;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+.enter-pin-amount {
+  font-size: 1.1rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+  margin-bottom: 1rem;
+}
+.enter-pin-btn {
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.enter-pin-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Confirm Transaction Overlay */
+.confirm-transaction-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem 2rem 1.5rem 2rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+}
+.confirm-transaction-header {
+  font-size: 1.3rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold;
+  margin-bottom: 1rem;
+}
+.confirm-transaction-details {
+  background: #fdf5ce;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: #474747;
+  font-family: InterRegular;
+}
+.confirm-transaction-btn {
+  background: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.confirm-transaction-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Success/Failed Overlay */
+.success-overlay,
+.failed-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  margin: 0 auto;
+  position: relative;
+  animation: fadeInUp 0.5s cubic-bezier(0.23, 1.01, 0.32, 1) both;
+}
+.success-overlay .feedback-icon {
+  color: #00c851;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.failed-overlay .feedback-icon {
+  color: #ff4444;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.success-overlay .feedback-title,
+.failed-overlay .feedback-title {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #3c53a4;
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  letter-spacing: 0.01em;
+}
+.success-overlay .feedback-message,
+.failed-overlay .feedback-message {
+  font-size: 1.1rem;
+  color: #474747;
+  margin-bottom: 1.5rem;
+  font-family: InterLight, Arial, sans-serif;
+}
+.success-overlay .feedback-btn,
+.failed-overlay .feedback-btn {
+  background-color: #3c53a4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin: 0.5rem 0.25rem;
+  width: 80%;
+  max-width: 250px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold, Arial, sans-serif;
+  box-shadow: 0 2px 8px rgba(60, 83, 164, 0.08);
+}
+.success-overlay .feedback-btn:hover,
+.failed-overlay .feedback-btn:hover {
+  background: #2b3d7a;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Invalid Card Alert Overlay */
+.invalid-card-alert-overlay {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem 2rem 1.5rem 2rem;
+  max-width: 400px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(255, 68, 68, 0.08);
+  text-align: center;
+  position: relative;
+  border: 2px solid #ff4444;
+  z-index: 9999 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 245, 225, 0.98);
+}
+.invalid-card-alert-overlay h3 {
+  color: #ff4444;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-family: LexendExtraBold;
+}
+.invalid-card-alert-overlay p {
+  color: #474747;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-family: InterRegular;
+}
+.invalid-card-alert-overlay .feedback-btn {
+  background-color: #ff4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 80%;
+  max-width: 250px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: InterBold, Arial, sans-serif;
+  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.08);
+}
+.invalid-card-alert-overlay .feedback-btn:hover {
+  background: #c43e26;
+  transform: translateY(-2px) scale(1.03);
+}
+
+@media (max-width: 500px) {
+  .scan-qr-overlay,
+  .enter-pin-overlay,
+  .confirm-transaction-overlay,
+  .success-overlay,
+  .failed-overlay,
+  .invalid-card-alert-overlay {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+}
+
+/* Scan QR Overlay Modal */
+.scan-qr-bg {
+  z-index: 5100;
+}
+
+.scan-qr-modal {
+  background: #fff5e1;
+  border-radius: 16px;
+  padding: 2rem 1.5rem 2.5rem 1.5rem;
+  width: 340px;
+  max-width: 95vw;
+  box-shadow: 0 8px 32px rgba(60, 83, 164, 0.1);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scan-qr-title {
+  font-size: 1.5rem;
+  font-family: LexendExtraBold, InterBold, Arial, sans-serif;
+  color: #3c53a4;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.scan-qr-desc {
+  font-size: 1rem;
+  color: #474747;
+  margin-bottom: 1.5rem;
+  font-family: InterRegular, Arial, sans-serif;
+}
+
+.scan-qr-frame {
+  width: 220px;
+  height: 220px;
+  border: 3px solid #ffc43a;
+  border-radius: 18px;
+  margin-bottom: 1.5rem;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.scan-qr-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #c43e26;
+  font-size: 22px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.scan-qr-close-btn:hover {
+  background: #ffe0b8;
+}
+
+@media (max-width: 500px) {
+  .scan-qr-modal {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .scan-qr-frame {
+    width: 98vw;
+    max-width: 220px;
+    height: 40vw;
+    max-height: 220px;
+  }
 }
