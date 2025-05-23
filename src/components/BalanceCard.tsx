@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import Loading from "@/components/Loading";
 
 interface Props {
   title: string;
@@ -40,14 +41,7 @@ export default React.memo(function BalanceCard({
       </div>
 
       <div className="card-amount">
-        {loading ? (
-          <div
-            className="loader"
-            style={{ width: 30, height: 30, margin: "auto" }}
-          />
-        ) : (
-          <h2>{visible ? amount : "******"}</h2>
-        )}
+        {loading ? <Loading /> : <h2>{visible ? amount : "******"}</h2>}
       </div>
 
       <div className="card-footer">

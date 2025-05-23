@@ -1,69 +1,107 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { FaBell, FaBars, FaChevronDown, FaTimes } from "react-icons/fa";
+import {
+  FaHome,
+  FaCreditCard,
+  FaUsers,
+  FaPiggyBank,
+  FaBars,
+  FaInfoCircle,
+} from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
+import { usePathname } from "next/navigation";
+
+const navLinks = [
+  { href: "/dashboard", label: "Dashboard", icon: <FaHome /> },
+  { href: "/payfricacard", label: "Payfrica card", icon: <FaCreditCard /> },
+  { href: "/pools", label: "Pools", icon: <FaUsers /> },
+  { href: "/savings", label: "Savings circle", icon: <FaPiggyBank /> },
+];
 
 export const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
 
   return (
-    <nav className="navbar">
-      <div className="desktop-nav">
-        <Image
-          src={"/Payfrica_Logo_Logo_Deep_red.png"}
-          alt="Payfrica Logo"
-          className="company-nav-logo"
-          width={100}
-          height={60}
-          priority
-        />
+    <>
+      {/* Desktop Top Nav */}
+      <nav className="navbar desktop-navbar">
+        <div className="nav-left">
+          <Image
+            src="/PayfricaNavLogo.png"
+            alt="Payfrica Logo"
+            className="company-nav-logo"
+            width={120}
+            height={60}
+            priority
+          />
+        </div>
         <ul className="nav-links">
-          <li>
-            <a href="/dashboard">Dashboard</a>
-          </li>
-          <li>
-            <a href="/payfricacard">Payfrica card</a>
-          </li>
-          <li>
-            <a href="/pools">Pools</a>
-          </li>
-          <li>
-            <a href="/pools">Savings circle</a>
-          </li>
+          {navLinks.map((link) => (
+            <li
+              key={link.href}
+              className={pathname === link.href ? "active" : ""}
+            >
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
         </ul>
         <div className="profile">
           <a href="/profile" className="profile-img">
-            <RxAvatar style={{ fontSize: "30px" }} />
+            <RxAvatar style={{ fontSize: "32px" }} />
           </a>
         </div>
-      </div>
+      </nav>
 
-      <div className="mobile-nav">
+      {/* Mobile Top Bar */}
+      <nav className="mobile-topbar">
         <FaBars className="icon menu-icon" onClick={toggleMobileMenu} />
-        <div className="profile-icon">
-          <div className="profile-img">
-            <RxAvatar style={{ fontSize: "30px" }} />
+        <Image
+          src="/PayfricaNavLogo.png"
+          alt="Payfrica Logo"
+          className="mobile-logo"
+          width={120}
+          height={60}
+        />
+        <FaInfoCircle className="icon info-icon" />
+      </nav>
+
+      {/* Mobile Bottom Nav */}
+      <nav className="mobile-bottom-nav">
+        {navLinks.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className={`mobile-nav-link${
+              pathname === link.href ? " active" : ""
+            }`}
+          >
+            {link.icon}
+            <span>{link.label}</span>
+          </a>
+        ))}
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={toggleMobileMenu}>
+          <div
+            className="mobile-menu-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ul>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </div>
-
-      {isMobileMenuOpen && (
-        <div className="mobile-menu">
-          <FaTimes className="close-icon" onClick={toggleMobileMenu} />
-          <ul className="mobile-nav-links">
-            <li>Dashboard</li>
-            <li>Pay</li>
-            <li>Bridge</li>
-            <li>Saving Circle</li>
-            <li>Payfrica Card</li>
-          </ul>
-        </div>
       )}
-    </nav>
+    </>
   );
 };

@@ -6,6 +6,7 @@ import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { nameExists, createLeafSubname } from "@/hooks/registerNsName";
+import Loading from "@/components/Loading";
 
 // Dynamic imports
 const Navigation = dynamic(
@@ -141,7 +142,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="loader" />
+        <Loading />
       </div>
     );
   }

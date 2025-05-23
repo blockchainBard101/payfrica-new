@@ -229,7 +229,7 @@ body {
 }
 
 .company-nav-logo {
-  /* width: 170px; */
+  width: 200px;
   height: 70px;
 }
 .nav-links {
@@ -4046,5 +4046,195 @@ form select:focus {
   .savings-goal-card {
     padding: 1.2rem 0.5rem 1.2rem 0.5rem;
     max-width: 98vw;
+  }
+}
+
+/* Desktop Navbar */
+.desktop-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #3c53a4;
+  padding: 0.7rem 2.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.desktop-navbar .nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+  color: #fff;
+}
+.desktop-navbar .nav-links li {
+  font-size: 1.08rem;
+  font-family: InterBold;
+  color: #222;
+  transition: color 0.2s;
+}
+.desktop-navbar .nav-links li.active a,
+.desktop-navbar .nav-links li a:hover {
+  /* color: #3c53a4; */
+  font-weight: bold;
+}
+.desktop-navbar .nav-links li a {
+  text-decoration: none;
+  /* color: inherit; */
+}
+.desktop-navbar .profile-img {
+  display: flex;
+  align-items: center;
+  background: #f5f6fa;
+  border-radius: 50%;
+  padding: 2px;
+}
+.desktop-navbar .profile-img svg {
+  color: #3c53a4;
+}
+
+/* Mobile Top Bar */
+.mobile-topbar {
+  display: none;
+}
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.mobile-menu-content {
+  background: #232a1a;
+  color: #fff;
+  width: 70vw;
+  max-width: 320px;
+  height: 100vh;
+  padding: 2rem 1.5rem;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.12);
+}
+.mobile-menu-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mobile-menu-content li {
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+}
+.mobile-menu-content a {
+  color: #fff;
+  text-decoration: none;
+  font-family: InterBold;
+}
+
+/* Mobile Nav */
+@media (max-width: 900px) {
+  .desktop-navbar {
+    display: none;
+  }
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #232a1a;
+    color: #fff;
+    padding: 0.7rem 1.2rem;
+    font-size: 1.2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .mobile-logo {
+    width: 150px;
+    height: 60px;
+  }
+  .menu-icon,
+  .info-icon {
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    background: #232a1a;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 0 0.2rem 0;
+  }
+  .mobile-nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #bfcdb2;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-family: InterRegular;
+    gap: 2px;
+    transition: color 0.2s;
+    padding: 0.2rem 0.5rem;
+  }
+  .mobile-nav-link svg {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+  }
+  .mobile-nav-link.active,
+  .mobile-nav-link:active {
+    color: #fff;
+    font-weight: bold;
+  }
+}
+
+/* Hide mobile nav on desktop */
+@media (min-width: 901px) {
+  .mobile-topbar,
+  .mobile-bottom-nav,
+  .mobile-menu-overlay {
+    display: none !important;
+    padding: 0;
+  }
+}
+
+/* Loader */
+/* HTML: <div class="loader"></div> */
+.loader {
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 30px;
+  line-height: 1.2em;
+  display: inline-grid;
+}
+.loader:before,
+.loader:after {
+  content: "Loading...";
+  grid-area: 1/1;
+  -webkit-mask: linear-gradient(90deg, #000 50%, #0000 0) 0 50%/2ch 100%;
+  color: #0000;
+  text-shadow: 0 0 0 #000, 0 calc(var(--s, 1) * 1.2em) 0 #000;
+  animation: l15 1s infinite;
+}
+.loader:after {
+  -webkit-mask-position: 1ch 50%;
+  --s: -1;
+}
+@keyframes l15 {
+  80%,
+  100% {
+    text-shadow: 0 calc(var(--s, 1) * -1.2em) 0 #000, 0 0 0 #000;
   }
 }

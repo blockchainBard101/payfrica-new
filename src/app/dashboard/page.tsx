@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import Loading from "@/components/Loading";
 
 const Navigation = dynamic(
   () => import("@/components/Navigations").then((mod) => mod.Navigation),
@@ -254,7 +255,7 @@ export default function Page() {
       {/* Full-page loading spinner overlay */}
       {isLoading && (
         <div className="overlay-background">
-          <div className="loader" />
+          <Loading />
         </div>
       )}
 

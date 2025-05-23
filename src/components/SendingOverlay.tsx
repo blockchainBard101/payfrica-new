@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useGlobalState } from "../GlobalStateProvider";
+import Loading from "@/components/Loading";
 
 export const SendingOverlay = () => {
   const { overlayStates, toggleOverlay } = useGlobalState();
@@ -19,7 +20,7 @@ export const SendingOverlay = () => {
   return (
     <div className="overlay-background">
       <div className="sending-overlay">
-        <div className="loader"></div>
+        <Loading />
         <h3>Sending...</h3>
         <p>View transaction</p>
       </div>

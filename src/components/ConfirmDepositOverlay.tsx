@@ -38,14 +38,26 @@ export default function ConfirmDepositOverlay() {
     amount: minimalAmt.toString(),
   });
 
-
-  const { isLoading, data: agent, error } = useQuery({
-    queryKey: ['get-best-deposit', coinType, amount, stripped, userDetails],
-    queryFn: async () => (await axios.get<{ id: string; accountNumber: string; comment: string; name: string; bank: string }>(`${API_BASE}/agent/best-deposit-agent?${params}`)).data,
-    enabled: Boolean(stripped && amount > 0)
+  const {
+    isLoading,
+    data: agent,
+    error,
+  } = useQuery({
+    queryKey: ["get-best-deposit", coinType, amount, stripped, userDetails],
+    queryFn: async () =>
+      (
+        await axios.get<{
+          id: string;
+          accountNumber: string;
+          comment: string;
+          name: string;
+          bank: string;
+        }>(`${API_BASE}/agent/best-deposit-agent?${params}`)
+      ).data,
+    enabled: Boolean(stripped && amount > 0),
   });
 
-  console.log({ isLoading, agent, error })
+  console.log({ isLoading, agent, error });
 
   if (!overlayStates.confirmDeposit) return null;
 
@@ -54,24 +66,14 @@ export default function ConfirmDepositOverlay() {
   const symbol = userDetails?.details?.country?.currencySymbol ?? "";
   const handleNext = async () => {
     if (!agent) return;
-    // re-compute minimal units
-    const decimals = userDetails?.details?.country?.baseToken?.decimals ?? 0;
-    const humanAmt = Number(amount);
-    const minimalAmt = Math.floor(humanAmt * 10 ** decimals);
-
     try {
-      await handleDepositRequest(
-        agent.id,
-        minimalAmt,
-        agent.comment,
-        coinType
-      );
       toggleOverlay("confirmDeposit");
-      toggleOverlay("success");
+      toggleOverlay("withdrawing");
+      await handleDepositRequest(agent.id, minimalAmt, agent.comment, coinType);
+      toggleOverlay("withdrawing");
     } catch (e) {
       console.error("Deposit on-chain failed", e);
-      toggleOverlay("confirmDeposit");
-      toggleOverlay("failed");
+      toggleOverlay("withdrawing");
     }
   };
 
@@ -114,7 +116,18 @@ export default function ConfirmDepositOverlay() {
           </div>
           <div>
             <span>Agent ID</span>
-            {isLoading ? "Loading…" : agent?.id ? <Link target="__blank" href={`https://testnet.suivision.xyz/object/${agent.id}`}>{agent?.id.slice(0, 6) + "..." + agent?.id.slice(-4)}</Link> : "—"}
+            {isLoading ? (
+              "Loading…"
+            ) : agent?.id ? (
+              <Link
+                target="__blank"
+                href={`https://testnet.suivision.xyz/object/${agent.id}`}
+              >
+                {agent?.id.slice(0, 6) + "..." + agent?.id.slice(-4)}
+              </Link>
+            ) : (
+              "—"
+            )}
           </div>
           <div>
             <span>Agent Name</span>
@@ -128,15 +141,15 @@ export default function ConfirmDepositOverlay() {
             <span>Account #</span>
             <strong>{agent?.accountNumber ?? "—"}</strong>
           </div>
-          <div>
+          {/* <div>
             <span>Total charged</span>
             <strong>
               {symbol} {total}
             </strong>
-          </div>
+          </div> */}
           {agent?.comment && (
             <div>
-              <span>Note</span>
+              <span>Comment</span>
               <strong>{agent.comment}</strong>
             </div>
           )}

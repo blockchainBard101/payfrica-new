@@ -19,6 +19,7 @@ import CardOverlay from "./CardOverlay";
 import AddFundsOverlay from "./AddFundsOverlay";
 import RemoveFundsOverlay from "./RemoveFundsOverlay";
 import "../app/ManageCardsOverlay.css";
+import Loading from "@/components/Loading";
 
 const ManageCardsOverlay = ({}) => {
   const {
@@ -452,7 +453,7 @@ const ManageCardsOverlay = ({}) => {
         {deactivating && (
           <div className="overlay-background" style={{ zIndex: 4000 }}>
             <div className="sending-overlay">
-              <div className="loader" />
+              <Loading />
               <h3>Deactivating card...</h3>
             </div>
           </div>
