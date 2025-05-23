@@ -58,7 +58,6 @@ export const Navigation = () => {
 
       {/* Mobile Top Bar */}
       <nav className="mobile-topbar">
-        <FaBars className="icon menu-icon" onClick={toggleMobileMenu} />
         <Image
           src="/PayfricaNavLogo.png"
           alt="Payfrica Logo"
@@ -66,7 +65,8 @@ export const Navigation = () => {
           width={120}
           height={60}
         />
-        <FaInfoCircle className="icon info-icon" />
+        {/* <FaBars className="icon menu-icon" onClick={toggleMobileMenu} /> */}
+        {/* <FaInfoCircle className="icon info-icon" /> */}
       </nav>
 
       {/* Mobile Bottom Nav */}

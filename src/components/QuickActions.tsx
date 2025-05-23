@@ -11,7 +11,7 @@ import { SiConvertio } from "react-icons/si";
 import { useGlobalState } from "../GlobalStateProvider";
 
 const quickActions = [
-  { name: "Send Money", icon: <BsSendFill />, command: "sendMoney" },
+  { name: "Send", icon: <BsSendFill />, command: "sendMoney" },
   {
     name: "Receive",
     icon: <MdOutlineCallReceived />,
@@ -20,7 +20,7 @@ const quickActions = [
   { name: "Deposit", icon: <FaMoneyCheckAlt />, command: "deposit" },
   { name: "Withdraw", icon: <FaRegMoneyBillAlt />, command: "withdraw" },
   { name: "Convert", icon: <SiConvertio />, command: "convert" },
-  { name: "Manage Cards", icon: <FaCreditCard />, command: "manageCards" },
+  { name: "Cards", icon: <FaCreditCard />, command: "manageCards" },
   { name: "Scan QR", icon: <FaQrcode />, command: "scanQR" },
 ];
 

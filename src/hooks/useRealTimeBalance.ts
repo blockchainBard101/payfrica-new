@@ -10,7 +10,7 @@ export const useRealTimeBalances = (address: string) => {
     try {
       const fundingBalance = await getBaseBalance();
       const { totalLocal } = await getPortfolio();
-      // console.log({ fundingBalance, totalLocal });
+      console.log({ fundingBalance, totalLocal });
       setBalances({ fundingBalance, portfolioBalance: totalLocal });
     } catch (e) {
       console.error('Error updating balances:', e);

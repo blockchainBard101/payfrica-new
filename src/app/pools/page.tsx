@@ -5,7 +5,7 @@ import { FaCoins } from "react-icons/fa";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useTokenExchange } from "@/hooks/useTokenExchange";
 import { getUserSuppliedPools } from "@/hooks/suiRpc";
-import Loading from "@/components/Loading";
+import LogoLoader from "@/components/LogoLoader";
 
 function formatNumber(num: number): string {
   if (num >= 1e9) return (num / 1e9).toFixed(1) + "b";
@@ -174,7 +174,7 @@ const PoolsPage = () => {
     );
   };
 
-  if (loading) return <div>Loading pools…</div>;
+  if (loading) return <LogoLoader />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
@@ -300,7 +300,7 @@ const PoolsPage = () => {
         {sending && (
           <div className="overlay-background">
             <div className="sending-overlay">
-              <Loading />
+              <LogoLoader />
               <h3>Processing transaction…</h3>
             </div>
           </div>

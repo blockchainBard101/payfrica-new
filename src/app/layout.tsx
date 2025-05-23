@@ -1,15 +1,25 @@
+"use client";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalStateProvider } from "@/GlobalStateProvider";
 import { ClientProvider } from "@/components/client-provider";
+import React, { useEffect, useState } from "react";
+import LogoLoader from "@/components/LogoLoader";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 1000); // 1s loader
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -21,7 +31,11 @@ export default function RootLayout({
       <body className="antialiased bg-background text-foreground">
         <ClientProvider>
           <GlobalStateProvider>
-            <ProvidersAndLayout>{children}</ProvidersAndLayout>
+            {showLoader ? (
+              <LogoLoader />
+            ) : (
+              <ProvidersAndLayout>{children}</ProvidersAndLayout>
+            )}
           </GlobalStateProvider>
 
           <ToastContainer

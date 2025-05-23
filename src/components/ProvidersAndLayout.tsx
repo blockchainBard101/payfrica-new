@@ -8,10 +8,10 @@ import {
   WalletProvider,
 } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
-import { isEnokiNetwork, registerEnokiWallets } from '@mysten/enoki';
+import { isEnokiNetwork, registerEnokiWallets } from "@mysten/enoki";
 import clientConfig from "@/config/clientConfig";
 import "@mysten/dapp-kit/dist/index.css";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CustomWalletProvider from "@/contexts/CustomWallet";
 
@@ -45,18 +45,13 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
         <RegisterEnokiWallets />
-        <WalletProvider
-        autoConnect
-        >
+        <WalletProvider autoConnect>
           <CustomWalletProvider>
-            <main>
-              {children}
-            </main>
+            <main>{children}</main>
           </CustomWalletProvider>
         </WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
-
   );
 };
 
@@ -73,13 +68,13 @@ function RegisterEnokiWallets() {
           clientId: clientConfig.GOOGLE_CLIENT_ID,
         },
         facebook: {
-          clientId: 'YOUR_FACEBOOK_CLIENT_ID',
+          clientId: "YOUR_FACEBOOK_CLIENT_ID",
         },
         twitch: {
-          clientId: 'YOUR_TWITCH_CLIENT_ID',
+          clientId: "YOUR_TWITCH_CLIENT_ID",
         },
       },
-      client,
+      client: client as any, // Type assertion to bypass type mismatch
       network,
     });
 
@@ -88,4 +83,3 @@ function RegisterEnokiWallets() {
 
   return null;
 }
-

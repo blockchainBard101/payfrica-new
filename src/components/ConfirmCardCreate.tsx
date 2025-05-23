@@ -62,7 +62,10 @@ const ConfirmCardCreate = () => {
   const suiClient = useSuiClient();
   const client = new SealClient({
     suiClient,
-    serverObjectIds: getAllowlistedKeyServers("testnet"),
+    serverObjectIds: getAllowlistedKeyServers("testnet").map((server) => [
+      server,
+      0,
+    ]),
     verifyKeyServers: false,
   });
 
@@ -131,7 +134,6 @@ const ConfirmCardCreate = () => {
     }).then((response) => {
       if (response.status === 200) {
         return response.json().then((info) => {
-
           return { info };
         });
       } else {
@@ -240,7 +242,7 @@ const ConfirmCardCreate = () => {
           inf.blobUrl
         );
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
 
       console.log(data);

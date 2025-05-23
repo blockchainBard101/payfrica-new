@@ -363,10 +363,13 @@ export function useTokenExchange() {
 
   const getBaseBalance = useCallback(async () => {
     if (!address) throw new Error('No wallet');
-    if (!userDetails) return
+    if (!userDetails) return;
     const baseType = userDetails.country.baseTokencoinType;
-    const token = poolMap.get(baseType)!;
-    // console.log(token);
+    const token = poolMap.get(baseType);
+    if (!token) {
+      console.warn("No pool found for baseType:", baseType);
+      return "0.00";
+    }
     const r = await client.getBalance({ owner: address, coinType: token.coinType });
     return `${userDetails.country.currencySymbol}${formatter.format(
       Number(r.totalBalance) / 10 ** token.coinDecimal
@@ -391,10 +394,11 @@ export function useTokenExchange() {
     );
     const totalUSD = breakdown.reduce((sum, b) => sum + b.usdValue, 0);
     const totalLocal = (totalUSD || 0) * localRate;
+
     return {
       breakdown,
       totalUSD,
-      totalLocal: `${userDetails?.country.currencySymbol}${formatter.format(totalLocal)}`
+      totalLocal: `${userDetails?.country.currencySymbol ?? ""}${formatter.format(totalLocal)}`
     };
   }, [address, poolMap, userDetails, getBalance]);
 

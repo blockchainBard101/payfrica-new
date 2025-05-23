@@ -2,7 +2,6 @@
 "use client";
 
 import React from "react";
-import Loading from "@/components/Loading";
 
 interface Props {
   title: string;
@@ -15,6 +14,7 @@ interface Props {
   EllipsisIcon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   onToggle(): void;
   onMore(): void;
+  currencySymbol?: string;
 }
 
 export default React.memo(function BalanceCard({
@@ -28,6 +28,7 @@ export default React.memo(function BalanceCard({
   EllipsisIcon,
   onToggle,
   onMore,
+  currencySymbol,
 }: Props) {
   return (
     <div className="balance-card">
@@ -41,7 +42,21 @@ export default React.memo(function BalanceCard({
       </div>
 
       <div className="card-amount">
-        {loading ? <Loading /> : <h2>{visible ? amount : "******"}</h2>}
+        {loading ? (
+          0
+        ) : (
+          <h2>
+            {visible ? (
+              <>
+                {/* {currencySymbol } */}
+                {/* {amount && !isNaN(Number(amount)) ? amount : "0"} */}
+                {amount}
+              </>
+            ) : (
+              "******"
+            )}
+          </h2>
+        )}
       </div>
 
       <div className="card-footer">

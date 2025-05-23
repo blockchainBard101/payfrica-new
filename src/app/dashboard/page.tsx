@@ -1,12 +1,12 @@
 // app/page.tsx (or pages/index.tsx)
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import Loading from "@/components/Loading";
+import LogoLoader from "@/components/LogoLoader";
 
 const Navigation = dynamic(
   () => import("@/components/Navigations").then((mod) => mod.Navigation),
@@ -186,11 +186,11 @@ const fetcher = (url: string) =>
   });
 
 export default function Page() {
-  // const router = useRouter();
+  // Always call hooks at the top
+  const [showLoader, setShowLoader] = useState(true);
   const Window = typeof window !== "undefined" ? globalThis.window : undefined;
   const currentAccount = useCurrentAccount();
 
-  // Fetch user data as soon as we have an address
   const { data: user, error } = useSWR(
     currentAccount?.address
       ? `${process.env.NEXT_PUBLIC_API_URL}/users/${currentAccount.address}/basic`
@@ -198,6 +198,27 @@ export default function Page() {
     fetcher,
     { revalidateOnFocus: false }
   );
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showLoader) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#fff",
+        }}
+      >
+        <LogoLoader />
+      </div>
+    );
+  }
 
   // Redirect to login if not connected
   if (!currentAccount && Window) {
@@ -255,7 +276,7 @@ export default function Page() {
       {/* Full-page loading spinner overlay */}
       {isLoading && (
         <div className="overlay-background">
-          <Loading />
+          <LogoLoader />
         </div>
       )}
 

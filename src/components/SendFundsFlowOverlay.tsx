@@ -54,6 +54,7 @@ const SendFundsFlowOverlay = () => {
     return (
       <>
         <ScanQrOverlay
+          scanningPaused={false}
           onScan={(data: string) => {
             let wallet = null;
             // Accept plain wallet address or JSON with wallet field
