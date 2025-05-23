@@ -15,7 +15,7 @@ export const Navigation = () => {
     <nav className="navbar">
       <div className="desktop-nav">
         <Image
-          src={"/Payfrica_Logo_Logo_Deep_red.png"}
+          src={"/PayfricaNavLogo.png"}
           alt="Payfrica Logo"
           className="company-nav-logo"
           width={100}
