@@ -229,8 +229,8 @@ body {
 }
 
 .company-nav-logo {
-  width: 170px;
-  height: 60px;
+  /* width: 170px; */
+  height: 70px;
 }
 .nav-links {
   display: flex;
@@ -650,6 +650,10 @@ body {
   font-family: LexendExtraBold;
   color: #b3004b;
   word-wrap: break-word;
+}
+
+.quick-action-name {
+  color: orange;
 }
 
 /* Tablet View (1024px and below) */
@@ -3850,5 +3854,197 @@ form select:focus {
     max-width: 220px;
     height: 40vw;
     max-height: 220px;
+  }
+}
+
+/* No Savings State */
+.no-savings-container {
+  background: orange;
+  /* border-radius: 18px; */
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  width: 100%;
+  margin: 3rem auto 0 auto;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(60, 83, 164, 0.06);
+  background-image: url("/No-savings-broken.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+.no-savings-content img {
+  width: 300px;
+  height: 150px;
+  margin-bottom: 1.5rem;
+  border-radius: 18px;
+  background: #fff6e5;
+}
+.no-savings-content h2 {
+  font-size: 4rem;
+  font-family: LexendExtraBold;
+  color: #222;
+  margin-bottom: 2rem;
+  color: orange;
+}
+.no-savings-content p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: InterBold;
+  color: orange;
+  margin-bottom: 2rem;
+}
+.create-savings-btn {
+  background: orange;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-family: InterBold;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  max-width: 300px;
+  font-size: 1.2rem;
+  font-family: LexendExtraBold;
+}
+.create-savings-btn:hover {
+  background: #d1d5db;
+}
+.new-goal-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  background: #f5f6fa;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-family: InterBold;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(60, 83, 164, 0.04);
+  transition: background 0.2s;
+}
+.new-goal-btn:hover {
+  background: #e5e7eb;
+}
+
+/* Savings Goal Card */
+.savings-goal-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(60, 83, 164, 0.06);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 900px;
+  gap: 2rem;
+}
+.goal-image {
+  width: 260px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #f5f6fa;
+}
+.goal-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.goal-info h3 {
+  font-size: 1.5rem;
+  font-family: LexendExtraBold;
+  color: #222;
+  margin-bottom: 0.2rem;
+}
+.goal-info p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  font-family: InterLight;
+}
+.goal-info span {
+  color: #888;
+  font-size: 0.95rem;
+  font-family: InterRegular;
+}
+.view-details-btn {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-family: InterBold;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-bottom: 0.5rem;
+  transition: background 0.2s;
+}
+.view-details-btn:hover {
+  background: #125ea2;
+}
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: #222;
+  margin-bottom: 0.2rem;
+  font-family: InterBold;
+}
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 0.2rem;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1976d2 60%, #f6b918 100%);
+  border-radius: 6px;
+  transition: width 0.4s;
+}
+.target-row {
+  color: #888;
+  font-size: 0.95rem;
+  font-family: InterRegular;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .savings-goal-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  .goal-image {
+    width: 100%;
+    max-width: 350px;
+    height: 120px;
+  }
+}
+@media (max-width: 500px) {
+  .no-savings-container {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .savings-goal-card {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
   }
 }

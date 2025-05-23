@@ -15,11 +15,11 @@ export const Navigation = () => {
     <nav className="navbar">
       <div className="desktop-nav">
         <Image
-          src={"/PayfricaNavLogo.png"}
+          src={"/Payfrica_Logo_Logo_Deep_red.png"}
           alt="Payfrica Logo"
           className="company-nav-logo"
           width={100}
-          height={40}
+          height={60}
           priority
         />
         <ul className="nav-links">

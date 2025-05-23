@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaEllipsisV, FaCalendarAlt } from "react-icons/fa";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { LuCircleArrowOutUpRight } from "react-icons/lu";
 
 interface Transaction {
   id: string;
@@ -34,39 +35,48 @@ export const TransactionHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   useEffect(() => {
-  if (!address) return;
+    if (!address) return;
 
-  let intervalId: NodeJS.Timeout;
+    let intervalId: NodeJS.Timeout;
 
-  const fetchTransactions = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-    fetch(`${baseUrl}/users/${address}/transactions`)
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const payload = await res.json();
-        setTransactions(payload.transactions);
-      })
-      .catch((err) => {
-        console.error("Failed fetching transactions:", err);
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
-  };
+    const fetchTransactions = () => {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+      fetch(`${baseUrl}/users/${address}/transactions`)
+        .then(async (res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const payload = await res.json();
+          setTransactions(payload.transactions);
+        })
+        .catch((err) => {
+          console.error("Failed fetching transactions:", err);
+          setError(err.message);
+        })
+        .finally(() => setLoading(false));
+    };
 
-  fetchTransactions(); // Fetch immediately on mount
-  intervalId = setInterval(fetchTransactions, 5000); // Poll every 5 seconds
+    fetchTransactions(); // Fetch immediately on mount
+    intervalId = setInterval(fetchTransactions, 5000); // Poll every 5 seconds
 
-  return () => clearInterval(intervalId); // Clean up interval on unmount
-}, [address]);
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, [address]);
 
   // filter client-side
-  const filtered = transactions.filter((txn) =>
-    (txn.interactedWith || txn.transactionId || "")
+  const filtered = transactions.filter((txn) => {
+    const matchesSearch = (txn.interactedWith || txn.transactionId || "")
       .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+      .includes(searchTerm.toLowerCase());
+
+    const txnDate = new Date(txn.date);
+    const afterStart = !startDate || txnDate >= new Date(startDate);
+    const beforeEnd = !endDate || txnDate <= new Date(endDate + "T23:59:59");
+
+    return matchesSearch && afterStart && beforeEnd;
+  });
   // console.log(transactions);
 
   if (loading) return <div>Loading transactions…</div>;
@@ -88,7 +98,18 @@ export const TransactionHistory = () => {
           </div>
           <div className="date-range">
             <FaCalendarAlt />
-            <input type="text" placeholder="01 Jan - 03 Mar" />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{ marginRight: 8 }}
+            />
+            <span style={{ margin: "0 4px" }}>to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -99,12 +120,12 @@ export const TransactionHistory = () => {
             <thead>
               <tr>
                 {[
-                  "Tx ID",
                   "Counterparty",
                   "Type",
                   "Date",
                   "Amount",
                   "Fee",
+                  "View Txn",
                   "Status",
                 ].map((h, i) => (
                   <th
@@ -126,17 +147,19 @@ export const TransactionHistory = () => {
                 const nonConvertValue =
                   txn.incomingAmount != null
                     ? {
-                      text: `+${txn.incomingAmount.toLocaleString()} ${txn.incomingAsset
+                        text: `+${txn.incomingAmount.toLocaleString()} ${
+                          txn.incomingAsset
                         }`,
-                      color: "#027a48",
-                    }
+                        color: "#027a48",
+                      }
                     : txn.outgoingAmount != null
-                      ? {
-                        text: `-${txn.outgoingAmount.toLocaleString()} ${txn.outgoingAsset
-                          }`,
+                    ? {
+                        text: `-${txn.outgoingAmount.toLocaleString()} ${
+                          txn.outgoingAsset
+                        }`,
                         color: "#b91c1c",
                       }
-                      : { text: "-", color: "#000" };
+                    : { text: "-", color: "#000" };
 
                 let statusStyle: React.CSSProperties = {
                   border: "none",
@@ -167,34 +190,14 @@ export const TransactionHistory = () => {
 
                 return (
                   <tr key={txn.id}>
-                    <td>
-                      {txn.transactionId.startsWith("0x") ? (
-                        <a
-                          href={`https://testnet.suivision.xyz/object/${txn.transactionId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: 'blue', textDecoration: 'underline' }}
-                        >
-                          {txn.transactionId.slice(0, 6)}...{txn.transactionId.slice(-4)}
-                        </a>
-                      ) : (
-                        <a
-                          href={`https://testnet.suivision.xyz/txblock/${txn.transactionId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: 'blue', textDecoration: 'underline' }}
-                        >
-                          {txn.transactionId.slice(0, 6)}...{txn.transactionId.slice(-4)}
-                        </a>
-                      )}
-                    </td>
-
                     <td>{txn.interactedWith}</td>
                     <td>{txn.type}</td>
                     <td>{formatDate(txn.date)}</td>
                     <td>
                       {isConvert ? (
-                        <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div
+                          style={{ display: "flex", flexDirection: "column" }}
+                        >
                           <span
                             style={{ marginBottom: "4px", color: "#027a48" }}
                           >
@@ -213,6 +216,28 @@ export const TransactionHistory = () => {
                       )}
                     </td>
                     <td style={{ textAlign: "center" }}>{txn.fees}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <a
+                        href={
+                          txn.transactionId.startsWith("0x")
+                            ? `https://testnet.suivision.xyz/object/${txn.transactionId}`
+                            : `https://testnet.suivision.xyz/txblock/${txn.transactionId}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: "#1976d2",
+                          textDecoration: "none",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 22,
+                        }}
+                        title="View on Sui Vision"
+                      >
+                        <LuCircleArrowOutUpRight />
+                      </a>
+                    </td>
                     <td style={{ textAlign: "center" }}>
                       <button style={statusStyle}>{txn.status}</button>
                     </td>

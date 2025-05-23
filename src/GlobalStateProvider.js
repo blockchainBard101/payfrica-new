@@ -179,6 +179,7 @@ export const GlobalStateProvider = ({ children }) => {
     <GlobalStateContext.Provider
       value={{
         overlayStates,
+        setOverlayStates,
         toggleOverlay,
         closeAllOverlays,
         depositData,

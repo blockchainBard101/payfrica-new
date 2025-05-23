@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export function ConvertOverlay() {
-  const { overlayStates, toggleOverlay, setOverlayState } = useGlobalState();
+  const { overlayStates, toggleOverlay, setOverlayStates } = useGlobalState();
   const { handleConvert, getBalance } = useTokenExchange();
   const { pools, poolMap } = usePools();
   const router = useRouter();
@@ -95,21 +95,21 @@ export function ConvertOverlay() {
       try {
         await handleConvert(sellSymbol, buySymbol, amt);
         // Hide all overlays first
-        setOverlayState({
+        setOverlayStates({
           convert: false,
           sending: false,
           success: false,
           failed: false,
         });
-        setOverlayState((prev) => ({ ...prev, success: true }));
+        // setOverlayStates((prev) => ({ ...prev, success: true }));
       } catch (e) {
-        setOverlayState({
+        setOverlayStates({
           convert: false,
           sending: false,
           success: false,
-          failed: false,
+          failed: true,
         });
-        setOverlayState((prev) => ({ ...prev, failed: true }));
+        // setOverlayStates((prev) => ({ ...prev, failed: true }));
       }
     }, 0);
   }, [
@@ -118,12 +118,12 @@ export function ConvertOverlay() {
     buySymbol,
     handleConvert,
     toggleOverlay,
-    setOverlayState,
+    setOverlayStates,
   ]);
 
   const handleHomeClick = () => {
     // Hide all overlays
-    setOverlayState({
+    setOverlayStates({
       convert: false,
       sending: false,
       success: false,
