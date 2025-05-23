@@ -242,7 +242,7 @@ export function useTokenExchange() {
     blobUrl: string,
   ) => {
     if (!address) throw new Error('No wallet');
-    const payfObj = await getObject(address, `${clientConfig.PACKAGE_ID}::temporary_card::PayficaTemporaryCards`);
+    const payfObj = await getObject(address, `${clientConfig.PACKAGE_ID}::payfrica::PayfricaUser`);
     if (payfObj === null) {
       throw new Error('Not Payfrica User');
     }
@@ -255,7 +255,7 @@ export function useTokenExchange() {
         tx.pure.address(card_address),
         tx.pure.string(name),
         tx.pure.u64(expiration_date),
-        tx.pure.vector('u8', Uint8Array.from(hp, c => c.charCodeAt(0))),
+        tx.pure.string(hp),
         tx.pure.string(s),
         tx.pure.string(blobId),
         tx.pure.address(blobObjectId),

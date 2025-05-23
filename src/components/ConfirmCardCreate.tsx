@@ -62,7 +62,7 @@ const ConfirmCardCreate = () => {
   const suiClient = useSuiClient();
   const client = new SealClient({
     suiClient,
-    serverObjectIds: getAllowlistedKeyServers("testnet").map((id) => [id, 0]),
+    serverObjectIds: getAllowlistedKeyServers("testnet"),
     verifyKeyServers: false,
   });
 
@@ -131,7 +131,7 @@ const ConfirmCardCreate = () => {
     }).then((response) => {
       if (response.status === 200) {
         return response.json().then((info) => {
-          
+
           return { info };
         });
       } else {
@@ -179,6 +179,7 @@ const ConfirmCardCreate = () => {
     }
     console.log("info", info);
     setInfo(info);
+    return info;
   };
 
   const sealEncryptAndUpload = async (phrase: string) => {
@@ -200,10 +201,10 @@ const ConfirmCardCreate = () => {
       console.log("Uploading to Walrus...");
 
       const storageInfo = await storeBlob(encryptedBytes);
-      displayUpload(storageInfo.info, "text");
       console.log("Successfully uploaded to Walrus!");
-      
+
       setIsUploading(false);
+      return displayUpload(storageInfo.info, "text");
     } catch (error) {
       console.error(error);
     } finally {
@@ -226,11 +227,21 @@ const ConfirmCardCreate = () => {
       }
 
       const data = await res.json();
-      await sealEncryptAndUpload(data.encrypted).then(async () => {
-        await handleCreateCard(data.publicKey, cardDetails.name, cardDetails.ex, data.hashed_password_str, data.pass_salt, info.blobId, info.suiRef, info.blobUrl ).then(() => {
-          
-        });
-      });
+      try {
+        const inf = await sealEncryptAndUpload(data.encrypted);
+        await handleCreateCard(
+          data.publicKey,
+          cardDetails.name,
+          cardDetails.ex,
+          data.hashed_password_str,
+          data.pass_salt,
+          inf.blobId,
+          inf.suiRef,
+          inf.blobUrl
+        );
+      } catch (error) {
+        console.error('Error:', error);
+      }
 
       console.log(data);
       console.log("Wallet Created:", data);
