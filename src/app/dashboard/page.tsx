@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import LogoLoader from "@/components/LogoLoader";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { AuthGuard } from "@/components/auth-guard";
 
 const Navigation = dynamic(
   () => import("@/components/Navigations").then((mod) => mod.Navigation),
@@ -179,58 +182,25 @@ const SendFundsFlowOverlay = dynamic(
 );
 
 // SWR fetcher
-const fetcher = (url: string) =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  });
+
+//fetch(url).then((res) => {
+//  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+//  return res.json();
+//});
 
 export default function Page() {
-  // Always call hooks at the top
-  const [showLoader, setShowLoader] = useState(true);
-  const Window = typeof window !== "undefined" ? globalThis.window : undefined;
-  const currentAccount = useCurrentAccount();
-
-  const { data: user, error } = useSWR(
-    currentAccount?.address
-      ? `${process.env.NEXT_PUBLIC_API_URL}/users/${currentAccount.address}/basic`
-      : null,
-    fetcher,
-    { revalidateOnFocus: false }
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (showLoader) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#fff",
-        }}
-      >
-        <LogoLoader />
-      </div>
-    );
-  }
-
-  // Redirect to login if not connected
-  if (!currentAccount && Window) {
-    Window.location.href = "/login";
-    return null;
-  }
-
-  // Determine loading state
-  const isLoading = !user && !error;
+  //const {
+  //  data: user,
+  //  error,
+  //  isLoading,
+  //} = useSWR(
+  //  `${process.env.NEXT_PUBLIC_API_URL}/users/${currentAccount.address}/basic`,
+  //  fetcher,
+  //  { revalidateOnFocus: false, isPaused: () => !!currentAccount }
+  //  );
 
   return (
-    <div className="min-h-screen w-full bg-background relative">
+    <AuthGuard className="min-h-screen w-full bg-background relative">
       {/* Dashboard widgets mount and start fetching balances immediately */}
       <Suspense fallback={null}>
         <Navigation />
@@ -272,22 +242,6 @@ export default function Page() {
         <ReceiveFundsFlowOverlay />
         <SendFundsFlowOverlay />
       </Suspense>
-
-      {/* Full-page loading spinner overlay */}
-      {isLoading && (
-        <div className="overlay-background">
-          <LogoLoader />
-        </div>
-      )}
-
-      {/* Full-page error message overlay */}
-      {error && (
-        <div className="overlay-background flex items-center justify-center">
-          <p className="text-red-600 bg-white p-4 rounded">
-            Error loading profile: {error.message}
-          </p>
-        </div>
-      )}
-    </div>
+    </AuthGuard>
   );
 }

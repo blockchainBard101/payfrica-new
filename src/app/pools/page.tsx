@@ -1,11 +1,12 @@
 "use client";
 import { Navigation } from "@/components/Navigations";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaCoins } from "react-icons/fa";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useTokenExchange } from "@/hooks/useTokenExchange";
 import { getUserSuppliedPools } from "@/hooks/suiRpc";
 import LogoLoader from "@/components/LogoLoader";
+import { AuthGuard } from "@/components/auth-guard";
 
 function formatNumber(num: number): string {
   if (num >= 1e9) return (num / 1e9).toFixed(1) + "b";
@@ -178,7 +179,7 @@ const PoolsPage = () => {
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
-    <div>
+    <AuthGuard>
       <Navigation />
       <div className="pools-page">
         <div className="pools-list-wrapper">
@@ -337,7 +338,7 @@ const PoolsPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </AuthGuard>
   );
 };
 

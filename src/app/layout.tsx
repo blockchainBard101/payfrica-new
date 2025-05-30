@@ -1,25 +1,18 @@
-"use client";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalStateProvider } from "@/GlobalStateProvider";
 import { ClientProvider } from "@/components/client-provider";
-import React, { useEffect, useState } from "react";
+import React, { Suspense } from "react";
 import LogoLoader from "@/components/LogoLoader";
+//import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [showLoader, setShowLoader] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(false), 1000); // 1s loader
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -29,13 +22,10 @@ export default function RootLayout({
         <title>Payfrica</title>
       </head>
       <body className="antialiased bg-background text-foreground">
+        {/*<Suspense fallback={<LogoLoader />}>*/}
         <ClientProvider>
           <GlobalStateProvider>
-            {showLoader ? (
-              <LogoLoader />
-            ) : (
-              <ProvidersAndLayout>{children}</ProvidersAndLayout>
-            )}
+            <ProvidersAndLayout>{children}</ProvidersAndLayout>
           </GlobalStateProvider>
 
           <ToastContainer
@@ -51,6 +41,7 @@ export default function RootLayout({
             theme="light"
           />
         </ClientProvider>
+        {/*</Suspense>*/}
       </body>
     </html>
   );
