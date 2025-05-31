@@ -27,8 +27,6 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     enabled: Boolean(currentAccount?.address),
   });
 
-  console.log({ isLoading, addr: currentAccount?.address });
-
   //If the component is still loading, show this loader
   if (isLoading) {
     return (

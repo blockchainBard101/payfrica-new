@@ -2,14 +2,18 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useConnectWallet, useWallets } from "@mysten/dapp-kit";
+import React, { useEffect, useState } from "react";
+import {
+  useConnectWallet,
+  useCurrentAccount,
+  useWallets,
+} from "@mysten/dapp-kit";
 import { isEnokiWallet, EnokiWallet, AuthProvider } from "@mysten/enoki";
 import { socialLogins } from "@/config/constants";
 
 function LoginPage() {
   const router = useRouter();
-  //const currentAccount = useCurrentAccount();
+  const currentAccount = useCurrentAccount();
   const { mutateAsync: connect } = useConnectWallet();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -18,6 +22,13 @@ function LoginPage() {
     (map, wallet) => map.set(wallet.provider, wallet),
     new Map<AuthProvider, EnokiWallet>()
   );
+
+  //If the user is already logged in redirect to the dashboard page
+  useEffect(() => {
+    if (currentAccount?.address) {
+      router.push("/dashboard");
+    }
+  }, [currentAccount?.address]);
 
   return (
     <div className="login-page-container flex">
@@ -56,6 +67,7 @@ function LoginPage() {
                     setIsLoading(true);
                     try {
                       await connect({ wallet });
+                      //await connect({ wallet });
                       router.push("/dashboard");
                     } catch (error) {
                       console.error("Login failed:", error);
