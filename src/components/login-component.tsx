@@ -13,8 +13,7 @@ import { socialLogins } from "@/config/constants";
 
 function LoginPage() {
   const router = useRouter();
-  const currentAccount = useCurrentAccount();
-  const { mutateAsync: connect } = useConnectWallet();
+  const { mutateAsync: connect, mutate, ...p } = useConnectWallet();
   const [isLoading, setIsLoading] = useState(false);
 
   const wallets = useWallets().filter(isEnokiWallet);
@@ -24,11 +23,11 @@ function LoginPage() {
   );
 
   //If the user is already logged in redirect to the dashboard page
-  useEffect(() => {
-    if (currentAccount?.address) {
-      router.push("/dashboard");
-    }
-  }, [currentAccount?.address]);
+  //useEffect(() => {
+  //  if (wallet) {
+  //    router.push("/dashboard");
+  //  }
+  //}, [wallet]);
 
   return (
     <div className="login-page-container flex">
@@ -66,9 +65,23 @@ function LoginPage() {
                     setIsLoading(true);
                     try {
                       const res = await connect({ wallet });
-                      console.log({ res });
+                      //
+                      //                      if (res?.accounts[0]) {
+                      //                        const newWallet = res?.accounts[0]?.address;
+                      //
+                      //                        setCurrentAccount(newWallet);
+                      //                        router.push("/dashboard");
+                      //                      }
                       //await connect({ wallet });
-                      router.push("/dashboard");
+
+                      mutate(
+                        { wallet },
+                        {
+                          onSuccess: (res) => {
+                            router.push("/dashboard");
+                          },
+                        }
+                      );
                     } catch (error) {
                       console.error("Login failed:", error);
                       // you may want to show an error toast here

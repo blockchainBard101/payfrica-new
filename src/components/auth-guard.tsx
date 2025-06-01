@@ -1,10 +1,11 @@
 "use client";
 
-import React, { FC, ReactNode } from "react";
+import React, { FC, ReactNode, useEffect } from "react";
 import LogoLoader from "./LogoLoader";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 //import { LoginPage } from "./login-component";
 
 const fetcher = async (addr?: string) => {
@@ -20,14 +21,15 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
   className,
 }) => {
   const currentAccount = useCurrentAccount();
+  const r = useRouter();
 
-  const { isLoading, error } = useQuery({
+  console.log({ currentAccountAddr: currentAccount?.address });
+
+  const { isLoading, error, data } = useQuery({
     queryKey: ["create-user", currentAccount?.address],
     queryFn: () => fetcher(currentAccount?.address),
     enabled: Boolean(currentAccount?.address),
   });
-
-  console.log({ currentAccount });
 
   //If the component is still loading, show this loader
   if (isLoading) {
@@ -48,6 +50,19 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
       </div>
     );
   }
+
+  console.log({ currentAccount });
+
+  //  useEffect(() => {
+  //    if (!currentAccount?.address) {
+  //      r.push("/login");
+  //      return;
+  //    }
+  //
+  //    if (error && !data) {
+  //      r.push("/login");
+  //    }
+  //  }, [currentAccount?.address, data, error, r]);
 
   return <div className={className}>{children}</div>;
 };

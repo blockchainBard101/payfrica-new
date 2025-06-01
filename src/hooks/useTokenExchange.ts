@@ -6,6 +6,8 @@ import clientConfig from "@/config/clientConfig";
 import { useCustomWallet } from "@/contexts/CustomWallet";
 import { getNsAddress } from "./registerNsName";
 import { getObject } from "./suiRpc";
+import { useCustomCurrentAccount } from "./useCustomCurrentAccount";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 export interface Pool {
   coinBalance: number;
@@ -54,7 +56,8 @@ const formatter = new Intl.NumberFormat("en-US", {
 
 /** On-chain token conversion and transfer hook */
 export function useTokenExchange() {
-  const { address, sponsorAndExecuteTransactionBlock } = useCustomWallet();
+  const { sponsorAndExecuteTransactionBlock } = useCustomWallet();
+  const { address } = useCurrentAccount();
   const { pools, poolMap } = usePools();
   const { details: userDetails } = useUserDetails(address);
 

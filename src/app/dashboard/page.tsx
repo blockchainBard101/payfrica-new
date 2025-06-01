@@ -5,7 +5,6 @@ import React, { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { useCurrentAccount } from "@mysten/dapp-kit";
 import LogoLoader from "@/components/LogoLoader";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";

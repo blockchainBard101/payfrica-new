@@ -52,7 +52,7 @@ const CARD_CONFIG = [
 ];
 
 export default React.memo(function BalanceCards() {
-  const { address } = useCurrentAccount() || {};
+  const { address } = useCurrentAccount();
   const userDetails = useUserDetails(address);
   const { fundingBalance, portfolioBalance } = useRealTimeBalances(address);
   const [visible, setVisible] = useState<boolean[]>(() =>

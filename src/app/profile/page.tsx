@@ -4,9 +4,10 @@ import React, { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
-import { useCurrentAccount } from "@mysten/dapp-kit";
 import { nameExists, createLeafSubname } from "@/hooks/registerNsName";
 import Loading from "@/components/Loading";
+import { useCustomCurrentAccount } from "@/hooks/useCustomCurrentAccount";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 // Dynamic imports
 const Navigation = dynamic(
@@ -37,8 +38,8 @@ function shortenAddress(addr: string): string {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const current = useCurrentAccount();
-  const address = current?.address;
+  const { address: wallet } = useCurrentAccount();
+  const address = wallet;
 
   const {
     data: user,

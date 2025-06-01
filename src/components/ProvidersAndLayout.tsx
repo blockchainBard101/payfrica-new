@@ -55,6 +55,7 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   );
 };
 
+//NO ISSUE
 function RegisterEnokiWallets() {
   const { client, network } = useSuiClientContext();
 

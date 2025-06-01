@@ -30,13 +30,13 @@ const formatDate = (iso: string) =>
   });
 
 export const TransactionHistory = () => {
-  const { address } = useCurrentAccount() || {};
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const { address } = useCurrentAccount();
 
   useEffect(() => {
     if (!address) return;
