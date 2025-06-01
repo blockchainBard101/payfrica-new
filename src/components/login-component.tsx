@@ -58,7 +58,6 @@ function LoginPage() {
           ) : (
             socialLogins.map(({ label, icon, provider }) => {
               const wallet = walletsByProvider.get(provider as AuthProvider);
-              if (!wallet) return null;
               return (
                 <button
                   key={label}
@@ -66,7 +65,8 @@ function LoginPage() {
                   onClick={async () => {
                     setIsLoading(true);
                     try {
-                      await connect({ wallet });
+                      const res = await connect({ wallet });
+                      console.log({ res });
                       //await connect({ wallet });
                       router.push("/dashboard");
                     } catch (error) {

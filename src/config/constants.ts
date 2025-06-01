@@ -14,11 +14,11 @@ const socialLogins = [
     icon: "/TwitchLogo.png",
     provider: "twitch",
   },
-  {
-    label: "Microsoft",
-    icon: "/MicrosoftLogo.png",
-    provider: "microsoft",
-  },
+  //{
+  //  label: "Microsoft",
+  //  icon: "/MicrosoftLogo.png",
+  //  provider: "microsoft",
+  //},
 ];
 
 export { socialLogins };
