@@ -57,7 +57,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 /** On-chain token conversion and transfer hook */
 export function useTokenExchange() {
   const { sponsorAndExecuteTransactionBlock } = useCustomWallet();
-  const { address } = useCurrentAccount();
+  const { address } = useCurrentAccount() || {};
   const { pools, poolMap } = usePools();
   const { details: userDetails } = useUserDetails(address);
 
