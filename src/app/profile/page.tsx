@@ -41,6 +41,10 @@ export default function ProfilePage() {
   const currentAccount = useCurrentAccount();
   const address = currentAccount?.address;
 
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingBank, setSavingBank] = useState(false);
+
+
   const {
     data: user,
     error,
@@ -110,34 +114,73 @@ export default function ProfilePage() {
 
   const saveProfile = useCallback(async () => {
     if (!address) return;
+
+    setSavingProfile(true);
+
+    const trimmedUsername = profileForm.username.trim();
+
+    if (
+      user?.username === trimmedUsername &&
+      user?.country?.name === profileForm.countryName &&
+      user?.language === profileForm.language
+    ) {
+      setEditingProfile(false);
+      setSavingProfile(false);
+      return;
+    }
+
+    if (!hasUsername && usernameAvailable) {
+      try {
+        await createLeafSubname(trimmedUsername, address);
+      } catch (err) {
+        console.error("Failed to create subname:", err);
+        alert("Error creating username. Try again.");
+        setSavingProfile(false);
+        return;
+      }
+    }
+
     const payload = {
-      username: user?.username || profileForm.username.trim(),
+      username: trimmedUsername || user?.username,
       countryName: profileForm.countryName,
       language: profileForm.language,
     };
-    console.log(profileForm.username.trim());
-    if (usernameAvailable) {
-      await createLeafSubname(profileForm.username.trim(), address);
+
+    try {
+      await fetch(`${API}/users/${address}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      await mutate(`${API}/users/${address}`);
+      setEditingProfile(false);
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Failed to save profile. Try again.");
     }
-    await fetch(`${API}/users/${address}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    await mutate(`${API}/users/${address}`);
-    setEditingProfile(false);
-  }, [address, profileForm, user, usernameAvailable]);
+
+    setSavingProfile(false);
+  }, [address, profileForm, user, usernameAvailable, hasUsername]);
+
 
   const saveBank = useCallback(async () => {
     if (!address) return;
-    await fetch(`${API}/users/${address}/account-details`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bankForm),
-    });
-    await mutate(`${API}/users/${address}`);
-    setEditingBank(false);
+    setSavingBank(true);
+    try {
+      await fetch(`${API}/users/${address}/account-details`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bankForm),
+      });
+      await mutate(`${API}/users/${address}`);
+      setEditingBank(false);
+    } catch (err) {
+      console.error("Failed to save bank info:", err);
+      alert("Could not save bank info.");
+    }
+    setSavingBank(false);
   }, [address, bankForm]);
+
 
   // loading / error states
   if (loading) {
@@ -204,7 +247,7 @@ export default function ProfilePage() {
               </label>
               {editingProfile && !hasUsername && (
                 <div>
-                  {profileForm.username.trim().length < 4 ? (
+                  {profileForm.username.trim().length < 3 ? (
                     <small>Please enter at least 3 characters</small>
                   ) : checkingUsername ? (
                     <small>Checking...</small>
@@ -245,11 +288,20 @@ export default function ProfilePage() {
                   type="button"
                   className="save-btn"
                   onClick={saveProfile}
-                  disabled={!usernameAvailable}
+                  disabled={hasUsername && !usernameAvailable || savingProfile}
                 >
-                  <FaSave /> Save Details
+                  {savingProfile ? (
+                    <>
+                      <span className="spinner" /> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FaSave /> Save Details
+                    </>
+                  )}
                 </button>
               )}
+
             </form>
           </section>
           <section className="column">
@@ -298,10 +350,24 @@ export default function ProfilePage() {
                   />
                 </label>
                 {editingBank && (
-                  <button type="button" className="save-btn" onClick={saveBank}>
-                    <FaSave /> Save Account
+                  <button
+                    type="button"
+                    className="save-btn"
+                    onClick={saveBank}
+                    disabled={savingBank}
+                  >
+                    {savingBank ? (
+                      <>
+                        <span className="spinner" /> Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FaSave /> Save Account
+                      </>
+                    )}
                   </button>
                 )}
+
               </form>
             )}
           </section>
