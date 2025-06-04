@@ -71,7 +71,7 @@ export default function CustomWalletProvider({
   const address = account?.address; 
 
 
-  console.log({ "custom wallet": address, isConnected: !!address });
+  // console.log({ "custom wallet": address, isConnected: !!address });
 
   const isConnected = !!address;
 

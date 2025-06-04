@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-//import { LoginPage } from "./login-component";
 
 const fetcher = async (addr?: string) => {
   const res = await axios.get(
@@ -21,9 +20,7 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
   className,
 }) => {
   const currentAccount = useCurrentAccount();
-  const r = useRouter();
-
-  console.log({ currentAccountAddr: currentAccount?.address });
+  const router = useRouter();
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["create-user", currentAccount?.address],
@@ -31,7 +28,19 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     enabled: Boolean(currentAccount?.address),
   });
 
-  //If the component is still loading, show this loader
+  // ✅ Move useEffect to the top (before any return statements)
+  useEffect(() => {
+    if (!currentAccount?.address) {
+      router.push("/login");
+      return;
+    }
+
+    if (error && !data) {
+      router.push("/login");
+    }
+  }, [currentAccount?.address, data, error, router]);
+
+  // ✅ These are now safe because useEffect was already called
   if (isLoading) {
     return (
       <div className="overlay-background">
@@ -40,7 +49,6 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     );
   }
 
-  //When there is an issue show this UI
   if (error) {
     return (
       <div className="overlay-background flex items-center justify-center">
@@ -50,19 +58,6 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
       </div>
     );
   }
-
-  console.log({ currentAccount });
-
-  //  useEffect(() => {
-  //    if (!currentAccount?.address) {
-  //      r.push("/login");
-  //      return;
-  //    }
-  //
-  //    if (error && !data) {
-  //      r.push("/login");
-  //    }
-  //  }, [currentAccount?.address, data, error, r]);
 
   return <div className={className}>{children}</div>;
 };

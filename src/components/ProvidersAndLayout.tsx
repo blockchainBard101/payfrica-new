@@ -109,12 +109,16 @@ export interface StorageAdapter {
 
 const sessionStorageAdapter: StorageAdapter = {
   async getItem(key: string) {
-    return sessionStorage.getItem(key);
+    const value = sessionStorage.getItem(key);
+    // console.log(`[PROD] Getting ${key}:`, value, 'Domain:', window.location.hostname);
+    return value;
   },
   async setItem(key: string, value: string) {
+    // console.log(`[PROD] Setting ${key}:`, value, 'Domain:', window.location.hostname);
     sessionStorage.setItem(key, value);
   },
   async removeItem(key: string) {
+    // console.log(`[PROD] Removing ${key}`, 'Domain:', window.location.hostname);
     sessionStorage.removeItem(key);
   },
 };
