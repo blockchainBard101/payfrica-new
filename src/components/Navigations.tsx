@@ -17,6 +17,7 @@ const navLinks = [
   { href: "/payfricacard", label: "Payfrica card", icon: <FaCreditCard /> },
   { href: "/pools", label: "Pools", icon: <FaUsers /> },
   { href: "/savings", label: "Savings circle", icon: <FaPiggyBank /> },
+  { href: "/profile", label: "Profile", icon: <RxAvatar /> },
 ];
 
 export const Navigation = () => {
