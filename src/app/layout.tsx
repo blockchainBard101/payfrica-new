@@ -3,7 +3,7 @@ import { ToastContainer } from "react-toastify";
 import { ProvidersAndLayout } from "../components/ProvidersAndLayout";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalStateProvider } from "@/GlobalStateProvider";
-import { ClientProvider } from "@/components/client-provider";
+// import { ClientProvider } from "@/components/client-provider";
 import React, { Suspense } from "react";
 import LogoLoader from "@/components/LogoLoader";
 //import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
@@ -23,7 +23,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-background text-foreground">
         {/*<Suspense fallback={<LogoLoader />}>*/}
-        <ClientProvider>
+        {/* <ClientProvider> */}
           <GlobalStateProvider>
             <ProvidersAndLayout>{children}</ProvidersAndLayout>
           </GlobalStateProvider>
@@ -40,7 +40,7 @@ export default function RootLayout({
             pauseOnHover
             theme="light"
           />
-        </ClientProvider>
+        {/* </ClientProvider> */}
         {/*</Suspense>*/}
       </body>
     </html>

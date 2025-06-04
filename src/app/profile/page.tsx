@@ -38,8 +38,8 @@ function shortenAddress(addr: string): string {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { address: wallet } = useCurrentAccount() || {};
-  const address = wallet;
+  const currentAccount = useCurrentAccount();
+  const address = currentAccount?.address;
 
   const {
     data: user,

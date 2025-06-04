@@ -55,7 +55,7 @@ export const CustomWalletContext = createContext<CustomWalletContextProps>({
   sponsorAndExecuteTransactionBlock: async () => {
     throw new Error("Not implemented");
   },
-  executeTransactionBlockWithoutSponsorship: async () => {},
+  executeTransactionBlockWithoutSponsorship: async () => { },
 });
 
 export const useCustomWallet = () => useContext(CustomWalletContext);
@@ -67,7 +67,9 @@ export default function CustomWalletProvider({
 }) {
   const suiClient = useSuiClient() as unknown as SuiClient;
   const { mutateAsync: signTransactionBlock } = useSignTransaction();
-  const { address } = useCurrentAccount() || {};
+  const account = useCurrentAccount();
+  const address = account?.address; 
+
 
   console.log({ "custom wallet": address, isConnected: !!address });
 

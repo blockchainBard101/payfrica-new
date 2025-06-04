@@ -57,7 +57,9 @@ const formatter = new Intl.NumberFormat("en-US", {
 /** On-chain token conversion and transfer hook */
 export function useTokenExchange() {
   const { sponsorAndExecuteTransactionBlock } = useCustomWallet();
-  const { address } = useCurrentAccount() || {};
+  const account = useCurrentAccount();
+  const address = account?.address;
+
   const { pools, poolMap } = usePools();
   const { details: userDetails } = useUserDetails(address);
 
@@ -515,9 +517,8 @@ export function useTokenExchange() {
     return {
       breakdown,
       totalUSD,
-      totalLocal: `${
-        userDetails?.country.currencySymbol ?? ""
-      }${formatter.format(totalLocal)}`,
+      totalLocal: `${userDetails?.country.currencySymbol ?? ""
+        }${formatter.format(totalLocal)}`,
     };
   }, [address, poolMap, userDetails, getBalance]);
 

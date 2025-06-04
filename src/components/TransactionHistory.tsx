@@ -36,7 +36,9 @@ export const TransactionHistory = () => {
   const [error, setError] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const { address } = useCurrentAccount();
+  const account = useCurrentAccount();
+  const address = account?.address;
+
 
   useEffect(() => {
     if (!address) return;
@@ -147,19 +149,17 @@ export const TransactionHistory = () => {
                 const nonConvertValue =
                   txn.incomingAmount != null
                     ? {
-                        text: `+${txn.incomingAmount.toLocaleString()} ${
-                          txn.incomingAsset
+                      text: `+${txn.incomingAmount.toLocaleString()} ${txn.incomingAsset
                         }`,
-                        color: "#027a48",
-                      }
+                      color: "#027a48",
+                    }
                     : txn.outgoingAmount != null
-                    ? {
-                        text: `-${txn.outgoingAmount.toLocaleString()} ${
-                          txn.outgoingAsset
-                        }`,
+                      ? {
+                        text: `-${txn.outgoingAmount.toLocaleString()} ${txn.outgoingAsset
+                          }`,
                         color: "#b91c1c",
                       }
-                    : { text: "-", color: "#000" };
+                      : { text: "-", color: "#000" };
 
                 let statusStyle: React.CSSProperties = {
                   border: "none",
