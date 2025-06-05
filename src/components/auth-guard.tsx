@@ -28,16 +28,16 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     enabled: Boolean(currentAccount?.address),
   });
 
-  useEffect(() => {
-    if (!currentAccount?.address) {
-      router.push("/login");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!currentAccount?.address) {
+  //     router.push("/login");
+  //     return;
+  //   }
 
-    if (error && !data) {
-      router.push("/login");
-    }
-  }, [currentAccount?.address, data, error, router]);
+  //   if (error && !data) {
+  //     router.push("/login");
+  //   }
+  // }, [currentAccount?.address, data, error, router]);
 
   if (isLoading) {
     return (

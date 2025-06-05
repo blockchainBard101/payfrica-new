@@ -9,7 +9,6 @@ import Loading from "@/components/Loading";
 import { useCustomCurrentAccount } from "@/hooks/useCustomCurrentAccount";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 
-// Dynamic imports
 const Navigation = dynamic(
   () => import("@/components/Navigations").then((m) => m.Navigation),
   { ssr: false }
