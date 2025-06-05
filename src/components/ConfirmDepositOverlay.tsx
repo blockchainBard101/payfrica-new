@@ -57,7 +57,7 @@ export default function ConfirmDepositOverlay() {
     enabled: Boolean(stripped && amount > 0),
   });
 
-  console.log({ isLoading, agent, error });
+  // console.log({ isLoading, agent, error });
 
   if (!overlayStates.confirmDeposit) return null;
 

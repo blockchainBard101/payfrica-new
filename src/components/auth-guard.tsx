@@ -28,7 +28,6 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     enabled: Boolean(currentAccount?.address),
   });
 
-  // ✅ Move useEffect to the top (before any return statements)
   useEffect(() => {
     if (!currentAccount?.address) {
       router.push("/login");
@@ -40,7 +39,6 @@ export const AuthGuard: FC<{ children: ReactNode; className?: string }> = ({
     }
   }, [currentAccount?.address, data, error, router]);
 
-  // ✅ These are now safe because useEffect was already called
   if (isLoading) {
     return (
       <div className="overlay-background">

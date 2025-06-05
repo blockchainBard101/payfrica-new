@@ -199,7 +199,8 @@ export default function Page() {
   //  );
 
   return (
-    <AuthGuard className="min-h-screen w-full bg-background relative">
+    // <AuthGuard className="min-h-screen w-full bg-background relative">
+    <>
       {/* Dashboard widgets mount and start fetching balances immediately */}
       <Suspense fallback={null}>
         <Navigation />
@@ -241,6 +242,7 @@ export default function Page() {
         <ReceiveFundsFlowOverlay />
         <SendFundsFlowOverlay />
       </Suspense>
-    </AuthGuard>
+    </>
+    // </AuthGuard>
   );
 }

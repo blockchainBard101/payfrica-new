@@ -23,7 +23,7 @@ export const EnterAmountOverlay = () => {
     () => pools.filter((p) => p.coinName !== "USDC"),
     [pools]
   );
-  const [currency, setCurrency] = useState(tokenOptions[0]?.coinType ?? "");
+  const [currency, setCurrency] = useState(tokenOptions[0]?.coinType ?? "NGNC");
 
   const [amount, setAmount] = useState("");
   const [balance, setBalance] = useState<string | null>(null);
@@ -174,22 +174,40 @@ export const EnterAmountOverlay = () => {
         {/* Amount & Token */}
         <div className="amount-entry">
           <h3>Amount & Token</h3>
-          <div className="amount-entry-container">
+          <div
+            className="amount-entry-container"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+              flexWrap: "wrap",
+            }}
+          >
             <input
               type="text"
               inputMode="decimal"
               placeholder="0.00"
               value={amount}
               onChange={(e) => {
-                // Only allow numbers and decimals
                 const val = e.target.value.replace(/[^0-9.]/g, "");
                 setAmount(val);
               }}
-              style={{ flex: 1, padding: 10 }}
+              style={{
+                flex: 1,
+                minWidth: "0", // ✅ important to allow shrinking
+                padding: 10,
+                fontSize: 16,
+              }}
             />
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
+              style={{
+                flexBasis: "40%",
+                minWidth: "120px", // ✅ prevent too-narrow on wrap
+                fontSize: 16,
+                padding: "10px",
+              }}
             >
               {tokenOptions.map((t) => (
                 <option key={t.coinType} value={t.coinType}>
@@ -198,12 +216,12 @@ export const EnterAmountOverlay = () => {
               ))}
             </select>
           </div>
+
           <div style={{ fontSize: 14, color: "#333" }}>
             {loadingBal
               ? "Loading balance…"
-              : `Balance: ${normalizedBalance} ${
-                  tokenOptions.find((t) => t.coinType === currency)?.coinName
-                }`}
+              : `Balance: ${normalizedBalance} ${tokenOptions.find((t) => t.coinType === currency)?.coinName
+              }`}
           </div>
           <div className="amount-entry-buttons">
             {["10", "50", "100"].map((v) => (
@@ -250,9 +268,8 @@ export const EnterAmountOverlay = () => {
         >
           {isSending
             ? "Sending…"
-            : `Send ${
-                tokenOptions.find((t) => t.coinType === currency)?.coinName
-              }`}
+            : `Send ${tokenOptions.find((t) => t.coinType === currency)?.coinName
+            }`}
         </button>
       </div>
     </div>

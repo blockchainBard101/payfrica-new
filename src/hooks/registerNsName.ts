@@ -11,7 +11,6 @@ export const createLeafSubname = async (name: string, targetAddress: string) => 
   const transaction = new Transaction();
   const suinsTransaction = new SuinsTransaction(suinsClient, transaction);
   const subname = name + "@payfrica"
-
   suinsTransaction.createLeafSubName({
     parentNft: parentNftId,
     name: subname,
@@ -31,8 +30,11 @@ export const createLeafSubname = async (name: string, targetAddress: string) => 
         showRawInput: false,
       }
     });
-  } catch {
-
+    // console.log("events")
+    return true
+  } catch (err: any){
+    console.error(err.message)
+    return false
   }
 }
 

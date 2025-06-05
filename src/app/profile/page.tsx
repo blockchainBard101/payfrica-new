@@ -87,13 +87,17 @@ export default function ProfilePage() {
 
   const shouldCheck =
     editingProfile && !hasUsername && profileForm.username.trim().length >= 3;
+  // console.log("shouldCheck:", shouldCheck, "username:", profileForm.username);
+
   const { data: exists, isValidating: checkingUsername } = useSWR(
     shouldCheck ? ["username", profileForm.username] : null,
-    (_, name) => nameExists(name)
+    ([_, name]) => {
+      return nameExists(name);
+    }
+
   );
   const usernameAvailable = exists === false;
-
-  // redirect in effect
+  // console.log(profileForm.username, exists);
   useEffect(() => {
     if (address === undefined) return;
     if (!address) router.push("/login");
@@ -128,10 +132,29 @@ export default function ProfilePage() {
       setSavingProfile(false);
       return;
     }
-
+    // console.log(hasUsername, usernameAvailable);
     if (!hasUsername && usernameAvailable) {
       try {
-        await createLeafSubname(trimmedUsername, address);
+        const success = await createLeafSubname(trimmedUsername, address);
+        if (success) {
+          try {
+            const payload = {
+              username: trimmedUsername || user?.username,
+              countryName: profileForm.countryName,
+              language: profileForm.language,
+            };
+            await fetch(`${API}/users/${address}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            await mutate(`${API}/users/${address}`);
+            setEditingProfile(false);
+          } catch (err) {
+            console.error("Save failed:", err);
+            alert("Failed to save profile. Try again.");
+          }
+        }
       } catch (err) {
         console.error("Failed to create subname:", err);
         alert("Error creating username. Try again.");
@@ -139,26 +162,6 @@ export default function ProfilePage() {
         return;
       }
     }
-
-    const payload = {
-      username: trimmedUsername || user?.username,
-      countryName: profileForm.countryName,
-      language: profileForm.language,
-    };
-
-    try {
-      await fetch(`${API}/users/${address}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      await mutate(`${API}/users/${address}`);
-      setEditingProfile(false);
-    } catch (err) {
-      console.error("Save failed:", err);
-      alert("Failed to save profile. Try again.");
-    }
-
     setSavingProfile(false);
   }, [address, profileForm, user, usernameAvailable, hasUsername]);
 

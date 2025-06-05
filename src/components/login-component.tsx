@@ -140,6 +140,7 @@ function LoginPage() {
 
   // ✅ If user is logged in, render the dashboard inline
   if (currentAccount) {
+    // console.log(currentAccount.address)
     return <Page />;
   }
 
