@@ -190,7 +190,12 @@ export const TransactionHistory = () => {
 
                 return (
                   <tr key={txn.id}>
-                    <td>{txn.interactedWith}</td>
+                    <td>
+                      {txn.interactedWith.startsWith("0x")
+                        ? `${txn.interactedWith.slice(0, 6)}...${txn.interactedWith.slice(-4)}`
+                        : txn.interactedWith}
+                    </td>
+
                     <td>{txn.type}</td>
                     <td>{formatDate(txn.date)}</td>
                     <td>
